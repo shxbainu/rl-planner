@@ -1,0 +1,77 @@
+/* STUDY HALL: the library after hours. Walnut-dark room, bone paper, brass lamp hardware.
+   Hairline rules instead of boxes, big italic serif numerals, lots of air. Dark, but warm, never neon. */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+html[data-skin="studyhall"]:root{
+  --bg:#151412; --surface:#1c1a17; --surface-2:#22201c; --fg:#ebe4d4; --muted:#9a9282; --line:#33302a;
+  --accent:#c4a061; --accent-fg:#151412; --accent-soft:#2c271d; --done:#6c665b;
+  --warn:#d7b36c; --warn-soft:#2c271d; --bad:#d9826f; --bad-soft:#2e1f1b;
+  --c-latin:#d2a85b; --c-eng:#8fb0cf; --c-msi:#93b98a; --c-fr:#b4a0d6; --c-fgc:#d99a6c; --c-arts:#d494b5; --c-glee:#86c1bd; --c-health:#b9c27c; --c-other:#9a9282;
+  --sans:"Lora",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,monospace; --head:"Instrument Serif",Georgia,serif;
+  color-scheme:dark;
+}
+html[data-skin="studyhall"] body{background:var(--bg);color:var(--fg)}
+html[data-skin="studyhall"] #theme-btn{display:none}
+
+html[data-skin="studyhall"] .bar{background:var(--bg);border-bottom:1px solid var(--line)}
+html[data-skin="studyhall"] .bar-date{font-family:var(--head);font-weight:400;font-size:26px;letter-spacing:.005em}
+html[data-skin="studyhall"] .bar-sub{font-style:italic}
+html[data-skin="studyhall"] .letter-pick select{border-radius:50%;background:transparent;color:var(--accent);border:1px solid var(--accent);font-family:var(--head);font-style:italic;font-weight:400;font-size:28px}
+html[data-skin="studyhall"] .bar-status span.pill{border-radius:0;background:transparent;border:0;font-style:italic}
+html[data-skin="studyhall"] .btn{border-radius:0;background:transparent;border:1px solid var(--line)}
+html[data-skin="studyhall"] .btn.primary{background:transparent;color:var(--accent);border-color:var(--accent)}
+html[data-skin="studyhall"] .btn.primary:hover{background:var(--accent);color:var(--accent-fg);filter:none}
+
+/* no boxes: hairlines and air */
+html[data-skin="studyhall"] .dash{gap:28px;padding:18px 28px}
+html[data-skin="studyhall"] .panel,html[data-skin="studyhall"] details.extra{background:transparent;border:0;border-top:1px solid var(--accent);border-radius:0;padding:14px 2px}
+html[data-skin="studyhall"] details.extra{border-top:1px solid var(--line);padding:0 2px}
+html[data-skin="studyhall"] .panel-h h2{font-family:var(--head);font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;font-size:26px}
+html[data-skin="studyhall"] .panel-h h2::before{display:none}
+html[data-skin="studyhall"] .x-name{font-family:var(--head);font-style:italic;font-weight:400;text-transform:none;letter-spacing:0;font-size:19px}
+html[data-skin="studyhall"] .panel-meta,html[data-skin="studyhall"] .x-tease{font-style:italic}
+
+/* schedule */
+html[data-skin="studyhall"] .now-card{background:transparent;border-radius:0;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+html[data-skin="studyhall"] .now-card .num{font-family:var(--head);font-style:italic;font-weight:400;font-size:54px;color:var(--accent);line-height:.9}
+html[data-skin="studyhall"] .now-card .lbl{font-family:var(--head);font-style:italic;font-size:20px;font-weight:400}
+html[data-skin="studyhall"] .prog{height:1px;background:var(--line)}
+html[data-skin="studyhall"] .prog i{background:var(--accent)}
+html[data-skin="studyhall"] .tl{gap:0}
+html[data-skin="studyhall"] .tl li{border-radius:0;border-bottom:1px solid var(--line);padding:9px 2px}
+html[data-skin="studyhall"] .tl .blk{background:transparent;color:var(--cc);border:1px solid var(--cc);border-radius:50%;font-family:var(--head);font-style:italic;font-size:15px}
+html[data-skin="studyhall"] .tl .cn{font-weight:500}
+html[data-skin="studyhall"] .tl li.now{background:var(--accent-soft)}
+html[data-skin="studyhall"] .tl li.lunch{background:transparent}
+
+/* calendar */
+html[data-skin="studyhall"] .cal{gap:0;border-top:1px solid var(--line)}
+html[data-skin="studyhall"] .cal .dow{font-family:var(--head);font-style:italic;text-transform:none;letter-spacing:0;font-size:14px;padding:6px 0}
+html[data-skin="studyhall"] .cell{border-radius:0;background:transparent;border:0;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+html[data-skin="studyhall"] .cell:nth-child(5n+5){border-right:0}
+html[data-skin="studyhall"] .cell .top b{font-family:var(--head);font-weight:400;font-size:20px}
+html[data-skin="studyhall"] .cell.today .top b{background:none;color:var(--accent);font-style:italic}
+html[data-skin="studyhall"] .cell.sel{box-shadow:inset 0 -2px 0 var(--accent);background:var(--surface)}
+html[data-skin="studyhall"] .chip2{border-radius:0;background:transparent;border-left:2px solid var(--cc)}
+html[data-skin="studyhall"] .chip2.major{color:var(--cc);background:transparent;font-style:italic}
+html[data-skin="studyhall"] .item{border-radius:0;background:transparent;border-left:0;border-bottom:1px solid var(--line)}
+html[data-skin="studyhall"] .item.major{background:transparent}
+html[data-skin="studyhall"] .check{border-radius:50%;border-width:1px;background:transparent}
+html[data-skin="studyhall"] .tag{background:transparent;color:var(--cc);border:1px solid var(--cc);border-radius:0;font-weight:500}
+html[data-skin="studyhall"] .title{font-weight:500}
+
+/* rotation + tests */
+html[data-skin="studyhall"] .rot td{border-radius:0;background:transparent;border-bottom:1px solid var(--cc);font-family:var(--head);font-style:italic;font-weight:400;font-size:14px}
+html[data-skin="studyhall"] .rot th.cur{background:transparent;color:var(--accent);border-bottom:1px solid var(--accent);border-radius:0}
+html[data-skin="studyhall"] .rot td.cur{outline:0;background:var(--accent-soft)}
+html[data-skin="studyhall"] .seg{border-radius:0;background:transparent;border:0}
+html[data-skin="studyhall"] .seg button{font-style:italic;border-radius:0}
+html[data-skin="studyhall"] .seg button[aria-pressed="true"]{background:transparent;color:var(--accent);box-shadow:inset 0 -1px 0 var(--accent)}
+html[data-skin="studyhall"] .big li{border-radius:0;background:transparent;border-left:0;border-bottom:1px solid var(--line)}
+html[data-skin="studyhall"] .big .d{font-family:var(--head);font-style:italic;font-size:28px;font-weight:400}
+
+/* quiet underline */
+html[data-skin="studyhall"] .news li a .hl{background:linear-gradient(var(--accent),var(--accent)) 0 100%/0 1px no-repeat;transition:background-size .35s}
+html[data-skin="studyhall"] .news li a:hover .hl{background-size:100% 1px}
+html[data-skin="studyhall"] .news li a:hover{background:transparent}
+html[data-skin="studyhall"] .sb li,html[data-skin="studyhall"] .team,html[data-skin="studyhall"] .counts li{border-radius:0;background:var(--surface)}

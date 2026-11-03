@@ -1020,6 +1020,16 @@
   };
   paintThemeBtn();
 
+  // ?theme=ledger|timetable|riso|studyhall loads a concept skin from themes/ (default look otherwise)
+  const skin = new URLSearchParams(location.search).get("theme");
+  if (skin && /^[a-z]{2,20}$/.test(skin)) {
+    const l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = `themes/${skin}.css`;
+    document.head.append(l);
+    document.documentElement.dataset.skin = skin;
+  }
+
   // ?font=Some+Family tries another Google font without editing the CSS
   const tryFont = new URLSearchParams(location.search).get("font");
   if (tryFont && /^[\w ]{2,40}$/.test(tryFont)) {

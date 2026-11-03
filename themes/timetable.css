@@ -1,0 +1,80 @@
+/* TIMETABLE: a Swiss station departure board. Off-white enamel, black type, signal yellow, one red.
+   Everything is a row with a time on the left; headers are black strips with condensed caps. */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;600;800&display=swap");
+
+html[data-skin="timetable"]:root{
+  --bg:#e9e7e1; --surface:#ffffff; --surface-2:#f3f2ee; --fg:#111111; --muted:#5d5d58; --line:#d4d2cb;
+  --accent:#111111; --accent-fg:#f5c400; --accent-soft:#fff3b8; --done:#9a9a94;
+  --warn:#111111; --warn-soft:#f5c400; --bad:#d8322b; --bad-soft:#fbe1df;
+  --c-latin:#d8322b; --c-eng:#1857c6; --c-msi:#0f8a4a; --c-fr:#6b3fc0; --c-fgc:#e0700f; --c-arts:#c2207e; --c-glee:#0b8a93; --c-health:#7a8a12; --c-other:#555;
+  --sans:"Archivo",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace; --sig:#f5c400;
+  color-scheme:light;
+}
+html[data-skin="timetable"] body{font-stretch:100%;font-size:14px}
+html[data-skin="timetable"] #theme-btn{display:none}
+
+/* top bar: the station clock strip */
+html[data-skin="timetable"] .bar{background:var(--fg);color:#fff;border:0}
+html[data-skin="timetable"] .bar-date{font-stretch:75%;font-weight:800;text-transform:uppercase;letter-spacing:.02em;font-size:20px}
+html[data-skin="timetable"] .bar-sub{color:#bdbdb6}
+html[data-skin="timetable"] .letter-pick select{border-radius:0;background:var(--sig);color:var(--fg);font-family:var(--mono);font-weight:800}
+html[data-skin="timetable"] .bar-status span.pill{border-radius:0;background:#222;border:0;color:#ddd;font-family:var(--mono);font-size:11.5px}
+html[data-skin="timetable"] .bar-status.stale span.pill{background:var(--sig);color:var(--fg)}
+html[data-skin="timetable"] .btn{border-radius:0;font-stretch:80%;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border:2px solid var(--fg)}
+html[data-skin="timetable"] .btn.primary{background:var(--sig);color:var(--fg);border-color:var(--sig)}
+
+/* panels: black header strip, hard edges */
+html[data-skin="timetable"] .panel,html[data-skin="timetable"] details.extra{border-radius:0;border:2px solid var(--fg);background:var(--surface);padding-top:0}
+html[data-skin="timetable"] .panel-h{background:var(--fg);color:var(--sig);margin:0 -14px 6px;padding:7px 14px}
+html[data-skin="timetable"] .panel-h h2{font-stretch:70%;font-weight:800;font-size:15px;letter-spacing:.06em}
+html[data-skin="timetable"] .panel-h h2::before{display:none}
+html[data-skin="timetable"] .panel-h .panel-meta{color:#cfcfc8;font-family:var(--mono);font-size:11px}
+html[data-skin="timetable"] .panel-h .icon-btn{background:#222;border-color:#444;color:#fff;border-radius:0}
+html[data-skin="timetable"] .panel-h .link{color:var(--sig)}
+html[data-skin="timetable"] .panel-h .seg{background:#222;border-color:#444;border-radius:0}
+html[data-skin="timetable"] .panel-h .seg button{color:#bbb;border-radius:0;font-family:var(--mono);font-size:11px;text-transform:uppercase}
+html[data-skin="timetable"] .panel-h .seg button[aria-pressed="true"]{background:var(--sig);color:var(--fg)}
+html[data-skin="timetable"] details.extra > summary{padding:10px 0}
+html[data-skin="timetable"] .x-name{font-stretch:70%;font-weight:800;letter-spacing:.06em}
+html[data-skin="timetable"] .x-tease{font-family:var(--mono);font-size:11.5px}
+
+/* schedule: departures */
+html[data-skin="timetable"] .now-card{border-radius:0;background:var(--sig);color:var(--fg)}
+html[data-skin="timetable"] .now-card .num{font-family:var(--mono);font-weight:800;font-size:38px;color:var(--fg);letter-spacing:-.03em}
+html[data-skin="timetable"] .now-card .lbl{font-stretch:80%;font-weight:700;text-transform:uppercase}
+html[data-skin="timetable"] .now-card .sub{color:#333}
+html[data-skin="timetable"] .prog{border-radius:0;background:rgb(0 0 0 / .15)}
+html[data-skin="timetable"] .prog i{background:var(--fg);border-radius:0}
+html[data-skin="timetable"] .tl{gap:0}
+html[data-skin="timetable"] .tl li{border-radius:0;border-bottom:1px solid var(--line);grid-template-columns:30px 1fr auto;padding:8px 4px}
+html[data-skin="timetable"] .tl .blk{border-radius:0;font-family:var(--mono);font-weight:800}
+html[data-skin="timetable"] .tl .cn{font-stretch:85%;font-weight:700;text-transform:uppercase;letter-spacing:.01em;font-size:14.5px}
+html[data-skin="timetable"] .tl .tm{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--fg)}
+html[data-skin="timetable"] .tl li.now{background:var(--fg);color:#fff}
+html[data-skin="timetable"] .tl li.now .tm{color:var(--sig)}
+html[data-skin="timetable"] .tl li.now .who{color:#bbb}
+html[data-skin="timetable"] .tl li.lunch{background:repeating-linear-gradient(-45deg,var(--surface-2) 0 6px,var(--surface) 6px 12px)}
+
+/* calendar: a printed week board */
+html[data-skin="timetable"] .cal{gap:2px}
+html[data-skin="timetable"] .cal .dow{font-family:var(--mono);font-weight:600;color:var(--fg)}
+html[data-skin="timetable"] .cell{border-radius:0;background:var(--surface-2);border:0;border-top:3px solid var(--fg)}
+html[data-skin="timetable"] .cell.today{background:var(--accent-soft);border-top-color:var(--sig)}
+html[data-skin="timetable"] .cell.today .top b{background:var(--fg);color:var(--sig);border-radius:0;font-family:var(--mono)}
+html[data-skin="timetable"] .cell.sel{box-shadow:inset 0 0 0 2px var(--fg)}
+html[data-skin="timetable"] .cell .top b{font-family:var(--mono);font-weight:800}
+html[data-skin="timetable"] .chip2{border-radius:0;background:var(--surface);border-left:4px solid var(--cc);font-stretch:85%}
+html[data-skin="timetable"] .chip2.major{background:var(--cc);color:#fff;font-weight:700}
+html[data-skin="timetable"] .item{border-radius:0;background:var(--surface-2);border-left-width:5px}
+html[data-skin="timetable"] .check{border-radius:0}
+html[data-skin="timetable"] .tag{border-radius:0;font-family:var(--mono)}
+html[data-skin="timetable"] .title{font-weight:600}
+
+/* rotation + tests */
+html[data-skin="timetable"] .rot td{border-radius:0;background:var(--surface-2);color:var(--fg);font-family:var(--mono);font-weight:600;box-shadow:inset 0 3px 0 var(--cc)}
+html[data-skin="timetable"] .rot th.cur{border-radius:0;background:var(--sig);color:var(--fg)}
+html[data-skin="timetable"] .rot td.cur{outline:2px solid var(--fg)}
+html[data-skin="timetable"] .big li{border-radius:0;background:var(--surface-2);border-left-width:5px}
+html[data-skin="timetable"] .big .d{font-family:var(--mono);font-weight:800;color:var(--fg)}
+html[data-skin="timetable"] .sb li,html[data-skin="timetable"] .team,html[data-skin="timetable"] .counts li{border-radius:0}
+html[data-skin="timetable"] .sb .row .sc,html[data-skin="timetable"] .score{font-weight:800}

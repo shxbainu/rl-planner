@@ -1,0 +1,70 @@
+/* RISO: a two-ink risograph zine. Cream stock, federal blue + fluorescent pink, a little misregistration.
+   Flat ink only: hard offset "second pass" shadows, a halftone dot field, chunky borders. No soft gradients. */
+@import url("https://fonts.googleapis.com/css2?family=Young+Serif&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+
+html[data-skin="riso"]:root{
+  --bg:#f5efe3; --surface:#fbf7ee; --surface-2:#f1e9da; --fg:#1d2a5c; --muted:#5a6087; --line:#d8cdb8;
+  --accent:#e8418c; --accent-fg:#fbf7ee; --accent-soft:#fbd9e8; --done:#9b9cb2;
+  --warn:#1d2a5c; --warn-soft:#fde6a8; --bad:#e8418c; --bad-soft:#fbd9e8;
+  --blue:#2f4fa2; --pink:#e8418c; --yellow:#f2c14e;
+  --c-latin:#2f4fa2; --c-eng:#e8418c; --c-msi:#2f8f6b; --c-fr:#6d4bbf; --c-fgc:#e0782e; --c-arts:#e8418c; --c-glee:#2f4fa2; --c-health:#2f8f6b; --c-other:#5a6087;
+  --sans:"Work Sans",system-ui,sans-serif; --mono:"Space Mono",ui-monospace,monospace; --head:"Young Serif",Georgia,serif;
+  color-scheme:light;
+}
+html[data-skin="riso"] body{background-color:var(--bg);
+  background-image:radial-gradient(color-mix(in srgb,var(--pink) 18%,transparent) 1px,transparent 1.4px);background-size:7px 7px;color:var(--fg)}
+html[data-skin="riso"] #theme-btn{display:none}
+
+/* masthead */
+html[data-skin="riso"] .bar{background:var(--surface);border-bottom:3px solid var(--blue)}
+html[data-skin="riso"] .bar-date{font-family:var(--head);font-size:22px;font-weight:400;color:var(--blue);text-shadow:2px 1px 0 color-mix(in srgb,var(--pink) 55%,transparent)}
+html[data-skin="riso"] .letter-pick select{border-radius:0;background:var(--pink);color:var(--surface);font-family:var(--head);box-shadow:4px 4px 0 var(--blue)}
+html[data-skin="riso"] .bar-status span.pill{border-radius:0;background:var(--yellow);border:0;color:var(--fg);font-family:var(--mono);font-size:11px}
+html[data-skin="riso"] .btn{border-radius:0;border:2px solid var(--blue);color:var(--blue);font-weight:700}
+html[data-skin="riso"] .btn.primary{background:var(--blue);color:var(--surface);box-shadow:3px 3px 0 var(--pink)}
+
+/* panels: printed boxes with a pink second pass */
+html[data-skin="riso"] .panel,html[data-skin="riso"] details.extra{border-radius:0;border:2px solid var(--blue);background:var(--surface);box-shadow:5px 5px 0 color-mix(in srgb,var(--pink) 70%,transparent)}
+html[data-skin="riso"] .panel-h h2,html[data-skin="riso"] .x-name{font-family:var(--head);font-weight:400;text-transform:none;letter-spacing:0;font-size:20px;color:var(--blue)}
+html[data-skin="riso"] .x-name{font-size:16px}
+html[data-skin="riso"] .panel-h h2::before{width:12px;height:12px;border-radius:50%;background:var(--pink)}
+html[data-skin="riso"] .panel-meta,html[data-skin="riso"] .x-tease{font-family:var(--mono);font-size:11px}
+
+/* schedule */
+html[data-skin="riso"] .now-card{border-radius:0;background:var(--pink);color:var(--surface)}
+html[data-skin="riso"] .now-card .num{font-family:var(--head);font-weight:400;font-size:40px;color:var(--surface);text-shadow:3px 2px 0 var(--blue)}
+html[data-skin="riso"] .now-card .sub{color:color-mix(in srgb,var(--surface) 85%,transparent)}
+html[data-skin="riso"] .now-card .sub b{color:var(--surface)}
+html[data-skin="riso"] .prog{border-radius:0;background:color-mix(in srgb,var(--surface) 35%,transparent)}
+html[data-skin="riso"] .prog i{background:var(--blue);border-radius:0}
+html[data-skin="riso"] .tl li{border-radius:0}
+html[data-skin="riso"] .tl .blk{border-radius:0;font-family:var(--mono);box-shadow:2px 2px 0 var(--fg)}
+html[data-skin="riso"] .tl .cn{font-weight:600}
+html[data-skin="riso"] .tl .tm{font-family:var(--mono)}
+html[data-skin="riso"] .tl li.now{background:var(--accent-soft)}
+html[data-skin="riso"] .tl li.lunch{background:var(--warn-soft)}
+
+/* calendar */
+html[data-skin="riso"] .cell{border-radius:0;background:var(--surface-2);border:1.5px solid color-mix(in srgb,var(--blue) 30%,transparent)}
+html[data-skin="riso"] .cell.today{background:var(--warn-soft);border-color:var(--blue)}
+html[data-skin="riso"] .cell.today .top b{background:var(--blue);color:var(--surface);border-radius:0}
+html[data-skin="riso"] .cell.sel{box-shadow:3px 3px 0 var(--pink);border-color:var(--blue)}
+html[data-skin="riso"] .cell .top b{font-family:var(--head);font-weight:400;font-size:16px;color:var(--blue)}
+html[data-skin="riso"] .cal .dow{font-family:var(--mono);color:var(--blue)}
+html[data-skin="riso"] .chip2{border-radius:0;background:var(--surface);border-left:0;box-shadow:inset 3px 0 0 var(--cc)}
+html[data-skin="riso"] .chip2.major{background:var(--cc);color:var(--surface)}
+html[data-skin="riso"] .item{border-radius:0;background:var(--surface-2)}
+html[data-skin="riso"] .check{border-radius:0;border-color:var(--blue)}
+html[data-skin="riso"] .tag{border-radius:0;font-family:var(--mono);background:var(--pink)}
+html[data-skin="riso"] .title{font-weight:600}
+
+/* rotation + tests */
+html[data-skin="riso"] .rot td{border-radius:0;font-family:var(--mono);font-weight:700;background:color-mix(in srgb,var(--cc) 16%,transparent)}
+html[data-skin="riso"] .rot th.cur{border-radius:0;background:var(--pink);color:var(--surface)}
+html[data-skin="riso"] .rot td.cur{outline:2px solid var(--blue)}
+html[data-skin="riso"] .seg{border-radius:0;border:2px solid var(--blue);background:var(--surface)}
+html[data-skin="riso"] .seg button{border-radius:0;font-family:var(--mono)}
+html[data-skin="riso"] .seg button[aria-pressed="true"]{background:var(--blue);color:var(--surface);box-shadow:none}
+html[data-skin="riso"] .big li{border-radius:0;background:var(--surface-2)}
+html[data-skin="riso"] .big .d{font-family:var(--head);font-weight:400;font-size:22px}
+html[data-skin="riso"] .sb li,html[data-skin="riso"] .team,html[data-skin="riso"] .counts li{border-radius:0}

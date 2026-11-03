@@ -1,0 +1,74 @@
+/* LEDGER: the school register, 1645 onward. Warm rag paper, iron-gall ink, oxblood seal, faded-blue ruling.
+   Panels are ruled pages, not cards: no rounded corners, no shadows, double rules under headings. */
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+html[data-skin="ledger"]:root{
+  --bg:#efe8d8; --surface:#f6f1e4; --surface-2:#ebe3d0; --fg:#1f1a14; --muted:#6a5f50; --line:#cdbfa3;
+  --accent:#7b1e1e; --accent-fg:#f6f1e4; --accent-soft:#ead8cc; --done:#a39782;
+  --warn:#8a5a12; --warn-soft:#efe0bf; --bad:#9b1c1c; --bad-soft:#f1d9cf;
+  --c-latin:#7b1e1e; --c-eng:#24476b; --c-msi:#3c5a2a; --c-fr:#4b3769; --c-fgc:#8a4b14; --c-arts:#7a3157; --c-glee:#2d5d60; --c-health:#5c6324; --c-other:#5b5548;
+  --sans:"Source Serif 4",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,monospace; --head:"Newsreader",Georgia,serif;
+  --rule:#b9cbd8; color-scheme:light;
+}
+html[data-skin="ledger"] body{background:var(--bg);font-size:14.5px}
+html[data-skin="ledger"] #theme-btn{display:none}
+
+/* top bar: a masthead with a double rule */
+html[data-skin="ledger"] .bar{background:var(--bg);border-bottom:3px double var(--fg)}
+html[data-skin="ledger"] .bar-date{font-family:var(--head);font-size:21px;font-weight:600;letter-spacing:-.01em}
+html[data-skin="ledger"] .bar-sub{font-family:var(--head);font-style:italic}
+html[data-skin="ledger"] .letter-pick select{border-radius:50%;font-family:var(--head);font-style:italic;font-weight:600;background:var(--accent);box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--accent)}
+html[data-skin="ledger"] .bar-status span.pill{border-radius:0;background:transparent;border:0;border-bottom:1px solid var(--line);font-style:italic}
+html[data-skin="ledger"] .btn{border-radius:0;font-family:var(--head);letter-spacing:.02em}
+html[data-skin="ledger"] .btn.primary{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+
+/* panels are pages */
+html[data-skin="ledger"] .panel,html[data-skin="ledger"] details.extra{border-radius:0;border:1px solid var(--fg);background:var(--surface);box-shadow:none}
+html[data-skin="ledger"] .panel-h{border-bottom:3px double var(--fg);padding-bottom:6px;margin-bottom:4px}
+html[data-skin="ledger"] .panel-h h2,html[data-skin="ledger"] .x-name{font-family:var(--head);font-variant:small-caps;text-transform:lowercase;letter-spacing:.12em;font-size:16px;font-weight:600}
+html[data-skin="ledger"] .panel-h h2::before{display:none}
+html[data-skin="ledger"] .panel-meta,html[data-skin="ledger"] .x-tease{font-style:italic}
+
+/* homework: ruled paper with a red margin */
+html[data-skin="ledger"] .p-hw{background:
+  linear-gradient(90deg,transparent 30px,#c9706a 30px,#c9706a 31px,transparent 31px),
+  repeating-linear-gradient(var(--surface) 0 25px,var(--rule) 25px 26px);padding-left:40px}
+html[data-skin="ledger"] .cal{gap:0;border-top:1px solid var(--fg);border-left:1px solid var(--fg)}
+html[data-skin="ledger"] .cal .dow{border-right:1px solid var(--fg);border-bottom:1px solid var(--fg);padding:3px 0;font-variant:small-caps;text-transform:lowercase;font-family:var(--head);letter-spacing:.1em;font-size:13px;background:var(--surface)}
+html[data-skin="ledger"] .cell{border-radius:0;background:var(--surface);border:0;border-right:1px solid var(--fg);border-bottom:1px solid var(--fg)}
+html[data-skin="ledger"] .cell.sel{box-shadow:inset 0 0 0 2px var(--accent)}
+html[data-skin="ledger"] .cell.today .top b{background:none;color:var(--accent);border:1.5px solid var(--accent);border-radius:50%;padding:0 5px;font-family:var(--head);font-style:italic}
+html[data-skin="ledger"] .cell .top b{font-family:var(--head);font-size:15px}
+html[data-skin="ledger"] .chip2{background:transparent;border-left:0;border-bottom:1.5px solid var(--cc);border-radius:0;padding:1px 0;font-family:var(--head);font-size:12px}
+html[data-skin="ledger"] .chip2.major{font-weight:600;font-style:italic;background:transparent;color:var(--cc)}
+html[data-skin="ledger"] .item{border-radius:0;background:transparent;border-left:0;border-bottom:1px solid var(--line);padding-left:2px}
+html[data-skin="ledger"] .item.major{background:transparent}
+html[data-skin="ledger"] .check{border-radius:0;border-width:1.5px;border-color:var(--fg)}
+html[data-skin="ledger"] .check:checked{background:var(--fg)}
+html[data-skin="ledger"] .tag{background:transparent;color:var(--cc);border:1px solid var(--cc);border-radius:0;font-family:var(--head);letter-spacing:.08em}
+html[data-skin="ledger"] .title{font-family:var(--head);font-size:15px}
+
+/* schedule: an entry in the register */
+html[data-skin="ledger"] .now-card{border-radius:0;background:transparent;border:1.5px solid var(--accent);position:relative}
+html[data-skin="ledger"] .now-card .num{font-family:var(--head);font-style:italic;font-size:36px;color:var(--accent)}
+html[data-skin="ledger"] .now-card .lbl{font-family:var(--head);font-style:italic}
+html[data-skin="ledger"] .prog{border-radius:0;height:3px}
+html[data-skin="ledger"] .tl li{border-radius:0;border-bottom:1px dotted var(--line)}
+html[data-skin="ledger"] .tl li.now{background:transparent;box-shadow:inset 3px 0 0 var(--accent)}
+html[data-skin="ledger"] .tl .blk{border-radius:50%;font-family:var(--head);font-style:italic}
+html[data-skin="ledger"] .tl .cn{font-family:var(--head);font-size:15.5px}
+html[data-skin="ledger"] .big li{border-radius:0;background:transparent;border-left:0;border-bottom:1px solid var(--line)}
+html[data-skin="ledger"] .big .d{font-family:var(--head);font-style:italic;font-size:22px}
+
+/* rotation: a printed timetable */
+html[data-skin="ledger"] .rot td{border-radius:0;background:transparent;border-bottom:1.5px solid var(--cc);font-family:var(--head);font-weight:600}
+html[data-skin="ledger"] .rot th.cur{background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:0}
+html[data-skin="ledger"] .rot td.cur{outline:0;background:var(--accent-soft)}
+html[data-skin="ledger"] .seg{border-radius:0;background:transparent}
+html[data-skin="ledger"] .seg button{border-radius:0;font-family:var(--head);font-style:italic}
+html[data-skin="ledger"] .seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);box-shadow:none}
+
+/* quiet link underline that draws in on hover */
+html[data-skin="ledger"] .news li a .hl{background:linear-gradient(var(--accent),var(--accent)) 0 100%/0 1px no-repeat;transition:background-size .3s}
+html[data-skin="ledger"] .news li a:hover .hl{background-size:100% 1px}
+html[data-skin="ledger"] .news li a:hover{background:transparent}

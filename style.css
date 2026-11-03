@@ -91,7 +91,7 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 }
 /* tests & quizzes */
 .big{list-style:none;margin:0;padding:0;display:grid;gap:4px}
-.big li{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--cc)}
+.big li{display:grid;grid-template-columns:minmax(44px,auto) 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--cc)}
 .big .d{text-align:center;font-weight:700;font-size:18px;line-height:1;color:var(--cc)}
 .big .d small{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
 .big .w{min-width:0;line-height:1.3}

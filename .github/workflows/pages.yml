@@ -38,6 +38,7 @@ jobs:
         run: |
           mkdir _site
           cp index.html style.css app.js schedule.json homework.json fantasy.json news.json _site/
+          cp -r themes _site/themes
           # version the asset links so browsers don't keep a stale script after a deploy
           v="${GITHUB_SHA::7}"
           sed -i "s#href=\"style.css\"#href=\"style.css?v=$v\"#; s#src=\"app.js\"#src=\"app.js?v=$v\"#" _site/index.html
