@@ -578,6 +578,7 @@
   // ---------- opening a box scrolls just enough to show all of it (or its top, if it's taller than the space) ----------
   document.querySelectorAll("details.extra").forEach((d) => d.addEventListener("toggle", () => {
     if (!d.open) return;
+    wake(d);
     {
       let sc = d.parentElement;
       while (sc && sc !== document.body && !(/(auto|scroll)/.test(getComputedStyle(sc).overflowY) && sc.scrollHeight > sc.clientHeight)) sc = sc.parentElement;
@@ -601,6 +602,7 @@
     xdlg.dataset.x = xHome.dataset.x;
     $("#x-dlg-body").append(xHome.querySelector(".x-body"));
     xdlg.showModal();
+    wake($("#x-dlg-body"));
     $("#x-dlg-body").scrollTop = 0;
   });
   xdlg.addEventListener("close", () => { if (xHome) xHome.append($("#x-dlg-body .x-body")); xHome = null; });
@@ -897,6 +899,10 @@
       <span class="pic" data-i="${esc(initials(x.chip))}">${x.img ? `<img src="${esc(x.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}</span>
       <span class="txt"><span class="hl">${esc(x.title)}</span>${x.summary ? `<span class="sum">${esc(x.summary)}</span>` : ""}<span class="meta"><span class="chip-src">${esc(x.chip)}</span>${x.when ? `<span class="ago">${ago(x.when)} ago</span>` : ""}</span></span>
     </a></li>`;
+  // a lazy picture inside a box that starts closed doesn't always load once it opens (Safari), so load them when it's open
+  const wake = (el) => { if (el.closest("details[open], dialog[open]")) el.querySelectorAll('img[loading="lazy"]').forEach((im) => { im.loading = "eager"; }); };
+  // ESPN photos come full-size (up to 2 MB); its resizer serves a small copy
+  const espnImg = (u, w) => { const m = /^https:\/\/a\.espncdn\.com(\/photo\/[^?#]+)$/.exec(u || ""); return m ? `https://a.espncdn.com/combiner/i?img=${m[1]}&w=${w}` : u; };
   function renderNews() {
     const secs = news?.sections ? Object.keys(news.sections) : [];
     if (!secs.length) {
@@ -909,6 +915,7 @@
     $("#news-tabs").innerHTML = secs.map((k) => `<button type="button" data-news="${esc(k)}" aria-pressed="${k === newsTab}" style="${tintOf(SECTION_C[k] || "other")}">${esc(k[0].toUpperCase() + k.slice(1))}</button>`).join("");
     $("#news").innerHTML = news.sections[newsTab].slice(0, 25).map((n, i) =>
       story({ link: n.link, title: n.title, summary: n.summary, chip: n.source, img: n.image, when: n.published }, i === 0)).join("");
+    wake($("#news"));
     tease("t-news", esc(news.sections[newsTab][0]?.title || ""));
     $("#news-foot").textContent = news.updated_at ? `Updated ${ago(news.updated_at)} ago · ${[...new Set(news.sections[newsTab].map((n) => n.source))].join(", ")}` : "";
   }
@@ -929,8 +936,9 @@
     tease("t-snews", esc(all[0]?.headline || ""));
     const teamOf = (a) => (schedule.teams || []).find((t) => a.headline.toLowerCase().includes(t.name.toLowerCase()))?.name;
     $("#snews").innerHTML = all.length ? all.slice(0, 20).map((a, i) =>
-      story({ link: a.links.web.href, title: a.headline, summary: a.description, chip: teamOf(a) || a.lg.toUpperCase(), img: a.images?.[0]?.url, when: a.published }, i === 0)).join("")
+      story({ link: a.links.web.href, title: a.headline, summary: a.description, chip: teamOf(a) || a.lg.toUpperCase(), img: espnImg(a.images?.[0]?.url, i === 0 ? 800 : 400), when: a.published }, i === 0)).join("")
       : `<li class="empty-state">Sports news unavailable right now.</li>`;
+    wake($("#snews"));
   }
 
   // ---------- tests & quizzes (from homework) ----------
