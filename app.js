@@ -111,6 +111,22 @@
   const cls = (name) => schedule.classes[name] || schedule.classes.Other;
   const cc = (name) => `--cc:var(--c-${cls(name).color})`;
 
+  // Next time a class meets, walking the day letters forward. "?" when a guessed or unknown letter is in the way.
+  function nextMeeting(name) {
+    const t = today(), mins = now().getHours() * 60 + now().getMinutes();
+    let d = t, unsure = false;
+    for (let i = 0; i < 21; i++, d = addDays(d, 1)) {
+      if (isWeekend(d)) continue;
+      const { letter, from } = letterFor(d);
+      if (!letter) { unsure = true; continue; }
+      if (from === "guess") unsure = true;
+      const p = schedule.rotations[letter]?.periods.find((x) => x[1] === name);
+      if (!p || (d === t && mins >= minutes(p[0]))) continue;
+      return { date: d, time: p[0], unsure };
+    }
+    return null;
+  }
+
   function itemHTML(it, { showDue = false, overdue = false } = {}) {
     const done = isDone(it);
     const major = MAJOR.has(it.type);
@@ -121,11 +137,13 @@
       showDue ? `<span>due ${esc(relDay(it.due))}</span>` : "",
       it.manual ? `<span class="mine">yours</span>` : "",
     ].filter(Boolean).join("");
+    const nm = !done && nextMeeting(it.class);
+    const next = nm ? `<span class="next" title="${nm.unsure ? "Based on a guessed day letter" : ""}">next class ${esc(/^(Today|Tomorrow)$/.test(relDay(nm.date)) ? relDay(nm.date).toLowerCase() : relDay(nm.date))} ${esc(nm.time)}${nm.unsure ? "?" : ""}</span>` : "";
     return `<li class="item${done ? " done" : ""}${major && !done ? " major" : ""}${overdue ? " overdue" : ""}" style="${cc(it.class)}" data-id="${esc(it.id)}">
       <input type="checkbox" class="check" ${done ? "checked" : ""} aria-label="Done: ${esc(it.title)}">
       <div class="body">
         <span class="title">${esc(it.title)}</span>
-        <span class="meta">${meta}</span>
+        <span class="meta">${meta}${next}</span>
         ${it.details ? `<span class="det">${esc(it.details)}</span>` : ""}
       </div>
       ${it.manual ? `<button class="edit" type="button" data-edit="${esc(it.id)}">Edit</button>` : "<span></span>"}
@@ -141,7 +159,7 @@
 
     $("#bar-date").textContent = day === t
       ? fmt(t, { weekday: "long", month: "long", day: "numeric" })
-      : `Next up: ${fmt(day, { weekday: "long", month: "short", day: "numeric" })}`;
+      : `Next up: ${fmt(day, { weekday: "short", month: "short", day: "numeric" })}`;
     const rot = letter && schedule.rotations[letter];
     const sub = [];
     if (!letter) sub.push("Tap ? to set the day letter");

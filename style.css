@@ -39,7 +39,8 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .bar-day{display:flex;align-items:center;gap:12px;min-width:0}
 .letter-pick select{appearance:none;-webkit-appearance:none;font-weight:700;font-size:22px;line-height:1;width:44px;height:44px;text-align:center;text-align-last:center;
   border-radius:10px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;padding:0;font-family:var(--sans)}
-.bar-date{font-weight:600;font-size:16px;white-space:nowrap}
+.bar-date{font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-day > div{min-width:0}
 .bar-sub{font-size:12.5px;color:var(--muted)}
 .bar-sub b{color:var(--warn);font-weight:600}
 .bar-status{flex:1;display:flex;justify-content:center;font-size:12.5px;color:var(--muted);min-width:0}
@@ -125,6 +126,8 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .chip{font-size:11.5px;font-weight:600;color:var(--cc);white-space:nowrap}
 .tag{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 5px;border-radius:4px;background:var(--cc);color:var(--surface)}
 .tag.bad{background:var(--bad)}
+.next{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.next::before{content:"→ "}
 .mine{font-size:11.5px;color:var(--muted);font-style:italic}
 .edit{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;padding:1px 6px;border-radius:6px;font-weight:600}
 .edit:hover{color:var(--fg);background:var(--accent-soft)}
