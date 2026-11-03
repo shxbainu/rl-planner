@@ -540,12 +540,21 @@
 
   // ---------- fantasy (fantasy.json, posted by Muse; moves from Muse and Claude) ----------
   let fantasy = null;
+  // positions keep fixed colors; bench and IR stay plain
+  const POS_C = { QB: "fgc", RB: "msi", WR: "eng", TE: "latin", FLEX: "fr", "W/R/T": "fr", OP: "fr", K: "glee", DST: "arts", DEF: "arts", "D/ST": "arts" };
+  const pos = (slot) => `<span class="pos" style="${POS_C[(slot || "").toUpperCase()] ? tintOf(POS_C[slot.toUpperCase()]) : "--cc:var(--muted);--ct:var(--surface)"}">${esc(slot || "–")}</span>`;
+  const MOVE_C = { add: "msi", pickup: "msi", waiver: "msi", drop: "fgc", start: "eng", sit: "other", bench: "other", trade: "fr" };
+  const logo = (abbr) => abbr ? `<img class="tlogo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/${encodeURIComponent(abbr.toLowerCase())}.png&w=40&h=40" alt="" loading="lazy" onerror="this.remove()">` : "";
   function renderFantasy() {
     const f = fantasy;
     if (!f || !f.lineup?.length) {
       $("#ff-meta").textContent = "";
       tease("t-ff", "Waiting on Muse");
-      $("#ff").innerHTML = `<p class="empty-state">Waiting on Muse to post your lineup. Suggested moves from Muse and Claude will show here too.</p>`;
+      // an empty lineup card, so the box shows its shape until Muse posts
+      $("#ff").innerHTML = `<div class="ff-match"><div class="side"><b>–</b>You</div><span class="vs">VS</span><div class="side"><b>–</b>Opponent</div></div>
+        <div class="sub-h">Starters</div>
+        <table class="ff-table ff-skel">${["QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "K", "DST"].map((s) => `<tr><td class="slot">${pos(s)}</td><td class="pl"><span class="ph"></span></td><td class="pj">–</td></tr>`).join("")}</table>
+        <p class="empty-state">Waiting on Muse to post your lineup. Suggested moves from Muse and Claude will show here too.</p>`;
       return;
     }
     const at = f.updated_at ? new Date(f.updated_at) : null;
@@ -553,16 +562,35 @@
     const m = f.matchup;
     tease("t-ff", esc([f.week ? `Wk ${f.week}` : "", m ? `${m.my_score ?? m.my_proj}–${m.opp_score ?? m.opp_proj}${m.my_score != null ? "" : " proj"}` : "", f.moves?.length ? `${f.moves.length} moves` : ""].filter(Boolean).join(" · ")));
     const score = (a, b) => (a ?? b ?? "–");
+    // your share of the combined score, for the bar under the matchup
+    const share = (m) => { const a = +(m.my_score ?? m.my_proj), b = +(m.opp_score ?? m.opp_proj); return a + b > 0 ? Math.round((a / (a + b)) * 100) : null; };
     const row = (p) => {
       const out = /^(O|IR|OUT)$/i.test(p.status || "");
-      return `<tr><td class="slot">${esc(p.slot || "")}</td><td class="pl">${esc(p.player)}${p.status ? `<span class="st${out ? " out" : ""}">${esc(p.status)}</span>` : ""}<small>${esc([p.team, p.opp, p.kickoff ? gameTime(p.kickoff) : ""].filter(Boolean).join(" · "))}</small></td><td class="pj">${p.points ?? p.proj ?? ""}</td></tr>`;
+      return `<tr><td class="slot">${pos(p.slot)}</td><td class="pl">${logo(p.team)}${esc(p.player)}${p.status ? `<span class="st${out ? " out" : ""}">${esc(p.status)}</span>` : ""}<small>${esc([p.team, p.opp, p.kickoff ? gameTime(p.kickoff) : ""].filter(Boolean).join(" · "))}</small></td><td class="pj">${p.points ?? p.proj ?? ""}</td></tr>`;
     };
     $("#ff").innerHTML = `
-      ${m ? `<div class="ff-match"><div class="side"><b>${score(m.my_score, m.my_proj)}</b>${esc(f.team || "You")}</div><span class="vs">${m.my_score != null ? "LIVE" : "PROJ"}</span><div class="side"><b>${score(m.opp_score, m.opp_proj)}</b>${esc(m.opponent || "")}</div></div>` : ""}
-      ${f.moves?.length ? `<div class="sub-h">Suggested moves</div><ul class="moves">${f.moves.map((x) => `<li><span class="by"><i>${esc(x.by || "")}</i>${x.kind ? ` · ${esc(x.kind)}` : ""}</span>${esc(x.text)}${x.why ? `<span class="why">${esc(x.why)}</span>` : ""}</li>`).join("")}</ul>` : ""}
+      ${m ? `<div class="ff-match"><div class="side"><b>${score(m.my_score, m.my_proj)}</b>${esc(f.team || "You")}</div><span class="vs">${m.my_score != null ? "LIVE" : "PROJ"}</span><div class="side"><b>${score(m.opp_score, m.opp_proj)}</b>${esc(m.opponent || "")}</div>${share(m) != null ? `<div class="ff-bar"><i style="width:${share(m)}%"></i></div>` : ""}</div>` : ""}
+      ${f.moves?.length ? `<div class="sub-h">Suggested moves</div><ul class="moves">${f.moves.map((x) => `<li style="${tintOf(MOVE_C[(x.kind || "").toLowerCase()] || "other")}"><span class="by"><i>${esc(x.by || "")}</i>${x.kind ? ` · ${esc(x.kind)}` : ""}</span>${esc(x.text)}${x.why ? `<span class="why">${esc(x.why)}</span>` : ""}</li>`).join("")}</ul>` : ""}
       <div class="sub-h">Starters</div><table class="ff-table">${f.lineup.map(row).join("")}</table>
       ${f.bench?.length ? `<details><summary>Bench <span class="count">${f.bench.length}</span></summary><table class="ff-table">${f.bench.map(row).join("")}</table></details>` : ""}`;
   }
+
+  // ---------- expanded view: a side box opens big; its contents move into the dialog and back ----------
+  const xdlg = $("#xdlg");
+  let xHome = null;
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-expand]");
+    if (!b) return;
+    xHome = b.closest("details.extra");
+    $("#x-dlg-h").textContent = xHome.querySelector(".x-name").textContent;
+    xdlg.dataset.x = xHome.dataset.x;
+    $("#x-dlg-body").append(xHome.querySelector(".x-body"));
+    xdlg.showModal();
+    $("#x-dlg-body").scrollTop = 0;
+  });
+  xdlg.addEventListener("close", () => { if (xHome) xHome.append($("#x-dlg-body .x-body")); xHome = null; });
+  $("#x-close").onclick = () => xdlg.close();
+  xdlg.addEventListener("click", (e) => { if (e.target === xdlg) xdlg.close(); });
 
   // ---------- league scoreboards (ESPN) ----------
   const ESPN = "https://site.api.espn.com/apis/site/v2/sports";
@@ -843,6 +871,17 @@
     return m < 60 ? `${m}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`;
   };
   let news = null, newsTab = null;
+  // each outlet (and league) keeps one color from the class palette, so every skin already has it
+  const PAL = ["eng", "fgc", "msi", "fr", "glee", "arts", "latin", "health"];
+  const tintOf = (c) => `--cc:var(--c-${c});--ct:var(--t-${c},var(--surface))`;
+  const tint = (key) => tintOf(PAL[parseInt(hash(key), 36) % PAL.length]);
+  const SECTION_C = { top: "fgc", politics: "eng", world: "msi", tech: "fr" };
+  const initials = (s) => s.split(/\s+/).filter((w) => !/^the$/i.test(w)).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
+  // first story leads with a big picture; the rest get thumbnails (or the outlet's initials)
+  const story = (x, lead) => `<li class="${lead ? "lead" : ""}"><a href="${esc(x.link)}" target="_blank" rel="noopener noreferrer" style="${tint(x.chip)}">
+      <span class="pic" data-i="${esc(initials(x.chip))}">${x.img ? `<img src="${esc(x.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}</span>
+      <span class="txt"><span class="hl">${esc(x.title)}</span>${x.summary ? `<span class="sum">${esc(x.summary)}</span>` : ""}<span class="meta"><span class="chip-src">${esc(x.chip)}</span>${x.when ? `<span class="ago">${ago(x.when)} ago</span>` : ""}</span></span>
+    </a></li>`;
   function renderNews() {
     const secs = news?.sections ? Object.keys(news.sections) : [];
     if (!secs.length) {
@@ -852,9 +891,9 @@
       return;
     }
     if (!secs.includes(newsTab)) newsTab = secs[0];
-    $("#news-tabs").innerHTML = secs.map((k) => `<button type="button" data-news="${esc(k)}" aria-pressed="${k === newsTab}">${esc(k[0].toUpperCase() + k.slice(1))}</button>`).join("");
-    $("#news").innerHTML = news.sections[newsTab].slice(0, 25).map((n) =>
-      `<li><a href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"><span class="hl">${esc(n.title)}</span>${n.summary ? `<span class="sum">${esc(n.summary)}</span>` : ""}<span class="src">${esc(n.source)}</span>${n.published ? `<span class="ago">${ago(n.published)}</span>` : ""}</a></li>`).join("");
+    $("#news-tabs").innerHTML = secs.map((k) => `<button type="button" data-news="${esc(k)}" aria-pressed="${k === newsTab}" style="${tintOf(SECTION_C[k] || "other")}">${esc(k[0].toUpperCase() + k.slice(1))}</button>`).join("");
+    $("#news").innerHTML = news.sections[newsTab].slice(0, 25).map((n, i) =>
+      story({ link: n.link, title: n.title, summary: n.summary, chip: n.source, img: n.image, when: n.published }, i === 0)).join("");
     tease("t-news", esc(news.sections[newsTab][0]?.title || ""));
     $("#news-foot").textContent = news.updated_at ? `Updated ${ago(news.updated_at)} ago · ${[...new Set(news.sections[newsTab].map((n) => n.source))].join(", ")}` : "";
   }
@@ -873,8 +912,9 @@
     const all = lists.flat().filter((a) => a.links?.web?.href && a.type !== "Media")
       .sort((a, b) => (mine.some((m) => b.headline.toLowerCase().includes(m)) - mine.some((m) => a.headline.toLowerCase().includes(m))) || b.published.localeCompare(a.published));
     tease("t-snews", esc(all[0]?.headline || ""));
-    $("#snews").innerHTML = all.length ? all.slice(0, 20).map((a) =>
-      `<li><a href="${esc(a.links.web.href)}" target="_blank" rel="noopener noreferrer"><span class="hl">${esc(a.headline)}</span><span class="src">${a.lg.toUpperCase()} · ${ago(a.published)} ago</span>${a.images?.[0]?.url ? `<img class="img" src="${esc(a.images[0].url)}" alt="" loading="lazy">` : ""}</a></li>`).join("")
+    const teamOf = (a) => (schedule.teams || []).find((t) => a.headline.toLowerCase().includes(t.name.toLowerCase()))?.name;
+    $("#snews").innerHTML = all.length ? all.slice(0, 20).map((a, i) =>
+      story({ link: a.links.web.href, title: a.headline, summary: a.description, chip: teamOf(a) || a.lg.toUpperCase(), img: a.images?.[0]?.url, when: a.published }, i === 0)).join("")
       : `<li class="empty-state">Sports news unavailable right now.</li>`;
   }
 

@@ -37,6 +37,9 @@ FEEDS = {
 }
 PER_FEED = 10
 ATOM = "{http://www.w3.org/2005/Atom}"
+MEDIA = "{http://search.yahoo.com/mrss/}"
+CONTENT = "{http://purl.org/rss/1.0/modules/content/}encoded"
+IMG = re.compile(r"""<img[^>]+src=["'](https://[^"']+)["']""", re.I)
 
 
 def when(text):
@@ -61,6 +64,28 @@ def clean(text, n=220):
     return t if len(t) <= n else t[: n - 1].rsplit(" ", 1)[0] + "…"
 
 
+def image(it, *html_bits):
+    """Best picture for an item: the widest media:content/thumbnail, an image enclosure, or the first <img> in its HTML."""
+    best, best_w = None, -1
+    for el in list(it.iter(MEDIA + "content")) + list(it.iter(MEDIA + "thumbnail")):
+        u, kind = el.get("url", ""), (el.get("medium") or el.get("type") or "image")
+        if not u.startswith("https://") or not kind.startswith("image"):
+            continue
+        w = int(el.get("width") or 0)
+        if w > best_w:
+            best, best_w = u, w
+    if best:
+        return best
+    for el in it.iter("enclosure"):
+        if (el.get("type") or "").startswith("image") and el.get("url", "").startswith("https://"):
+            return el.get("url")
+    for bit in html_bits:
+        m = IMG.search(html.unescape(bit or ""))
+        if m:
+            return m.group(1)
+    return None
+
+
 def read(source, url):
     req = urllib.request.Request(url, headers={"User-Agent": "rl-planner-news/1.0"})
     with urllib.request.urlopen(req, timeout=20) as r:
@@ -68,12 +93,14 @@ def read(source, url):
     out = []
     for it in root.iter("item"):  # RSS
         out.append({"title": (it.findtext("title") or "").strip(), "link": (it.findtext("link") or "").strip(),
-                    "published": when(it.findtext("pubDate")), "source": source, "summary": clean(it.findtext("description"))})
+                    "published": when(it.findtext("pubDate")), "source": source, "summary": clean(it.findtext("description")),
+                    "image": image(it, it.findtext(CONTENT), it.findtext("description"))})
     for it in root.iter(ATOM + "entry"):  # Atom
         link = it.find(ATOM + "link[@rel='alternate']") or it.find(ATOM + "link")
         out.append({"title": (it.findtext(ATOM + "title") or "").strip(), "link": link.get("href", "") if link is not None else "",
                     "published": when(it.findtext(ATOM + "published") or it.findtext(ATOM + "updated")), "source": source,
-                    "summary": clean(it.findtext(ATOM + "summary") or it.findtext(ATOM + "content"))})
+                    "summary": clean(it.findtext(ATOM + "summary") or it.findtext(ATOM + "content")),
+                    "image": image(it, it.findtext(ATOM + "content"), it.findtext(ATOM + "summary"))})
     return [x for x in out if x["title"] and x["link"].startswith("http")][:PER_FEED]
 
 

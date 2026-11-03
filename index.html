@@ -133,7 +133,7 @@
       <details class="extra" data-x="news">
         <summary><span class="x-name">News</span><span class="x-tease" id="t-news"></span></summary>
         <div class="x-body">
-          <div class="x-tools"><div class="seg" role="group" aria-label="News section" id="news-tabs"></div></div>
+          <div class="x-tools"><div class="seg" role="group" aria-label="News section" id="news-tabs"></div><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
           <ul class="news" id="news"></ul>
           <p class="panel-foot" id="news-foot"></p>
         </div>
@@ -141,12 +141,18 @@
 
       <details class="extra" data-x="snews">
         <summary><span class="x-name">Sports news</span><span class="x-tease" id="t-snews"></span></summary>
-        <div class="x-body"><ul class="news" id="snews"></ul></div>
+        <div class="x-body">
+          <div class="x-tools"><span class="panel-meta">NBA and NFL, Warriors and 49ers first</span><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
+          <ul class="news" id="snews"></ul>
+        </div>
       </details>
 
       <details class="extra" data-x="ff">
         <summary><span class="x-name">Fantasy</span><span class="x-tease" id="t-ff"></span></summary>
-        <div class="x-body"><span class="panel-meta" id="ff-meta"></span><div id="ff"></div></div>
+        <div class="x-body">
+          <div class="x-tools"><span class="panel-meta" id="ff-meta"></span><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
+          <div id="ff"></div>
+        </div>
       </details>
     </div>
   </div>
@@ -200,6 +206,14 @@
     <button type="button" data-tab="team" aria-pressed="false">Team stats</button>
   </div>
   <div class="g-body" id="g-body"></div>
+</dialog>
+
+<dialog id="xdlg" class="x-dlg" aria-labelledby="x-dlg-h">
+  <div class="x-dlg-head">
+    <h2 id="x-dlg-h"></h2>
+    <button class="icon-btn" type="button" id="x-close" aria-label="Close">✕</button>
+  </div>
+  <div class="x-dlg-body" id="x-dlg-body"></div>
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
