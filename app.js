@@ -263,6 +263,9 @@
     $("#sched-h").textContent = isToday ? "Today" : relDay(day);
     $("#sched-meta").textContent = letter ? `${letter} day · ${classes} classes` : "";
     $("#now-card").innerHTML = nowCard(rows, isToday, day, letter);
+    // tint the card with the class that's on right now
+    const tinted = $("#now-card [style*='--cc']");
+    $("#now-card").style.setProperty("--cc", tinted ? tinted.style.getPropertyValue("--cc") : "var(--accent)");
 
     const m = now().getHours() * 60 + now().getMinutes();
     const first = rows.findIndex((r) => r.kind === "class");
@@ -576,7 +579,7 @@
   const gdlg = $("#game");
   let game = null, gTab = "box", gTimer, scoringOnly = false;
   async function openGame(lg, id) {
-    game = { lg, id, d: null };
+    game = { lg, id, d: null, fresh: true };
     gTab = "box";
     $("#g-score").innerHTML = `<p class="note">Loading…</p>`;
     $("#g-body").innerHTML = "";
@@ -595,6 +598,7 @@
       return;
     }
     renderGame();
+    game.fresh = false;
     if (evState(game.d.header).state === "in") gTimer = setTimeout(refreshGame, 30_000);
   }
   gdlg.addEventListener("close", () => clearTimeout(gTimer));
@@ -613,46 +617,157 @@
     if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openGame(g.dataset.lg, g.dataset.game); }
   });
 
+  const hex = (c, fb) => (/^[0-9a-f]{6}$/i.test(c || "") ? `#${c}` : fb);
+  // ESPN's primary color is sometimes near-black; fall back to the alternate so it reads on dark backgrounds too
+  function teamColor(team) {
+    const p = hex(team.color, "#888888"), a = hex(team.alternateColor, p);
+    const lum = (h) => { const n = parseInt(h.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
+    return lum(p) < 0.12 && lum(a) > lum(p) ? a : p;
+  }
+  function countUp(el, to) {
+    if (!el || !Number.isFinite(to) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t0 = performance.now(), dur = 700;
+    const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+
   function renderGame() {
     const d = game.d, comp = d.header.competitions[0], st = comp.status.type;
     const teams = [...comp.competitors].sort((x) => (x.homeAway === "away" ? -1 : 1));
-    const side = (t) => `<div class="g-team ${t.homeAway}"><img src="${esc(t.team.logos?.[0]?.href || t.team.logo || "")}" alt=""><div><b>${esc(t.team.displayName)}</b><small>${esc(t.record?.[0]?.displayValue || t.record?.[0]?.summary || "")}</small></div><span class="pts">${st.state === "pre" ? "" : esc(t.score ?? "")}</span></div>`;
+    game.colors = Object.fromEntries(teams.map((t) => [t.team.id, teamColor(t.team)]));
+    game.abbr = Object.fromEntries(teams.map((t) => [t.team.id, t.team.abbreviation]));
+    const [away, home] = teams;
+    const lead = st.state !== "pre" && Number(away.score) !== Number(home.score) ? (Number(away.score) > Number(home.score) ? away : home) : null;
+    const side = (t) => `<div class="g-team ${t.homeAway}${lead === t ? " lead" : ""}" style="--tc:${game.colors[t.team.id]}"><img src="${esc(t.team.logos?.[0]?.href || t.team.logo || "")}" alt=""><div><b>${esc(t.team.displayName)}</b><small>${esc(t.record?.[0]?.displayValue || t.record?.[0]?.summary || "")}</small></div><span class="pts" data-pts="${esc(t.score ?? "")}">${st.state === "pre" ? "" : esc(t.score ?? "")}</span></div>`;
     const periods = Math.max(...teams.map((t) => t.linescores?.length || 0));
-    const pName = (i) => (game.lg === "nba" ? (i < 4 ? `Q${i + 1}` : `OT${i > 4 ? i - 3 : ""}`) : i < 4 ? `Q${i + 1}` : "OT");
-    const lines = periods ? `<table class="lines"><tr><th></th>${Array.from({ length: periods }, (_, i) => `<th>${pName(i)}</th>`).join("")}<th>T</th></tr>${teams.map((t) =>
-      `<tr><td>${esc(t.team.abbreviation)}</td>${(t.linescores || []).map((l) => `<td>${esc(l.displayValue ?? l.value ?? "")}</td>`).join("")}<td>${esc(t.score ?? "")}</td></tr>`).join("")}</table>` : "";
+    const pName = (i) => (i < 4 ? `Q${i + 1}` : `OT${i > 4 ? i - 3 : ""}`);
+    const pv = (t, i) => Number(t.linescores?.[i]?.displayValue ?? t.linescores?.[i]?.value ?? 0);
+    const lines = periods ? `<table class="lines"><tr><th></th>${Array.from({ length: periods }, (_, i) => `<th>${pName(i)}</th>`).join("")}<th>T</th></tr>${teams.map((t) => {
+      const other = t === away ? home : away;
+      return `<tr style="--tc:${game.colors[t.team.id]}"><td>${esc(t.team.abbreviation)}</td>${Array.from({ length: periods }, (_, i) => `<td class="${pv(t, i) > pv(other, i) ? "won" : ""}">${t.linescores?.[i] ? pv(t, i) : ""}</td>`).join("")}<td>${esc(t.score ?? "")}</td></tr>`;
+    }).join("")}</table>` : "";
     const venue = d.gameInfo?.venue?.fullName;
-    const mid = `<div class="g-mid"><b class="${st.state === "in" ? "live" : ""}">${esc(st.state === "pre" ? gameTime(comp.date) : st.shortDetail || st.detail)}</b>${venue ? esc(venue) : ""}${d.gameInfo?.attendance ? `<br>${Number(d.gameInfo.attendance).toLocaleString()} fans` : ""}</div>`;
-    $("#g-score").innerHTML = `<div class="g-sc">${side(teams[0])}${mid}${side(teams[1])}</div>${lines}`;
+    const mid = `<div class="g-mid"><b class="${st.state === "in" ? "live" : ""}">${st.state === "in" ? `<span class="live-dot"></span>` : ""}${esc(st.state === "pre" ? gameTime(comp.date) : st.shortDetail || st.detail)}</b>${venue ? esc(venue) : ""}${d.gameInfo?.attendance ? `<br>${Number(d.gameInfo.attendance).toLocaleString()} fans` : ""}</div>`;
+    const head = $(".g-head");
+    head.style.setProperty("--ac", game.colors[away.team.id]);
+    head.style.setProperty("--hc", game.colors[home.team.id]);
+    $("#g-score").innerHTML = `<div class="g-sc">${side(away)}${mid}${side(home)}</div>${lines}`;
+    if (game.fresh) document.querySelectorAll("#g-score .pts").forEach((el) => countUp(el, Number(el.dataset.pts)));
     document.querySelectorAll("#g-tabs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tab === gTab)));
-    $("#g-body").innerHTML = gTab === "box" ? boxHTML(d) : gTab === "plays" ? playsHTML(d) : teamStatsHTML(d, teams);
+    const body = $("#g-body");
+    body.innerHTML = gTab === "box" ? winProbHTML(d, away, home) + boxHTML(d) : gTab === "plays" ? playsHTML(d) : teamStatsHTML(d);
+    body.classList.remove("swap"); void body.offsetWidth; body.classList.add("swap");
+    if (gTab === "box") wireWinProb(d, away, home);
+  }
+
+  // win probability: home team's chance after every play, shaded by who's ahead
+  function winProbHTML(d, away, home) {
+    const wp = d.winprobability || [];
+    if (wp.length < 3) return "";
+    const W = 600, H = 110, n = wp.length - 1;
+    const pts = wp.map((p, i) => [(i / n) * W, (1 - p.homeWinPercentage) * H]);
+    const line = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join("");
+    const area = `${line}L${W},${H / 2}L0,${H / 2}Z`;
+    const last = wp.at(-1).homeWinPercentage;
+    const pct = (v) => `${Math.round(v * 100)}%`;
+    return `<div class="wp" style="--ac:${game.colors[away.team.id]};--hc:${game.colors[home.team.id]}">
+      <div class="wp-h"><h3>Win probability</h3><span class="wp-now"><b class="tt" style="--tc:var(--hc)">${esc(home.team.abbreviation)} ${pct(last)}</b> · <b class="tt" style="--tc:var(--ac)">${esc(away.team.abbreviation)} ${pct(1 - last)}</b></span></div>
+      <div class="wp-chart"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Win probability over the game">
+        <defs><clipPath id="wp-top"><rect x="0" y="0" width="${W}" height="${H / 2}"/></clipPath><clipPath id="wp-bot"><rect x="0" y="${H / 2}" width="${W}" height="${H / 2}"/></clipPath></defs>
+        <path d="${area}" fill="var(--hc)" opacity=".28" clip-path="url(#wp-top)"/>
+        <path d="${area}" fill="var(--ac)" opacity=".28" clip-path="url(#wp-bot)"/>
+        <line x1="0" x2="${W}" y1="${H / 2}" y2="${H / 2}" class="wp-mid"/>
+        <path d="${line}" class="wp-line" pathLength="1"/>
+        <line class="wp-cursor" x1="0" x2="0" y1="0" y2="${H}" style="display:none"/>
+      </svg><div class="wp-tip" hidden></div>
+      <span class="wp-lbl top tt" style="--tc:var(--hc)">${esc(home.team.abbreviation)}</span><span class="wp-lbl bot tt" style="--tc:var(--ac)">${esc(away.team.abbreviation)}</span></div></div>`;
+  }
+  function wireWinProb(d, away, home) {
+    const box = $("#g-body .wp-chart");
+    if (!box) return;
+    const wp = d.winprobability, plays = Object.fromEntries((d.plays || d.drives?.previous?.flatMap((x) => x.plays || []) || []).map((p) => [p.id, p]));
+    const cur = box.querySelector(".wp-cursor"), tip = box.querySelector(".wp-tip");
+    box.addEventListener("pointermove", (e) => {
+      const r = box.getBoundingClientRect(), k = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      const i = Math.round(k * (wp.length - 1)), p = wp[i], play = plays[p.playId];
+      cur.setAttribute("x1", k * 600); cur.setAttribute("x2", k * 600); cur.style.display = "";
+      const h = Math.round(p.homeWinPercentage * 100);
+      tip.hidden = false;
+      tip.style.left = `${Math.min(r.width - 180, Math.max(0, e.clientX - r.left - 90))}px`;
+      tip.innerHTML = `<b>${esc(home.team.abbreviation)} ${h}% · ${esc(away.team.abbreviation)} ${100 - h}%</b>${play ? `<span>${esc(play.period?.displayValue || (play.period?.number ? `Q${play.period.number}` : ""))} ${esc(play.clock?.displayValue || "")}${play.awayScore != null ? ` · ${play.awayScore}–${play.homeScore}` : ""}</span><span>${esc((play.text || "").trim().slice(0, 90))}</span>` : ""}`;
+    });
+    box.addEventListener("pointerleave", () => { cur.style.display = "none"; tip.hidden = true; });
   }
 
   function leadersHTML(d) {
     if (!d.leaders?.length) return "";
-    return `<div><h3>Leaders</h3><div class="ldrs">${d.leaders.flatMap((t) => (t.leaders || []).slice(0, 3).map((c) =>
-      c.leaders?.[0] ? `<div class="ldr"><span>${esc(t.team.abbreviation)} · ${esc(c.displayName)}</span><b>${esc(c.leaders[0].athlete.displayName)}</b> ${esc(c.leaders[0].displayValue)}</div>` : "")).join("")}</div></div>`;
+    return `<div><h3>Leaders</h3><div class="ldrs">${d.leaders.flatMap((t) => (t.leaders || []).slice(0, 3).map((c) => {
+      const l = c.leaders?.[0];
+      if (!l) return "";
+      const big = l.mainStat?.value ?? (/^\d+$/.test(l.displayValue) ? l.displayValue : "");
+      return `<div class="ldr" style="--tc:${game.colors?.[t.team.id] || "var(--accent)"}">${l.athlete.headshot?.href ? `<img src="${esc(l.athlete.headshot.href)}" alt="" loading="lazy">` : `<span class="ph"></span>`}
+        <div><span>${esc(t.team.abbreviation)} · ${esc(c.displayName)}</span><b>${esc(l.athlete.shortName || l.athlete.displayName)}</b>${big !== "" ? `<em>${esc(big)}</em>` : `<small>${esc(l.displayValue)}</small>`}</div></div>`;
+    })).join("")}</div></div>`;
   }
+
+  // numeric value of a stat cell for sorting/shading ("8-16" sorts by makes)
+  const num = (v) => { const m = String(v).match(/^[+-]?\d+(\.\d+)?/); return m ? Number(m[0]) : NaN; };
+  const HEAT = { nba: ["PTS", "REB", "AST", "STL", "BLK"], nfl: ["YDS", "TD", "REC", "SACKS", "INT"] };
   function boxHTML(d) {
     const groups = d.boxscore?.players || [];
     if (!groups.length) return `${leadersHTML(d)}<p class="empty-state">Box score shows up once the game starts.</p>`;
-    const tables = groups.map((g) => g.statistics.map((s) => {
+    const tables = groups.map((g) => g.statistics.map((s, si) => {
       if (!s.athletes?.length) return "";
+      const tc = game.colors?.[g.team.id] || "var(--accent)";
       const title = `${g.team.displayName}${s.name ? ` · ${s.name[0].toUpperCase() + s.name.slice(1)}` : ""}`;
+      const played = s.athletes.filter((a) => !a.didNotPlay && a.stats?.length);
+      const maxes = s.labels.map((_, c) => Math.max(0, ...played.map((a) => num(a.stats[c])).filter(Number.isFinite)));
+      const heatCols = new Set(s.labels.map((l, c) => (HEAT[game.lg].includes(l) ? c : -1)).filter((c) => c >= 0));
       let benchMarked = false;
-      const rows = s.athletes.map((a) => {
+      const rows = s.athletes.map((a, ri) => {
         const bench = game.lg === "nba" && a.starter === false && !benchMarked;
         if (bench) benchMarked = true;
         const dnp = a.didNotPlay || !a.stats?.length;
-        return `<tr class="${bench ? "bench-start" : ""}${dnp ? " dnp" : ""}"><td>${esc(a.athlete.shortName || a.athlete.displayName)}${a.athlete.position?.abbreviation ? `<small>${esc(a.athlete.position.abbreviation)}</small>` : ""}</td>${dnp ? `<td colspan="${s.labels.length}" style="text-align:left">${esc(a.reason || "DNP")}</td>` : a.stats.map((v) => `<td>${esc(v)}</td>`).join("")}</tr>`;
+        const ath = a.athlete;
+        const name = `<td><span class="pl">${ath.headshot?.href ? `<img src="${esc(ath.headshot.href)}" alt="" loading="lazy">` : `<span class="ph"></span>`}<span>${esc(ath.shortName || ath.displayName)}<small>${ath.jersey ? `#${esc(ath.jersey)} ` : ""}${esc(ath.position?.abbreviation || "")}</small></span></span></td>`;
+        if (dnp) return `<tr class="dnp" data-i="${ri}">${name}<td colspan="${s.labels.length}" class="why">${esc((a.reason || "DNP").toLowerCase())}</td></tr>`;
+        const cells = a.stats.map((v, c) => {
+          const n = num(v), lbl = s.labels[c];
+          const pm = lbl === "+/-" ? (n > 0 ? " pos" : n < 0 ? " neg" : "") : "";
+          const heat = heatCols.has(c) && maxes[c] > 0 && Number.isFinite(n) ? ` style="--h:${Math.round((n / maxes[c]) * 100)}%"` : "";
+          const top = heatCols.has(c) && n > 0 && n === maxes[c] ? " top" : "";
+          return `<td class="${heat ? "heat" : ""}${pm}${top}" data-v="${Number.isFinite(n) ? n : ""}"${heat}>${esc(v)}</td>`;
+        }).join("");
+        return `<tr class="${bench ? "bench-start" : ""}" data-i="${ri}">${name}${cells}</tr>`;
       }).join("");
-      const totals = s.totals?.length ? `<tr><td>Team</td>${s.totals.map((v) => `<td>${esc(v)}</td>`).join("")}</tr>` : "";
-      return `<div><h3>${esc(title)}</h3><div class="bx-wrap"><table class="bx"><tr><th>Player</th>${s.labels.map((l) => `<th>${esc(l)}</th>`).join("")}</tr>${rows}${totals}</table></div></div>`;
+      const totals = s.totals?.length ? `<tfoot><tr><td>Team</td>${s.totals.map((v) => `<td>${esc(v)}</td>`).join("")}</tr></tfoot>` : "";
+      return `<div class="bx-card" style="--tc:${tc}"><h3><span class="sw"></span>${esc(title)}</h3><div class="bx-wrap"><table class="bx"><thead><tr><th>Player</th>${s.labels.map((l, c) => `<th data-col="${c + 1}" title="Sort by ${esc(l)}">${esc(l)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody>${totals}</table></div></div>`;
     }).join("")).join("");
-    return leadersHTML(d) + tables;
+    return leadersHTML(d) + `<p class="hint">Tap a column to sort.</p>` + tables;
   }
+  // click a box-score header to sort that table (again to flip, third time back to the lineup order)
+  $("#g-body").addEventListener("click", (e) => {
+    const th = e.target.closest(".bx th[data-col]");
+    if (!th) return;
+    const table = th.closest("table"), col = Number(th.dataset.col), tbody = table.tBodies[0];
+    const dir = th.dataset.sort === "desc" ? "asc" : th.dataset.sort === "asc" ? "" : "desc";
+    table.querySelectorAll("th").forEach((x) => delete x.dataset.sort);
+    if (dir) th.dataset.sort = dir;
+    const rows = [...tbody.rows];
+    rows.sort((a, b) => {
+      if (!dir) return a.dataset.i - b.dataset.i;
+      const va = a.cells[col]?.dataset.v, vb = b.cells[col]?.dataset.v;
+      const x = va === undefined || va === "" ? -Infinity : Number(va), y = vb === undefined || vb === "" ? -Infinity : Number(vb);
+      return dir === "desc" ? y - x : x - y;
+    });
+    table.classList.toggle("sorted", !!dir);
+    rows.forEach((r) => tbody.append(r));
+  });
+
   function playsHTML(d) {
     const filter = `<label class="g-filter"><input type="checkbox" id="g-scoring" ${scoringOnly ? "checked" : ""}> Scoring plays only</label>`;
+    const tcol = (p) => game.colors?.[p.team?.id] || "var(--line)";
+    const row = (p, clk) => `<li class="${p.scoringPlay ? "scoring" : ""}" style="--tc:${tcol(p)}"><span class="clk">${clk}</span><span>${p.scoringPlay && p.scoreValue ? `<em class="pts-badge">+${p.scoreValue}</em>` : ""}${p.team?.id && game.abbr?.[p.team.id] && game.lg === "nfl" ? `<b>${esc(game.abbr[p.team.id])}</b> ` : ""}${esc((p.text || "").trim())}</span><span class="scr">${p.awayScore ?? ""}–${p.homeScore ?? ""}</span></li>`;
     if (game.lg === "nba") {
       let plays = [...(d.plays || [])].reverse();
       if (scoringOnly) plays = plays.filter((p) => p.scoringPlay);
@@ -661,27 +776,35 @@
       const items = plays.slice(0, 400).map((p) => {
         const head = p.period?.number !== per ? `<li class="per">${esc(p.period?.displayValue || `Period ${p.period?.number}`)}</li>` : "";
         per = p.period?.number;
-        return `${head}<li class="${p.scoringPlay ? "scoring" : ""}"><span class="clk">${esc(p.clock?.displayValue || "")}</span><span>${esc(p.text || "")}</span><span class="scr">${p.awayScore ?? ""}–${p.homeScore ?? ""}</span></li>`;
+        return head + row(p, esc(p.clock?.displayValue || ""));
       }).join("");
       return filter + `<ul class="plays">${items}</ul>`;
     }
-    // NFL: drives, newest first, with their plays
-    const drives = [...(d.drives?.previous || []), ...(d.drives?.current ? [d.drives.current] : [])].reverse();
     if (scoringOnly) {
       const sp = d.scoringPlays || [];
-      return filter + (sp.length ? `<ul class="plays">${[...sp].reverse().map((p) => `<li class="scoring"><span class="clk">Q${p.period?.number} ${esc(p.clock?.displayValue || "")}</span><span><b>${esc(p.team?.abbreviation || "")}</b> ${esc(p.text)}</span><span class="scr">${p.awayScore}–${p.homeScore}</span></li>`).join("")}</ul>` : `<p class="empty-state">No scores yet.</p>`);
+      return filter + (sp.length ? `<ul class="plays">${[...sp].reverse().map((p) => row({ ...p, scoringPlay: true }, `Q${p.period?.number} ${esc(p.clock?.displayValue || "")}`)).join("")}</ul>` : `<p class="empty-state">No scores yet.</p>`);
     }
+    const drives = [...(d.drives?.previous || []), ...(d.drives?.current ? [d.drives.current] : [])].reverse();
     if (!drives.length) return filter + `<p class="empty-state">No drives yet.</p>`;
-    return filter + drives.map((dr, i) => `<details class="drive"${i === 0 ? " open" : ""}><summary>${esc(dr.team?.abbreviation || dr.team?.shortDisplayName || "")} · ${esc(dr.result || dr.displayResult || "In progress")}<small>${esc(dr.description || "")}</small></summary><ul class="plays">${[...(dr.plays || [])].reverse().map((p) =>
-      `<li class="${p.scoringPlay ? "scoring" : ""}"><span class="clk">Q${p.period?.number} ${esc(p.clock?.displayValue || "")}</span><span>${esc((p.text || "").trim())}</span><span class="scr">${p.awayScore ?? ""}–${p.homeScore ?? ""}</span></li>`).join("")}</ul></details>`).join("");
+    return filter + drives.map((dr, i) => `<details class="drive" style="--tc:${game.colors?.[dr.team?.id] || "var(--line)"}"${i === 0 ? " open" : ""}><summary><span class="sw"></span>${esc(dr.team?.abbreviation || dr.team?.shortDisplayName || "")} · ${esc(dr.result || dr.displayResult || "In progress")}<small>${esc(dr.description || "")}</small></summary><ul class="plays">${[...(dr.plays || [])].reverse().map((p) =>
+      row(p, `Q${p.period?.number} ${esc(p.clock?.displayValue || "")}`)).join("")}</ul></details>`).join("");
   }
-  function teamStatsHTML(d, teams) {
+
+  // team stats as face-off bars
+  function teamStatsHTML(d) {
     const bt = d.boxscore?.teams || [];
     if (bt.length < 2) return `<p class="empty-state">Team stats show up once the game starts.</p>`;
     const away = bt.find((t) => t.homeAway === "away") || bt[0], home = bt.find((t) => t !== away);
+    const ac = game.colors?.[away.team.id], hc = game.colors?.[home.team.id];
     const homeBy = Object.fromEntries((home.statistics || []).map((s) => [s.label || s.name, s.displayValue]));
-    return `<table class="ts"><tr><th style="text-align:right">${esc(away.team.abbreviation)}</th><th></th><th style="text-align:left">${esc(home.team.abbreviation)}</th></tr>${(away.statistics || []).map((s) =>
-      `<tr><td>${esc(s.displayValue)}</td><td>${esc(s.label || s.name)}</td><td>${esc(homeBy[s.label || s.name] ?? "")}</td></tr>`).join("")}</table>`;
+    const rows = (away.statistics || []).map((s) => {
+      const k = s.label || s.name, av = s.displayValue, hv = homeBy[k] ?? "";
+      const a = num(av), h = num(hv);
+      const tot = (Number.isFinite(a) ? Math.abs(a) : 0) + (Number.isFinite(h) ? Math.abs(h) : 0);
+      const aw = tot ? (Math.abs(a) / tot) * 100 : 50;
+      return `<div class="fo"><span class="v${a > h ? " win" : ""}">${esc(av)}</span><div class="fo-mid"><span class="lbl">${esc(k)}</span><div class="fo-bar"><i style="width:${aw}%;background:${ac}"></i><i style="width:${100 - aw}%;background:${hc}"></i></div></div><span class="v${h > a ? " win" : ""}">${esc(hv)}</span></div>`;
+    }).join("");
+    return `<div class="fo-head"><b class="tt" style="--tc:${ac}">${esc(away.team.displayName)}</b><b class="tt" style="--tc:${hc}">${esc(home.team.displayName)}</b></div><div class="fos">${rows}</div>`;
   }
   $("#g-body").addEventListener("change", (e) => {
     if (e.target.id === "g-scoring") { scoringOnly = e.target.checked; renderGame(); }
@@ -754,6 +877,19 @@
   }
 
   // ---------- interactions ----------
+  function confetti(x, y) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const colors = ["--c-latin", "--c-eng", "--c-msi", "--c-fr", "--c-fgc", "--c-arts", "--accent"];
+    for (let i = 0; i < 28; i++) {
+      const c = document.createElement("i");
+      c.className = "confetti";
+      const a = Math.random() * Math.PI - Math.PI, dist = 60 + Math.random() * 120;
+      c.style.cssText = `left:${x}px;top:${y}px;background:var(${colors[i % colors.length]});--dx:${Math.cos(a) * dist}px;--dy:${Math.sin(a) * dist + 160}px;--r:${Math.random() * 720 - 360}deg`;
+      document.body.append(c);
+      setTimeout(() => c.remove(), 1200);
+    }
+    toast("Everything due that day is done 🎉");
+  }
   let toastTimer;
   function toast(msg, undo) {
     const el = $("#toast");
@@ -780,7 +916,13 @@
       setDone(id, on);
       li.classList.add("leaving");
       setTimeout(() => { renderHomework(); renderBig(); }, 220);
-      if (on) toast("Moved to Done", () => { setDone(id, false); renderHomework(); });
+      if (on) {
+        toast("Moved to Done", () => { setDone(id, false); renderHomework(); renderBig(); });
+        // finished everything due that day? celebrate a little
+        const day = allItems().find((i) => i.id === id)?.due;
+        const left = allItems().filter((i) => i.due === day && !isDone(i)).length;
+        if (day && !left) { const r = e.target.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top); }
+      }
     }
     if (e.target.id === "letter-select") {
       const d = e.target.dataset.date;
@@ -929,6 +1071,10 @@
       fantasy = f;
       document.title = s.owner ? `${s.owner}'s RL Planner` : "RL Planner";
       render();
+      requestAnimationFrame(() => {
+        document.body.classList.add("enter");
+        setTimeout(() => document.body.classList.remove("enter"), 1200);
+      });
       loadTeams();
       loadBoards();
       loadSportsNews();
