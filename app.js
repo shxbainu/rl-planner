@@ -221,7 +221,7 @@
   const passing = () => schedule.passing || 5;
   // the card counts down to the second: m:ss, or h:mm:ss over an hour
   const clock = (minsLeft) => {
-    const sec = Math.max(0, Math.ceil(minsLeft * 60)), h = Math.floor(sec / 3600), mm = Math.floor((sec % 3600) / 60);
+    const sec = Math.max(0, Math.ceil(minsLeft * 60 - 1e-6)), h = Math.floor(sec / 3600), mm = Math.floor((sec % 3600) / 60);
     return h ? `${h}:${pad(mm)}:${pad(sec % 60)}` : `${mm}:${pad(sec % 60)}`;
   };
   const where = (name) => (name ? cls(name).room || "" : "");
@@ -238,7 +238,7 @@
     const segs = rows.flatMap((r) => r.segs);
     const firstI = segs.findIndex((s) => s.name || s.edge), lastI = segs.length - 1 - [...segs].reverse().findIndex((s) => s.name);
     const day_ = segs.slice(firstI, lastI + 1);
-    const m = now().getHours() * 60 + now().getMinutes() + now().getSeconds() / 60;
+    const t_ = now(), m = t_.getHours() * 60 + t_.getMinutes() + (t_.getSeconds() + t_.getMilliseconds() / 1000) / 60;
     const nextAfter = (i) => day_.slice(i + 1).find((s) => s.name || s.ev);
     const nextLine = (n) => n ? `Then <b>${esc(n.label)}</b> at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : "Last one today";
 
@@ -1185,7 +1185,10 @@
       loadSportsNews();
       setInterval(loadSportsNews, 15 * 60_000);
       setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
-      setInterval(tickNow, 1000);
+      // tick just after each second turns over; a plain 1s interval drifts and skips a second now and then
+      const tickLoop = () => { tickNow(); setTimeout(tickLoop, 1000 - (now().getTime() % 1000) + 15); };
+      tickLoop();
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) tickNow(); });
     })
     .catch((err) => {
       $(".dash").innerHTML = `<p class="empty-state">Couldn't load the schedule (${esc(err.message)}). If you opened the file directly, serve the folder instead: <code>python3 -m http.server</code>.</p>`;
