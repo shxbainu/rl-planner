@@ -1,302 +1,41 @@
 {
+  "owner": "Brian",
   "term": "Fall 2026 · MP2",
   "classes": {
-    "Latin": {
-      "name": "Latin 2-3",
-      "block": "A",
-      "teacher": "Mr. Reid",
-      "room": "J22",
-      "color": "latin",
-      "short": "Lat"
-    },
-    "English": {
-      "name": "English",
-      "block": "B",
-      "teacher": "Mr. Beam",
-      "room": "J20",
-      "color": "eng",
-      "short": "Eng"
-    },
-    "MSI": {
-      "name": "Math-Sci Investigations",
-      "block": "C",
-      "teacher": "Mr. Lieb",
-      "room": "E23",
-      "color": "msi",
-      "short": "MSI"
-    },
-    "French": {
-      "name": "French 1",
-      "block": "D",
-      "teacher": "M. Diop",
-      "room": "P11",
-      "color": "fr",
-      "short": "Fr"
-    },
-    "Forces": {
-      "name": "Forces of Global Change",
-      "block": "E",
-      "teacher": "Ms. Dromgoole",
-      "room": "P26",
-      "color": "fgc",
-      "short": "FGC"
-    },
-    "Arts": {
-      "name": "Arts",
-      "block": "F",
-      "teacher": "Mr. Hiatt",
-      "room": "Lecture Rm",
-      "color": "arts",
-      "short": "Art"
-    },
-    "Glee": {
-      "name": "Glee Club",
-      "block": "H",
-      "teacher": "Mr. Opdycke",
-      "room": "Choral Rm",
-      "color": "glee",
-      "short": "Glee"
-    },
-    "Health": {
-      "name": "Health & Wellness",
-      "block": "H",
-      "teacher": "Ms. Kuhlmann",
-      "room": "P27",
-      "color": "health",
-      "note": "Wednesdays in fall",
-      "short": "H&W"
-    },
-    "Other": {
-      "name": "Other",
-      "color": "other",
-      "short": "—"
-    }
+    "Latin": {"name": "Latin 2-3", "block": "A", "teacher": "Mr. Reid", "room": "J22", "color": "latin", "short": "Lat"},
+    "English": {"name": "English", "block": "B", "teacher": "Mr. Beam", "room": "J20", "color": "eng", "short": "Eng"},
+    "MSI": {"name": "Math-Sci Investigations", "block": "C", "teacher": "Mr. Lieb", "room": "E23", "color": "msi", "short": "MSI"},
+    "French": {"name": "French 1", "block": "D", "teacher": "M. Diop", "room": "P11", "color": "fr", "short": "Fr"},
+    "Forces": {"name": "Forces of Global Change", "block": "E", "teacher": "Ms. Dromgoole", "room": "P26", "color": "fgc", "short": "FGC"},
+    "Arts": {"name": "Arts", "block": "F", "teacher": "Mr. Hiatt", "room": "Lecture Rm", "color": "arts", "short": "Art"},
+    "Glee": {"name": "Glee Club", "block": "H", "teacher": "Mr. Opdycke", "room": "Choral Rm", "color": "glee", "short": "Glee"},
+    "Health": {"name": "Health & Wellness", "block": "H", "teacher": "Ms. Kuhlmann", "room": "P27", "color": "health", "note": "Wednesdays in fall", "short": "H&W"},
+    "Other": {"name": "Other", "color": "other", "short": "—"}
   },
   "after_school": {
     "name": "Soccer (Third)",
     "coach": "Coach Hyde"
   },
+  "bells": [
+    {"slot": 1, "start": "8:30", "end": "9:15"},
+    {"slot": 2, "start": "9:20", "end": "10:05"},
+    {"slot": 3, "start": "10:10", "end": "10:55"},
+    {"slot": 4, "start": "11:00", "end": "11:45", "parts": [["11:00", "11:25"], ["11:30", "11:45"]]},
+    {"lunch": true, "start": "11:50", "end": "12:15"},
+    {"slot": 5, "start": "12:20", "end": "1:05"},
+    {"slot": 6, "start": "1:10", "end": "1:55"},
+    {"slot": 7, "start": "2:00", "end": "2:45"}
+  ],
+  "bells_note": "Start times are from the rotation. 45-minute blocks with 5-minute passing are assumed; the 4th block is 25 + 15 minutes, then a separate 25-minute lunch.",
   "rotations": {
-    "A": {
-      "confirmed": true,
-      "periods": [
-        [
-          "8:30",
-          "Latin"
-        ],
-        [
-          "9:20",
-          "English"
-        ],
-        [
-          "10:10",
-          "MSI"
-        ],
-        [
-          "11:00",
-          "French"
-        ],
-        [
-          "12:20",
-          "Forces"
-        ],
-        [
-          "1:10",
-          "Arts"
-        ]
-      ]
-    },
-    "B": {
-      "confirmed": false,
-      "periods": [
-        [
-          "8:30",
-          "English"
-        ],
-        [
-          "9:20",
-          "MSI"
-        ],
-        [
-          "10:10",
-          "French"
-        ],
-        [
-          "11:00",
-          "Forces"
-        ],
-        [
-          "12:20",
-          "Arts"
-        ],
-        [
-          "2:00",
-          "Glee"
-        ]
-      ]
-    },
-    "C": {
-      "confirmed": true,
-      "periods": [
-        [
-          "8:30",
-          "MSI"
-        ],
-        [
-          "9:20",
-          "French"
-        ],
-        [
-          "10:10",
-          "Forces"
-        ],
-        [
-          "11:00",
-          "Arts"
-        ]
-      ]
-    },
-    "D": {
-      "confirmed": true,
-      "periods": [
-        [
-          "8:30",
-          "French"
-        ],
-        [
-          "9:20",
-          "Forces"
-        ],
-        [
-          "10:10",
-          "Arts"
-        ],
-        [
-          "12:20",
-          "Glee"
-        ],
-        [
-          "1:10",
-          "Latin"
-        ],
-        [
-          "2:00",
-          "English"
-        ]
-      ]
-    },
-    "E": {
-      "confirmed": false,
-      "periods": [
-        [
-          "8:30",
-          "Forces"
-        ],
-        [
-          "9:20",
-          "Arts"
-        ],
-        [
-          "11:00",
-          "Glee"
-        ],
-        [
-          "12:20",
-          "Latin"
-        ],
-        [
-          "1:10",
-          "English"
-        ],
-        [
-          "2:00",
-          "MSI"
-        ]
-      ]
-    },
-    "F": {
-      "confirmed": true,
-      "periods": [
-        [
-          "8:30",
-          "Arts"
-        ],
-        [
-          "10:10",
-          "Health"
-        ],
-        [
-          "11:00",
-          "Latin"
-        ],
-        [
-          "12:20",
-          "English"
-        ],
-        [
-          "1:10",
-          "MSI"
-        ]
-      ]
-    },
-    "G": {
-      "confirmed": false,
-      "periods": [
-        [
-          "9:20",
-          "Glee"
-        ],
-        [
-          "10:10",
-          "Latin"
-        ],
-        [
-          "11:00",
-          "English"
-        ],
-        [
-          "12:20",
-          "MSI"
-        ],
-        [
-          "1:10",
-          "French"
-        ],
-        [
-          "2:00",
-          "Forces"
-        ]
-      ]
-    },
-    "H": {
-      "confirmed": true,
-      "periods": [
-        [
-          "9:20",
-          "Glee"
-        ],
-        [
-          "10:10",
-          "Latin"
-        ],
-        [
-          "11:00",
-          "English"
-        ],
-        [
-          "12:20",
-          "MSI"
-        ],
-        [
-          "1:10",
-          "French"
-        ],
-        [
-          "2:00",
-          "Forces"
-        ]
-      ]
-    }
+    "A": {"confirmed": true, "periods": [["8:30", "Latin"], ["9:20", "English"], ["10:10", "MSI"], ["11:00", "French"], ["12:20", "Forces"], ["1:10", "Arts"]]},
+    "B": {"confirmed": false, "periods": [["8:30", "English"], ["9:20", "MSI"], ["10:10", "French"], ["11:00", "Forces"], ["12:20", "Arts"], ["2:00", "Glee"]]},
+    "C": {"confirmed": true, "periods": [["8:30", "MSI"], ["9:20", "French"], ["10:10", "Forces"], ["11:00", "Arts"]]},
+    "D": {"confirmed": true, "periods": [["8:30", "French"], ["9:20", "Forces"], ["10:10", "Arts"], ["12:20", "Glee"], ["1:10", "Latin"], ["2:00", "English"]]},
+    "E": {"confirmed": false, "periods": [["8:30", "Forces"], ["9:20", "Arts"], ["11:00", "Glee"], ["12:20", "Latin"], ["1:10", "English"], ["2:00", "MSI"]]},
+    "F": {"confirmed": true, "periods": [["8:30", "Arts"], ["10:10", "Health"], ["11:00", "Latin"], ["12:20", "English"], ["1:10", "MSI"]]},
+    "G": {"confirmed": false, "periods": [["9:20", "Glee"], ["10:10", "Latin"], ["11:00", "English"], ["12:20", "MSI"], ["1:10", "French"], ["2:00", "Forces"]]},
+    "H": {"confirmed": true, "periods": [["9:20", "Glee"], ["10:10", "Latin"], ["11:00", "English"], ["12:20", "MSI"], ["1:10", "French"], ["2:00", "Forces"]]}
   },
   "weekday_guess": {
     "2": "H",
@@ -304,14 +43,5 @@
     "4": "D",
     "5": "C"
   },
-  "weekday_guess_note": "Fall pattern seen in October: Tue H, Wed F, Thu D, Fri C; Mondays vary. Day letters in homework.json (from Muse) win over this guess.",
-  "times": [
-    "8:30",
-    "9:20",
-    "10:10",
-    "11:00",
-    "12:20",
-    "1:10",
-    "2:00"
-  ]
+  "weekday_guess_note": "Fall pattern seen in October: Tue H, Wed F, Thu D, Fri C; Mondays vary. Day letters in homework.json (from Muse) win over this guess."
 }

@@ -1,4 +1,4 @@
-// Brian's RL Planner: renders schedule.json + homework.json, keeps check-offs and own items in localStorage.
+// RL Planner: renders schedule.json + homework.json, keeps check-offs and own items in localStorage.
 (() => {
   "use strict";
 
@@ -164,27 +164,135 @@
     el.innerHTML = `<span class="pill" title="Homework last updated ${esc(when)}"><span class="dot"></span>${stale ? `Homework is ${ago} old, check Blackbaud` : `Homework updated ${esc(when)} · ${ago}`}</span>`;
   }
 
-  function renderToday() {
-    const t = today(), day = schoolDay();
-    const isToday = day === t;
-    $("#today-h").textContent = isToday ? "Today" : fmt(day, { weekday: "long" });
-    const { letter } = letterFor(day);
+  // One row per bell slot; a class in a split slot (the 4th block) gets one segment per part.
+  function dayRows(letter) {
     const rot = letter && schedule.rotations[letter];
-    $("#today-meta").textContent = rot ? `${letter} day · ${rot.periods.length} classes` : "";
+    if (!rot) return [];
+    const at = Object.fromEntries(rot.periods);
+    return schedule.bells.map((b) => {
+      if (b.lunch) return { kind: "lunch", bell: b, segs: [{ start: b.start, end: b.end, label: "Lunch" }] };
+      const name = at[b.start];
+      const label = name ? cls(name).name : "Free";
+      const parts = b.parts || [[b.start, b.end]];
+      return {
+        kind: name ? "class" : "free", name, bell: b,
+        segs: parts.map(([s, e], i) => ({ start: s, end: e, label: parts.length > 1 ? `${label} (part ${i + 1} of 2)` : label, name })),
+      };
+    });
+  }
 
-    const mins = now().getHours() * 60 + now().getMinutes();
-    $("#periods").innerHTML = !rot
+  const dur = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${pad(m % 60)}m`);
+  const where = (name) => (name ? cls(name).room || "" : "");
+
+  function nowCard(rows, isToday, day, letter) {
+    const after = schedule.after_school;
+    if (!rows.length) return `<div class="big"><span class="lbl">Set the day letter to see your classes</span></div>`;
+    const firstClass = rows.flatMap((r) => r.segs).find((s) => s.name);
+    if (!isToday) {
+      return `<div class="big"><span class="lbl">${esc(fmt(day, { weekday: "long" }))} is ${/^[AEF]/.test(letter) ? "an" : "a"} ${letter} day</span></div>
+        <div class="sub">First class: <b>${esc(firstClass ? cls(firstClass.name).name : "none")}</b>${firstClass ? ` at ${firstClass.start} in ${esc(where(firstClass.name))}` : ""}</div>`;
+    }
+    // ignore free time before the first class and after the last
+    const segs = rows.flatMap((r) => r.segs);
+    const firstI = segs.findIndex((s) => s.name), lastI = segs.length - 1 - [...segs].reverse().findIndex((s) => s.name);
+    const day_ = segs.slice(firstI, lastI + 1);
+    const m = now().getHours() * 60 + now().getMinutes() + now().getSeconds() / 60;
+    const nextAfter = (i) => day_.slice(i + 1).find((s) => s.name || s.label === "Lunch");
+    const nextLine = (n) => n ? `Then <b>${esc(n.label)}</b> at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : "Last one today";
+
+    if (m < minutes(day_[0].start)) {
+      const left = Math.ceil(minutes(day_[0].start) - m);
+      return `<div class="big"><span class="num">${dur(left)}</span><span class="lbl">until school</span></div>
+        <div class="sub">First: <b>${esc(day_[0].label)}</b> at ${day_[0].start} in ${esc(where(day_[0].name))}</div>`;
+    }
+    if (m >= minutes(day_.at(-1).end)) {
+      return `<div class="big"><span class="lbl">Done with classes for today</span></div>${after ? `<div class="sub">Next: <b>${esc(after.name)}</b></div>` : ""}`;
+    }
+    for (let i = 0; i < day_.length; i++) {
+      const s = day_[i], a = minutes(s.start), b = minutes(s.end);
+      if (m >= a && m < b) {
+        const left = Math.ceil(b - m), pct = Math.round(((m - a) / (b - a)) * 100);
+        return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${dur(left)}</span><span class="lbl">left in ${esc(s.label)}</span></div>
+          <div class="prog" style="${s.name ? cc(s.name) : ""}"><i style="width:${pct}%"></i></div>
+          <div class="sub">Ends ${s.end} · ${nextLine(nextAfter(i))}</div>`;
+      }
+      const n = day_[i + 1];
+      if (n && m >= b && m < minutes(n.start)) {
+        const left = Math.ceil(minutes(n.start) - m);
+        return `<div class="big" style="${n.name ? cc(n.name) : ""}"><span class="num">${dur(left)}</span><span class="lbl">until ${esc(n.label)}</span></div>
+          <div class="sub">${n.name && n.name === s.name ? "Short break · same room" : `Passing time${n.name ? ` · head to <b>${esc(where(n.name))}</b>` : ""}`}</div>`;
+      }
+    }
+    return "";
+  }
+
+  function renderSchedule() {
+    const t = today(), day = schoolDay(), isToday = day === t;
+    const { letter } = letterFor(day);
+    const rows = dayRows(letter);
+    const classes = rows.filter((r) => r.kind === "class").length;
+    $("#sched-h").textContent = isToday ? "Today" : fmt(day, { weekday: "long" });
+    $("#sched-meta").textContent = letter ? `${letter} day · ${classes} classes` : "";
+    $("#now-card").innerHTML = nowCard(rows, isToday, day, letter);
+
+    const m = now().getHours() * 60 + now().getMinutes();
+    const first = rows.findIndex((r) => r.kind === "class");
+    const last = rows.length - 1 - [...rows].reverse().findIndex((r) => r.kind === "class");
+    $("#timeline").innerHTML = !rows.length
       ? `<li class="empty">Set the day letter to see classes.</li>`
-      : rot.periods.map(([time, name]) => {
-          const c = cls(name), start = minutes(time), end = start + 45;
-          const st = !isToday ? "" : mins >= end ? "past" : mins >= start - 5 ? "now" : "";
-          return `<li class="${st}" style="${cc(name)}">
-            <span class="tm">${esc(time)}</span><span class="bar-c"></span>
-            <span class="cn">${esc(c.name)}<span class="who">${esc([c.teacher, c.room].filter(Boolean).join(" · "))}</span></span>
+      : rows.map((r, i) => {
+          if (r.kind === "free" && (i < first || i > last)) return ""; // no class yet / already out
+          const a = minutes(r.bell.start), b = minutes(r.bell.end);
+          const live = isToday && r.segs.find((s) => m >= minutes(s.start) && m < minutes(s.end));
+          const st = !isToday ? "" : m >= b ? "past" : live ? "now" : "";
+          const pct = live ? Math.round(((m - minutes(live.start)) / (minutes(live.end) - minutes(live.start))) * 100) : 0;
+          const c = r.name && cls(r.name);
+          const badge = r.kind === "lunch" ? "L" : c ? c.block : "·";
+          const tm = r.bell.parts ? r.bell.parts.map((p) => p.join("–")).join("<br>") : `${r.bell.start}–${r.bell.end}`;
+          const label = r.kind === "lunch" ? "Lunch" : c ? c.name : "Free";
+          const who = c ? [c.teacher, c.room].filter(Boolean).join(" · ") : "";
+          return `<li class="${r.kind} ${st}" style="${r.name ? cc(r.name) : ""}">
+            <span class="blk">${badge}</span>
+            <span class="cn">${esc(label)}${r.bell.parts && c ? `<span class="split">25 + 15</span>` : ""}${who ? `<span class="who">${esc(who)}</span>` : ""}</span>
+            <span class="tm">${tm}</span>
+            ${live ? `<span class="prog"><i style="width:${pct}%"></i></span>` : ""}
           </li>`;
         }).join("");
-    const a = schedule.after_school;
-    $("#after").innerHTML = a ? `After school: <b>${esc(a.name)}</b>, ${esc(a.coach)}` : "";
+    const af = schedule.after_school;
+    $("#after").innerHTML = af ? `After school: <b>${esc(af.name)}</b>, ${esc(af.coach)}` : "";
+  }
+
+  function renderRotation() {
+    const view = state.view === "letters" ? "letters" : "week";
+    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+    const day = schoolDay();
+    let cols;
+    if (view === "week") {
+      const d = parse(day);
+      const mon = addDays(day, 1 - d.getDay());
+      cols = [0, 1, 2, 3, 4].map((i) => {
+        const date = addDays(mon, i), { letter, from } = letterFor(date);
+        return { key: date, cur: date === day, top: fmt(date, { weekday: "short" }), letter, q: !letter || from === "guess" };
+      });
+    } else {
+      const { letter: curL } = letterFor(day);
+      cols = LETTERS.map((l) => ({ key: l, cur: l === curL, top: "", letter: l, q: !schedule.rotations[l]?.confirmed }));
+    }
+    const head = `<colgroup><col class="tmc">${cols.map(() => "<col>").join("")}</colgroup><thead><tr><th></th>${cols.map((c) =>
+      `<th class="${c.cur ? "cur" : ""}">${esc(c.top)}<small>${c.letter || ""}${c.q ? `<span class="q">?</span>` : ""}</small></th>`).join("")}</tr></thead>`;
+    const rows = schedule.bells.map((b) => {
+      if (b.lunch) return `<tr><td class="tm">${b.start}</td><td class="lunch" colspan="${cols.length}">Lunch</td></tr>`;
+      return `<tr><td class="tm">${b.start}</td>${cols.map((c) => {
+        const p = c.letter && schedule.rotations[c.letter]?.periods.find((x) => x[0] === b.start);
+        if (!p) return `<td class="x"></td>`;
+        return `<td class="${c.cur ? "cur" : ""}" style="${cc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
+      }).join("")}</tr>`;
+    }).join("");
+    $("#rot").className = "rot " + view;
+    $("#rot").innerHTML = head + `<tbody>${rows}</tbody>`;
+    $("#rot-note").textContent = view === "week"
+      ? "? = day letter is a guess. Tap the letter in the top bar to fix today's."
+      : "? = B, E and G times aren't confirmed yet.";
   }
 
   function groupBy(items) {
@@ -223,39 +331,10 @@
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
   }
 
-  function renderBlocks() {
-    const byBlock = {};
-    for (const [key, c] of Object.entries(schedule.classes)) if (c.block) (byBlock[c.block] ||= []).push([key, c]);
-    $("#blocks").innerHTML = LETTERS.map((b) => {
-      const list = byBlock[b];
-      if (!list) return `<li class="free"><span class="blk">${b}</span><span class="nm">Free</span><span></span></li>`;
-      const [key, c] = list[0];
-      const extra = list.slice(1).map(([, x]) => `${x.short}${x.note ? ` ${x.note.replace(/^(\w{3})\w*/, "$1")}` : ""}: ${x.teacher} · ${x.room}`);
-      return `<li style="${cc(key)}"><span class="blk">${b}</span>
-        <span class="nm">${esc(c.name)}<small>${esc(c.teacher || "")}${extra.length ? ` · ${esc(extra.join("; "))}` : ""}</small></span>
-        <span class="rm">${esc(c.room || "")}</span></li>`;
-    }).join("");
-  }
-
-  function renderRotation() {
-    const { letter } = letterFor(schoolDay());
-    const head = `<colgroup><col class="tmc">${LETTERS.map(() => "<col>").join("")}</colgroup><thead><tr><th></th>${LETTERS.map((l) => {
-      const r = schedule.rotations[l];
-      return `<th class="${l === letter ? "cur" : ""}">${l}${r && !r.confirmed ? `<span class="q">?</span>` : ""}</th>`;
-    }).join("")}</tr></thead>`;
-    const rows = schedule.times.map((t) => `<tr><td class="tm">${t}</td>${LETTERS.map((l) => {
-      const p = schedule.rotations[l]?.periods.find((x) => x[0] === t);
-      if (!p) return `<td class="x"></td>`;
-      return `<td class="${l === letter ? "cur" : ""}" style="${cc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
-    }).join("")}</tr>`).join("");
-    $("#rot").innerHTML = head + `<tbody>${rows}</tbody>`;
-  }
-
   function render() {
     renderBar();
-    renderToday();
+    renderSchedule();
     renderHomework();
-    renderBlocks();
     renderRotation();
   }
 
@@ -294,6 +373,14 @@
       save();
       render();
     }
+  });
+
+  document.querySelector(".seg").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-view]");
+    if (!b) return;
+    state.view = b.dataset.view;
+    save();
+    renderRotation();
   });
 
   // add / edit dialog
@@ -396,6 +483,16 @@
   };
   paintThemeBtn();
 
+  // ?font=Some+Family tries another Google font without editing the CSS
+  const tryFont = new URLSearchParams(location.search).get("font");
+  if (tryFont && /^[\w ]{2,40}$/.test(tryFont)) {
+    const l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(tryFont).replace(/%20/g, "+")}:wght@400;500;600;700&display=swap`;
+    document.head.append(l);
+    document.documentElement.style.setProperty("--sans", `"${tryFont}",system-ui,sans-serif`);
+  }
+
   // ---------- boot ----------
   async function getJSON(path) {
     const r = await fetch(path, { cache: "no-cache" });
@@ -406,8 +503,9 @@
     .then(([s, h]) => {
       schedule = s;
       homework = h;
+      document.title = s.owner ? `${s.owner}'s RL Planner` : "RL Planner";
       render();
-      setInterval(() => { renderBar(); renderToday(); }, 60_000);
+      setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
     })
     .catch((err) => {
       $(".dash").innerHTML = `<p class="empty-state">Couldn't load the schedule (${esc(err.message)}). If you opened the file directly, serve the folder instead: <code>python3 -m http.server</code>.</p>`;

@@ -1,8 +1,8 @@
 # RL Planner
 
-Brian's Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
+A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 
-- `schedule.json`: classes, blocks, day-letter rotations (B, E, G marked unconfirmed).
+- `schedule.json`: `owner` (first name shown in the page title), classes, blocks, day-letter rotations (B, E, G marked unconfirmed).
 - `homework.json`: latest assignments (`assignments`), optional day letters (`days`, `"YYYY-MM-DD": "H"`), and `updated_at`. The daily update only touches this file.
 - Check-offs and added assignments live in the browser's localStorage; Export / Import moves them between devices.
 

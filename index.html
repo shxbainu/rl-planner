@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#7a1a22">
-<title>Brian's RL Planner</title>
+<title>RL Planner</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a1a22'/%3E%3Ctext x='32' y='43' font-family='Helvetica,Arial,sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ERL%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,9 +31,10 @@
 </header>
 
 <main class="dash">
-  <section class="panel p-today" aria-labelledby="today-h">
-    <div class="panel-h"><h2 id="today-h">Today</h2><span class="panel-meta" id="today-meta"></span></div>
-    <ol class="periods" id="periods"></ol>
+  <section class="panel p-sched" aria-labelledby="sched-h">
+    <div class="panel-h"><h2 id="sched-h">Schedule</h2><span class="panel-meta" id="sched-meta"></span></div>
+    <div class="now-card" id="now-card"></div>
+    <ol class="tl" id="timeline"></ol>
     <p class="after" id="after"></p>
   </section>
 
@@ -46,14 +47,15 @@
     </details>
   </section>
 
-  <section class="panel p-blocks" aria-labelledby="blocks-h">
-    <div class="panel-h"><h2 id="blocks-h">My blocks</h2></div>
-    <ul class="blocks" id="blocks"></ul>
-  </section>
-
-  <section class="panel p-rot" aria-labelledby="rot-h">
-    <div class="panel-h"><h2 id="rot-h">Rotation</h2><span class="panel-meta"><span class="unc-key">?</span> = times not confirmed yet</span></div>
+  <section class="panel p-week" aria-labelledby="week-h">
+    <div class="panel-h"><h2 id="week-h">Rotation</h2>
+      <div class="seg" role="group" aria-label="Rotation view">
+        <button type="button" data-view="week" aria-pressed="true">This week</button>
+        <button type="button" data-view="letters" aria-pressed="false">All letters</button>
+      </div>
+    </div>
     <div class="rot-scroll"><table class="rot" id="rot"></table></div>
+    <p class="panel-foot" id="rot-note"></p>
   </section>
 </main>
 
