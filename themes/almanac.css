@@ -1,0 +1,147 @@
+/* SEED ALMANAC: a vintage seed catalog and farmer's almanac. Kraft paper, cream seed packets, tomato / mustard / leaf.
+   Each panel is a packet with a small flat illustration and a scalloped foot. Cheerful, with plenty of air; no mascots. */
+@import url("https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Work+Sans:wght@400;500;600;700&display=swap");
+
+html[data-skin="almanac"]:root{
+  --bg:#e6d5b8; --surface:#f6eedc; --surface-2:#f0e5cd; --fg:#3b2e22; --muted:#665544; --line:#ddcca9;
+  --tomato:#d9502f; --mustard:#e2a93b; --leaf:#5e8c4a;
+  --accent:#b8401f; --accent-fg:#fff8ea; --accent-soft:#f6dccd; --done:#968670;
+  --warn:#80570f; --warn-soft:#f5e3b5; --bad:#a83a1c; --bad-soft:#f5d9cd; --leaf-ink:#3f6a2e;
+  --c-glee:#3f9187; --c-latin:#e2a93b; --c-eng:#5a7fc2; --c-msi:#5e8c4a; --c-fr:#7a4e86; --c-fgc:#d9502f; --c-arts:#c95c83; --c-health:#d98632; --c-other:#968670;
+  --sans:"Work Sans",system-ui,sans-serif; --mono:"Work Sans",system-ui,sans-serif; --head:"Abril Fatface",Georgia,serif;
+  --moon-dark:#cbb48c; --moon-lit:#f9f1dc;
+  --leave-ms:700;
+  color-scheme:light;
+}
+html[data-skin="almanac"][data-mode="dark"]:root{
+  --bg:#221a13; --surface:#2f251c; --surface-2:#382c21; --fg:#f1e6d0; --muted:#c4b398; --line:#4a3b2c;
+  --tomato:#ec6a48; --mustard:#f0bc55; --leaf:#7aaa62;
+  --accent:#ec6a48; --accent-fg:#221a13; --accent-soft:#45291e; --done:#8c7d68;
+  --warn:#f0bc55; --warn-soft:#3d3020; --bad:#f08a6c; --bad-soft:#45271d; --leaf-ink:#93c07b;
+  --c-glee:#5eb0a5; --c-latin:#f0bc55; --c-eng:#7c9ddb; --c-msi:#7aaa62; --c-fr:#a679b3; --c-fgc:#ec6a48; --c-arts:#e07fa2; --c-health:#ee9f4f;
+  --moon-dark:#4a3b2c; --moon-lit:#f1e6d0;
+  color-scheme:dark;
+}
+
+html[data-skin="almanac"]{
+  /* kraft paper fiber on the page only */
+  body{background-color:var(--bg);font-size:13.5px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7 0.05' numOctaves='2' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.24 0 0 0 0 0.12 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23k)'/%3E%3C/svg%3E")}
+
+  /* header, with an almanac strip beside the date */
+  .bar{background:var(--surface);border-bottom:2px solid var(--fg)}
+  .bar-date{font-family:var(--head);font-weight:400;font-size:21px;letter-spacing:.01em}
+  .letter-pick select{border-radius:50%;background:var(--accent);color:var(--accent-fg);font-family:var(--head);font-weight:400;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--accent)}
+  @media (min-width:1100px){
+    .almanac{display:flex;align-items:center;gap:8px;margin-left:10px;padding-left:12px;border-left:1px solid var(--line);font-size:12px;line-height:1.25;white-space:nowrap}
+    .almanac svg{width:22px;height:22px;flex:none}
+    .almanac .m-dark{fill:var(--moon-dark)}
+    .almanac .m-lit{fill:var(--moon-lit);stroke:var(--fg);stroke-width:.6}
+    .almanac b{display:block;font-variant:small-caps;font-weight:600;letter-spacing:.04em}
+    .almanac small{display:block;color:var(--muted);font-size:11.5px}
+  }
+  .bar-status span.pill{border-radius:999px;background:var(--surface-2)}
+  .btn,.icon-btn,.skin-pick{border-radius:6px;background:var(--surface-2)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+  .link{color:var(--accent)}
+  .foot .link{color:var(--fg)}
+
+  /* panels: seed packets with a printed band, a small illustration and a scalloped foot */
+  .panel{position:relative;border-radius:6px 6px 0 0;border:0;border-top:6px solid var(--band,var(--leaf));background:var(--surface);padding-bottom:20px;
+    -webkit-mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat;
+    mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat}
+  .p-hw{--band:var(--tomato)}
+  .p-sched{--band:var(--mustard)}
+  .p-big{--band:var(--tomato)}
+  .p-week{--band:var(--leaf)}
+  details.extra{border-radius:6px;border:1px solid var(--line);background:var(--surface)}
+  .panel-h h2,.x-name{font-family:var(--head);font-weight:400;text-transform:none;letter-spacing:.01em;font-size:19px}
+  .x-name{font-size:16px}
+  .panel-h h2::before{width:20px;height:20px;border-radius:0;background:var(--pkt) center/contain no-repeat}
+  /* carrot, sunflower, tomato, pea pod: flat, two or three colors each */
+  .p-hw{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M12.5 6.5 4 17.5c-.6.7.2 1.4.9.9L15.5 9z' fill='%23d98632'/%3E%3Cpath d='M13 7c.5-2.5 1.8-4.6 3.6-5.4-.3 1.6-.9 3.2-2 4.6 1.6-.6 3.3-.6 4.4 0-1.7 1-3.5 1.6-5.3 1.6z' fill='%235e8c4a'/%3E%3C/svg%3E")}
+  .p-sched{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='%23e2a93b'%3E%3Cellipse cx='10' cy='3.2' rx='1.8' ry='3'/%3E%3Cellipse cx='10' cy='16.8' rx='1.8' ry='3'/%3E%3Cellipse cx='3.2' cy='10' rx='3' ry='1.8'/%3E%3Cellipse cx='16.8' cy='10' rx='3' ry='1.8'/%3E%3Cellipse cx='5.2' cy='5.2' rx='1.7' ry='2.8' transform='rotate(-45 5.2 5.2)'/%3E%3Cellipse cx='14.8' cy='14.8' rx='1.7' ry='2.8' transform='rotate(-45 14.8 14.8)'/%3E%3Cellipse cx='14.8' cy='5.2' rx='1.7' ry='2.8' transform='rotate(45 14.8 5.2)'/%3E%3Cellipse cx='5.2' cy='14.8' rx='1.7' ry='2.8' transform='rotate(45 5.2 14.8)'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='3.6' fill='%235a3a22'/%3E%3C/svg%3E")}
+  .p-big{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 6.5c4.6 0 7.5 2.6 7.5 6s-3.2 6-7.5 6-7.5-2.6-7.5-6 2.9-6 7.5-6z' fill='%23d9502f'/%3E%3Cpath d='M10 7.5 7 4.5l2.2.6L10 2.5l.8 2.6L13 4.5z' fill='%235e8c4a'/%3E%3C/svg%3E")}
+  .p-week{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M2.5 15C5 8 11 4.5 17.5 4.5 16 11 10.5 16 2.5 15z' fill='%235e8c4a'/%3E%3Cg fill='%239cc47e'%3E%3Ccircle cx='7' cy='12.2' r='1.7'/%3E%3Ccircle cx='10.2' cy='10' r='1.7'/%3E%3Ccircle cx='13.4' cy='7.6' r='1.7'/%3E%3C/g%3E%3C/svg%3E")}
+  .panel-meta,.x-tease,.panel-foot{font-size:11.5px}
+
+  /* countdown: a "time to harvest" label */
+  .now-card{border-radius:4px;background:var(--surface-2);border:1.5px dashed color-mix(in srgb,var(--fg) 35%,transparent)}
+  .now-card::before{content:"Time to harvest";font-variant:small-caps;font-weight:600;letter-spacing:.06em;font-size:12px;color:var(--leaf-ink)}
+  .now-card .num{font-family:var(--head);font-weight:400;font-size:40px;color:var(--fg)}
+  .now-card .lbl{font-weight:600}
+  .prog{height:5px;background:color-mix(in srgb,var(--leaf) 20%,transparent)}
+  .prog i{background:var(--leaf)}
+
+  /* schedule: round seed-company stamps */
+  .tl li{border-radius:4px}
+  .tl .blk{width:26px;height:26px;border-radius:50%;background:var(--surface);color:var(--fg);border:3px double var(--cc);font-weight:700;font-size:12px}
+  .tl li{grid-template-columns:26px 1fr auto}
+  .tl .cn{font-weight:600}
+  .tl .split{color:var(--muted)}
+  .tl li.now{background:var(--warn-soft)}
+  .tl li.now .tm{color:var(--fg);font-weight:600}
+  .tl li.lunch{background:transparent}
+  .after{border-top:1px dashed var(--line)}
+
+  /* homework: little packet cards, chips with a seed dot */
+  .cal .dow{font-variant:small-caps;text-transform:lowercase;font-weight:600;letter-spacing:.08em;font-size:12.5px}
+  .cell{border-radius:5px;background:var(--surface-2);border:1px solid var(--line)}
+  .cell .top b{font-family:var(--head);font-weight:400;font-size:16px}
+  .cell.today .top b{background:var(--accent);color:var(--accent-fg);border-radius:999px;padding:0 6px}
+  .cell.sel{border-color:var(--leaf);box-shadow:inset 0 0 0 1px var(--leaf)}
+  .chip2{border:0;border-radius:3px;background:var(--surface);padding:2px 5px;font-size:11.5px}
+  .chip2::before{content:"";display:inline-block;width:6px;height:8px;margin-right:4px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;background:var(--cc);vertical-align:0}
+  .chip2.major{background:var(--warn-soft);font-weight:600}
+
+  /* checklist: checking off pops a tiny sprout; the Done counter grows a plant through the day */
+  .item{position:relative;border-radius:5px;background:var(--surface-2);border-left:4px solid var(--cc)}
+  .item.major{background:var(--warn-soft)}
+  .check{border-radius:50%;border-width:2px}
+  .title{font-weight:500}
+  .chip{color:var(--fg);font-variant:small-caps;font-weight:600;letter-spacing:.03em;font-size:12.5px}
+  .tag{border-radius:3px;background:transparent;color:var(--fg);border:1.5px solid var(--cc);font-variant:small-caps;text-transform:lowercase;letter-spacing:.06em;font-size:12px}
+  .tag.bad{color:var(--bad);border-color:var(--bad);background:transparent}
+  .item.leaving{opacity:1}
+  .item.leaving.done{opacity:.7;transition:opacity .3s .35s}
+  .item.leaving.done::after{content:"";position:absolute;right:46px;top:50%;width:20px;height:22px;margin-top:-14px;transform-origin:50% 100%;animation:al-sprout .35s cubic-bezier(.3,1.4,.6,1);
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 22'%3E%3Cpath d='M10 21V10' stroke='%235e8c4a' stroke-width='1.8' stroke-linecap='round'/%3E%3Cpath d='M10 12C10 7 6.5 4.5 2.5 5c0 4 3 7 7.5 7zM10 10.5c0-4.5 3-7.5 7.5-7.5 0 4.5-3 7.5-7.5 7.5z' fill='%235e8c4a'/%3E%3C/svg%3E") center/contain no-repeat;pointer-events:none}
+  .done-box summary::after{content:"";width:18px;height:20px;margin-left:2px;background:center bottom/contain no-repeat}
+  .done-box:has(.count[data-stage="1"]) summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 20'%3E%3Cpath d='M9 19.5v-5' stroke='%235e8c4a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M9 15c0-2.5-2-4-4.5-3.8C4.5 13.6 6.5 15 9 15z' fill='%235e8c4a'/%3E%3C/svg%3E")}
+  .done-box:has(.count[data-stage="2"]) summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 20'%3E%3Cpath d='M9 19.5v-9' stroke='%235e8c4a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M9 15c0-2.5-2-4-4.5-3.8C4.5 13.6 6.5 15 9 15zM9 12c0-2.6 2-4.5 4.8-4.5 0 2.7-2 4.5-4.8 4.5z' fill='%235e8c4a'/%3E%3C/svg%3E")}
+  .done-box:has(.count[data-stage="3"]) summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 20'%3E%3Cpath d='M9 19.5v-13' stroke='%235e8c4a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M9 15c0-2.5-2-4-4.5-3.8C4.5 13.6 6.5 15 9 15zM9 12c0-2.6 2-4.5 4.8-4.5 0 2.7-2 4.5-4.8 4.5z' fill='%235e8c4a'/%3E%3Cellipse cx='9' cy='4.5' rx='2.2' ry='3' fill='%23e2a93b'/%3E%3C/svg%3E")}
+  .done-box:has(.count[data-stage="4"]) summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 20'%3E%3Cpath d='M9 19.5v-12' stroke='%235e8c4a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M9 15c0-2.5-2-4-4.5-3.8C4.5 13.6 6.5 15 9 15zM9 12c0-2.6 2-4.5 4.8-4.5 0 2.7-2 4.5-4.8 4.5z' fill='%235e8c4a'/%3E%3Cg fill='%23d9502f'%3E%3Ccircle cx='9' cy='2.4' r='2'/%3E%3Ccircle cx='11.6' cy='4.6' r='2'/%3E%3Ccircle cx='10.6' cy='7.4' r='2'/%3E%3Ccircle cx='7.4' cy='7.4' r='2'/%3E%3Ccircle cx='6.4' cy='4.6' r='2'/%3E%3C/g%3E%3Ccircle cx='9' cy='5.2' r='1.6' fill='%23e2a93b'/%3E%3C/svg%3E")}
+  .count{background:var(--leaf-ink);color:#fff8ea}
+  &[data-mode="dark"] .count{color:#221a13}
+  .hw-note,.empty-state,.overdue-strip{border-radius:5px}
+
+  /* tests & quizzes: germination-time labels */
+  .big li{border-radius:5px;background:var(--surface-2);border-left:4px solid var(--cc)}
+  .big .d{color:var(--fg);border:1.5px solid var(--leaf);border-radius:4px;padding:3px 5px;font-family:var(--head);font-weight:400;font-size:20px;background:var(--surface)}
+  .big .d small{color:var(--leaf-ink);font-family:var(--sans);font-variant:small-caps;text-transform:lowercase;letter-spacing:.06em;font-size:11px}
+
+  /* rotation: a planting chart with a light ruled grid */
+  .seg{border-radius:6px;background:var(--surface-2)}
+  .seg button{border-radius:4px}
+  .seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg)}
+  .rot{border-spacing:0}
+  .rot th{font-variant:small-caps;text-transform:lowercase;letter-spacing:.06em;border-radius:0}
+  .rot th small{font-family:var(--head);font-weight:400;font-size:15px}
+  .rot th.cur{background:var(--accent);color:var(--accent-fg);border-radius:4px 4px 0 0}
+  .rot td{border-radius:0;color:var(--fg);font-weight:600;background:color-mix(in srgb,var(--cc) 20%,var(--surface));border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .rot td.x,.rot td.tm{border-right:0;background:none}
+  .rot td.cur{outline:2px solid var(--accent);outline-offset:-2px}
+  .rot td.lunch{background:transparent}
+
+  /* extras: almanac-style boxed tables */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:var(--surface);border:1px solid var(--fg);border-top:3px double var(--fg)}
+  .counts .n{font-family:var(--head);font-weight:400;color:var(--accent)}
+  .count-form input{border-radius:5px}
+  dialog{border-radius:8px}
+
+  @media (max-width:600px){
+    .chip2{font-size:0;padding:0;height:5px;border:0;background:var(--cc)}
+    .chip2::before{display:none}
+  }
+}
+@keyframes al-sprout{from{transform:scale(0)}to{transform:scale(1)}}

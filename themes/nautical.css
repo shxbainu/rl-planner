@@ -1,0 +1,140 @@
+/* NAUTICAL CHART: a ship's navigation chart. Calm sea with depth contours, panels as sand-colored land with a navy coastline.
+   Place-name lettering for headings, soundings in mono. No anchors, ships or rope. */
+@import url("https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap");
+
+html[data-skin="nautical"]:root{
+  --bg:#dce7ea; --surface:#e9dfc7; --surface-2:#f1e9d6; --fg:#1d2e44; --muted:#4a5d72; --line:#c9bc9c; --coast:#1d2e44;
+  --accent:#1d2e44; --accent-fg:#f1e9d6; --accent-soft:#dfe3dc; --done:#7d8389;
+  --warn:#7d5a12; --warn-soft:#efe0bc; --bad:#a3321f; --bad-soft:#f1d8cd; --red:#c8442f; --buoy:#2f7d5b;
+  --c-glee:#3e9a93; --c-latin:#a88a3c; --c-eng:#2f6ba8; --c-msi:#3e7d4f; --c-fr:#6c5a9e; --c-fgc:#c8442f; --c-arts:#cf7a6b; --c-health:#7f8a45; --c-other:#7d8389;
+  --sans:"DM Sans",system-ui,sans-serif; --mono:"DM Mono",ui-monospace,monospace; --head:"Libre Caslon Text",Georgia,serif;
+  --leave-ms:650;
+  color-scheme:light;
+}
+html[data-skin="nautical"][data-mode="dark"]:root{
+  --bg:#0f1e2b; --surface:#182a3a; --surface-2:#1d3245; --fg:#dce7ea; --muted:#9fb3c2; --line:#2b4256; --coast:#7f9bb1;
+  --accent:#dce7ea; --accent-fg:#0f1e2b; --accent-soft:#213a50; --done:#73858f;
+  --warn:#e2bd6c; --warn-soft:#2c3326; --bad:#e8826e; --bad-soft:#36242a; --red:#e06a55; --buoy:#5cb48b;
+  --c-glee:#5bbab2; --c-latin:#c9a85a; --c-eng:#5f97d1; --c-msi:#64a875; --c-fr:#9a88cc; --c-fgc:#e06a55; --c-arts:#e09a8c; --c-health:#a3ad66;
+  color-scheme:dark;
+}
+
+html[data-skin="nautical"]{
+  /* the sea: depth contours, and a lat/long frame with ticks */
+  body{background-color:var(--bg);font-size:13.5px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='180' fill='none' stroke='%231d2e44' stroke-opacity='.11'%3E%3Cpath d='M0 30c40-14 80 12 130 0s90-14 130 0M0 70c50-18 90 16 130 2s80-16 130-2M0 112c36-10 84 14 130 0s94-12 130 0M0 150c44-16 86 12 130-2s86-10 130 2'/%3E%3Cpath d='M0 50c46-10 84 10 130 0s84-10 130 0M0 132c40-8 90 10 130 0s90-10 130 0' stroke-dasharray='2 4'/%3E%3C/svg%3E")}
+  &[data-mode="dark"] body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='180' fill='none' stroke='%2323394c'%3E%3Cpath d='M0 30c40-14 80 12 130 0s90-14 130 0M0 70c50-18 90 16 130 2s80-16 130-2M0 112c36-10 84 14 130 0s94-12 130 0M0 150c44-16 86 12 130-2s86-10 130 2'/%3E%3Cpath d='M0 50c46-10 84 10 130 0s84-10 130 0M0 132c40-8 90 10 130 0s90-10 130 0' stroke-dasharray='2 4'/%3E%3C/svg%3E")}
+  body::before{content:"";position:fixed;inset:4px;pointer-events:none;z-index:-1;border:1px solid color-mix(in srgb,var(--coast) 45%,transparent);
+    background:
+      repeating-linear-gradient(90deg,color-mix(in srgb,var(--coast) 55%,transparent) 0 1px,transparent 1px 20px) top/100% 5px no-repeat,
+      repeating-linear-gradient(90deg,color-mix(in srgb,var(--coast) 55%,transparent) 0 1px,transparent 1px 20px) bottom/100% 5px no-repeat,
+      repeating-linear-gradient(0deg,color-mix(in srgb,var(--coast) 55%,transparent) 0 1px,transparent 1px 20px) left/5px 100% no-repeat,
+      repeating-linear-gradient(0deg,color-mix(in srgb,var(--coast) 55%,transparent) 0 1px,transparent 1px 20px) right/5px 100% no-repeat}
+
+  /* header */
+  .bar{background:var(--surface);border-bottom:1.5px solid var(--coast)}
+  .bar-date{font-family:var(--head);font-weight:400;font-size:18px;letter-spacing:.1em;text-transform:uppercase}
+  .letter-pick select{border-radius:50%;background:var(--accent);color:var(--accent-fg);font-family:var(--head);font-weight:700;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--coast)}
+  .bar-status span.pill{border-radius:2px;background:var(--surface-2);border-color:var(--line);font-family:var(--mono);font-size:11.5px}
+  .btn,.icon-btn,.skin-pick{border-radius:2px;background:var(--surface-2);border-color:var(--line)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+  .link{color:var(--fg)}
+
+  /* panels: land with a coastline */
+  .panel,details.extra{border-radius:3px;background:var(--surface);border:1.5px solid var(--coast);box-shadow:0 0 0 3px color-mix(in srgb,var(--surface) 55%,transparent)}
+  .panel-h h2,.x-name{font-family:var(--head);font-weight:400;text-transform:uppercase;letter-spacing:.2em;font-size:13px}
+  .x-name{font-size:12px}
+  .panel-h h2::before{width:7px;height:7px;border-radius:50%;background:transparent;border:1.5px solid var(--coast)}
+  .panel-meta,.x-tease,.panel-foot{font-family:var(--mono);font-size:11px}
+
+  /* compass rose beside the week arrows */
+  .cal-nav::before{content:"";width:22px;height:22px;margin-right:2px;background:var(--fg);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke='black' stroke-width='.8'/%3E%3Cpath d='M12 1.5 13.6 10.4 12 12 10.4 10.4Z'/%3E%3Cpath d='M12 22.5 10.4 13.6 12 12 13.6 13.6Z' fill-opacity='.45'/%3E%3Cpath d='M1.5 12 10.4 10.4 12 12 10.4 13.6ZM22.5 12 13.6 13.6 12 12 13.6 10.4Z' fill-opacity='.6'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke='black' stroke-width='.8'/%3E%3Cpath d='M12 1.5 13.6 10.4 12 12 10.4 10.4Z'/%3E%3Cpath d='M12 22.5 10.4 13.6 12 12 13.6 13.6Z' fill-opacity='.45'/%3E%3Cpath d='M1.5 12 10.4 10.4 12 12 10.4 13.6ZM22.5 12 13.6 13.6 12 12 13.6 10.4Z' fill-opacity='.6'/%3E%3C/svg%3E") center/contain no-repeat}
+  .cal-nav .icon-btn{border-radius:50%}
+
+  /* countdown: a tide-table box */
+  .now-card{border-radius:0;background:var(--surface-2);border:1px solid var(--coast);padding:8px 14px 10px}
+  .now-card::before{content:"TIME TO DEPARTURE";font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);border-bottom:1px solid var(--coast);padding-bottom:3px}
+  .now-card .num{font-family:var(--mono);font-weight:500;font-size:32px;color:var(--fg);letter-spacing:-.02em}
+  .now-card .lbl{font-weight:600}
+  .prog{height:3px;border-radius:0;background:color-mix(in srgb,var(--coast) 18%,transparent)}
+  .prog i{border-radius:0;background:var(--coast)}
+
+  /* schedule: buoy markers */
+  .tl li{border-radius:2px}
+  .tl .blk{border-radius:50% 50% 3px 3px;background:color-mix(in srgb,var(--cc) 26%,var(--surface));color:var(--fg);border:2px solid var(--cc);font-family:var(--mono);font-weight:500;font-size:12px}
+  .tl .cn{font-weight:600}
+  .tl .tm{font-family:var(--mono)}
+  .tl .split{color:var(--muted);font-family:var(--mono);font-weight:500}
+  .tl li.now{background:var(--accent-soft)}
+  .tl li.now .tm{color:var(--fg);font-weight:500}
+  .tl li.lunch{background:transparent}
+  .after{border-top:1px dashed var(--coast)}
+
+  /* homework: chart squares, waypoint dots, red buoys for tests */
+  .cal .dow{font-family:var(--head);letter-spacing:.16em;font-weight:400}
+  .cell{border-radius:0;background:var(--surface-2);border:1px solid color-mix(in srgb,var(--coast) 30%,transparent)}
+  .cell .top b{font-family:var(--mono);font-weight:500}
+  .cell .top .lt{font-family:var(--mono);font-style:italic}
+  .cell.today .top b{background:var(--accent);color:var(--accent-fg);border-radius:50%;padding:0 5px}
+  .cell.sel{border-color:var(--coast);box-shadow:inset 0 0 0 1px var(--coast)}
+  .chip2{border:0;border-radius:0;background:transparent;padding:1px 3px;font-size:11.5px}
+  .chip2::before{content:"";display:inline-block;width:7px;height:7px;margin-right:4px;border-radius:50%;background:var(--cc);vertical-align:0}
+  .chip2.major{font-weight:600;background:color-mix(in srgb,var(--red) 10%,transparent)}
+  .chip2.major::before{border-radius:0;width:8px;height:9px;background:var(--red);clip-path:polygon(50% 0,100% 100%,0 100%)}
+
+  /* checklist: waypoints along a dotted route; checking fills the dot and inks that leg */
+  .list{gap:3px}
+  .item{position:relative;border-radius:2px;background:transparent;border-left:0;padding-left:8px}
+  .item::before{content:"";position:absolute;left:17px;top:-4px;bottom:-4px;border-left:2px dotted color-mix(in srgb,var(--coast) 55%,transparent)}
+  .item.done::before{border-left-style:solid;border-color:var(--buoy)}
+  .item.major{background:color-mix(in srgb,var(--red) 7%,transparent)}
+  .check{position:relative;border-radius:50%;border-width:2px;background:var(--surface)}
+  .check:checked{background:var(--cc)}
+  .item.leaving.done .check{animation:nc-fill .3s ease-out}
+  .title{font-weight:500}
+  .chip{color:var(--fg)}
+  .tag{border-radius:2px;background:var(--accent);color:var(--accent-fg);font-family:var(--mono);font-weight:500}
+  .tag.bad{background:var(--red);color:#fff}
+  .next{font-family:var(--mono)}
+  .item.leaving{opacity:1}
+  .item.leaving.done{opacity:.7;transition:opacity .3s .3s}
+  .hw-note,.empty-state,.overdue-strip{border-radius:2px}
+  .count{border-radius:2px;background:var(--accent);color:var(--accent-fg);font-family:var(--mono)}
+
+  /* tests & quizzes: red buoys, soundings */
+  .big li{grid-template-columns:12px minmax(44px,auto) 1fr;border-radius:0;background:transparent;border-left:0;border-bottom:1px solid var(--line)}
+  .big li::before{content:"";width:10px;height:12px;background:var(--red);clip-path:polygon(50% 0,100% 100%,0 100%)}
+  .big .d{color:var(--fg);font-family:var(--mono);font-style:italic;font-weight:400;font-size:20px}
+  .big .d small{font-style:normal;font-family:var(--mono);font-weight:400}
+
+  /* rotation: tide-table entries */
+  .seg{border-radius:2px;background:var(--surface-2)}
+  .seg button{border-radius:1px;font-family:var(--mono);font-weight:500;font-size:11px}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+  .rot{border-spacing:0}
+  .rot th{font-family:var(--head);font-weight:400;letter-spacing:.12em;border-radius:0}
+  .rot th small{font-family:var(--mono);font-weight:500}
+  .rot th.cur{background:var(--accent);color:var(--accent-fg)}
+  .rot td{border-radius:0;background:transparent;color:var(--fg);font-family:var(--mono);font-weight:500;border-bottom:1px solid color-mix(in srgb,var(--coast) 25%,transparent);box-shadow:inset 3px 0 0 var(--cc)}
+  .rot td.x,.rot td.tm{box-shadow:none}
+  .rot td.cur{outline:0;background:color-mix(in srgb,var(--coast) 9%,transparent)}
+  .rot td.lunch{box-shadow:none;background:transparent}
+
+  /* extras: chart-legend boxes */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:var(--surface-2);border:1px solid color-mix(in srgb,var(--coast) 45%,transparent)}
+  .counts .n{font-family:var(--mono);color:var(--fg)}
+  .count-form input{border-radius:2px}
+  dialog{border-radius:3px;border:1.5px solid var(--coast)}
+
+  @media (max-width:759px){
+    .bar .bar-date{font-size:13.5px}
+  }
+  @media (max-width:600px){
+    .chip2{font-size:0;padding:0;height:5px;border:0;background:var(--cc)}
+    .chip2::before{display:none}
+    .chip2.major{background:var(--red)}
+  }
+}
+@keyframes nc-fill{from{transform:scale(.6)}to{transform:scale(1)}}

@@ -41,7 +41,7 @@ jobs:
           cp -r themes _site/themes
           # version the asset links so browsers don't keep a stale script after a deploy
           v="${GITHUB_SHA::7}"
-          sed -i "s#href=\"style.css\"#href=\"style.css?v=$v\"#; s#src=\"app.js\"#src=\"app.js?v=$v\"#" _site/index.html
+          sed -i "s#href=\"style.css\"#href=\"style.css?v=$v\"#; s#src=\"app.js\"#src=\"app.js?v=$v\"#; s#__V__#$v#g" _site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

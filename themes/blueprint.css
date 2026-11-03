@@ -1,0 +1,144 @@
+/* BLUEPRINT: an architect's drawing table. Blueprint sheets with fine linework, mono annotations, one yellow highlighter.
+   The drafting grid stays on the page; panels are clean sheets so small text never sits on it. Light mode is a white print. */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+html[data-skin="blueprint"]:root{
+  /* light: white print */
+  --bg:#fbfcfe; --surface:#ffffff; --surface-2:#f5f8fc; --fg:#1d3a66; --muted:#4a6286; --line:#c3d2e8;
+  --hi:#f2b90c; --hi-ink:#1d3a66; --accent:#1d3a66; --accent-fg:#ffffff; --accent-soft:#fff3c4; --done:#8293ad;
+  --warn:#7d5a00; --warn-soft:#fff3c4; --bad:#b0361d; --bad-soft:#fbe3dc;
+  --grid-minor:#e1e9f5; --grid-major:#c9d7ec; --sheet-line:color-mix(in srgb,#1d3a66 70%,transparent);
+  --c-glee:#0f8c8c; --c-latin:#a87a00; --c-eng:#2f5fb3; --c-msi:#2e8a4a; --c-fr:#6b4fc0; --c-fgc:#c2531f; --c-arts:#b83e78; --c-health:#6a8a12; --c-other:#7d8aa0;
+  --sans:"IBM Plex Mono",ui-monospace,monospace; --mono:"IBM Plex Mono",ui-monospace,monospace; --head:"Space Grotesk",system-ui,sans-serif;
+  --arrow-l:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 9'%3E%3Cpath d='M0 4.5 7 1v7z'/%3E%3C/svg%3E");
+  --arrow-r:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 9'%3E%3Cpath d='M7 4.5 0 1v7z'/%3E%3C/svg%3E");
+  --leave-ms:700;
+  color-scheme:light;
+}
+html[data-skin="blueprint"][data-mode="dark"]:root{
+  --bg:#1f4e8c; --surface:#1b4783; --surface-2:#22528f; --fg:#f4f8ff; --muted:#cfe0f5; --line:#3d6aa8;
+  --hi:#ffd45c; --hi-ink:#16365f; --accent:#ffd45c; --accent-fg:#16365f; --accent-soft:#2a5a99; --done:#9fb8d8;
+  --warn:#ffd45c; --warn-soft:#2a5a99; --bad:#ffb08f; --bad-soft:#3a4f86;
+  --grid-minor:#2e63a6; --grid-major:#4a7dc0; --sheet-line:rgb(244 248 255 / .75);
+  --c-glee:#7fe0e0; --c-latin:#ffd45c; --c-eng:#a8c8ff; --c-msi:#8fe3a1; --c-fr:#c6b4ff; --c-fgc:#ff9a6b; --c-arts:#ffaacd; --c-health:#d2f08a; --c-other:#b5c7df;
+  color-scheme:dark;
+}
+
+html[data-skin="blueprint"]{
+  /* the drafting grid: minor lines, a major line every five */
+  body{background-color:var(--bg);font-size:12.5px;
+    background-image:linear-gradient(var(--grid-major) 1px,transparent 1px),linear-gradient(90deg,var(--grid-major) 1px,transparent 1px),
+      linear-gradient(var(--grid-minor) 1px,transparent 1px),linear-gradient(90deg,var(--grid-minor) 1px,transparent 1px);
+    background-size:80px 80px,80px 80px,16px 16px,16px 16px}
+
+  /* header */
+  .bar{background:var(--surface);border-bottom:1px solid var(--sheet-line);box-shadow:inset 0 -4px 0 var(--surface),inset 0 -5px 0 var(--line)}
+  .bar-date{font-family:var(--head);font-weight:600;font-size:17px;text-transform:uppercase;letter-spacing:.1em}
+  .letter-pick select{border-radius:50%;background:transparent;color:var(--fg);border:1.5px solid var(--fg);font-family:var(--head);font-weight:700}
+  .bar-status span.pill{border-radius:0;background:transparent;border:1px solid var(--line);font-size:11px}
+  .btn,.icon-btn,.skin-pick{border-radius:0;background:transparent;border-color:var(--sheet-line)}
+  .btn{font-family:var(--head);text-transform:uppercase;letter-spacing:.08em;font-size:12.5px}
+  .btn.primary{background:var(--hi);border-color:var(--hi);color:var(--hi-ink)}
+  .link{color:var(--fg);text-decoration-color:var(--hi)}
+
+  /* panels: drawing sheets with an inner margin line and a title block */
+  .panel,details.extra{border-radius:0;background:var(--surface);border:1px solid var(--sheet-line);box-shadow:inset 0 0 0 4px var(--surface),inset 0 0 0 5px var(--line)}
+  .panel{padding:14px 16px 10px}
+  .panel::after{align-self:flex-end;margin-top:auto;flex:none;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--muted);border:1px solid var(--line);padding:2px 7px}
+  .p-hw::after{content:"HOMEWORK — SHEET 1 OF 4"}
+  .p-sched::after{content:"SCHEDULE — SHEET 2 OF 4"}
+  .p-big::after{content:"TESTS & QUIZZES — SHEET 3 OF 4"}
+  .p-week::after{content:"ROTATION — SHEET 4 OF 4"}
+  .panel-h h2,.x-name{font-family:var(--head);font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:13px}
+  .panel-h h2::before{width:9px;height:9px;border-radius:50%;background:transparent;border:1.2px solid var(--fg)}
+  .panel-meta,.x-tease,.panel-foot{font-size:10.5px}
+
+  /* countdown: a dimension line across the card */
+  .now-card{border-radius:0;background:var(--surface-2);border:1px solid var(--line)}
+  .now-card .num{display:flex;align-items:center;gap:10px;width:100%;font-family:var(--mono);font-weight:500;font-size:28px;color:var(--fg)}
+  .now-card .num::before,.now-card .num::after{content:"";flex:1;height:9px;background:currentColor;opacity:.8}
+  .now-card .num::before{-webkit-mask:var(--arrow-l) left center/7px 9px no-repeat,linear-gradient(#000 0 0) left center/1px 100% no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat;mask:var(--arrow-l) left center/7px 9px no-repeat,linear-gradient(#000 0 0) left center/1px 100% no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat}
+  .now-card .num::after{-webkit-mask:var(--arrow-r) right center/7px 9px no-repeat,linear-gradient(#000 0 0) right center/1px 100% no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat;mask:var(--arrow-r) right center/7px 9px no-repeat,linear-gradient(#000 0 0) right center/1px 100% no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat}
+  .now-card .lbl{font-family:var(--head);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+  .prog{height:1px;border-radius:0;background:var(--line)}
+  .prog i{border-radius:0;background:var(--hi);height:3px;margin-top:-1px}
+
+  /* schedule: circled section callouts, times as dimension annotations */
+  .tl li{border-radius:0}
+  .tl .blk{border-radius:50%;background:transparent;color:var(--fg);border:1.2px solid var(--cc);font-family:var(--head);font-weight:700;box-shadow:inset 0 0 0 9px color-mix(in srgb,var(--cc) 16%,transparent)}
+  .tl .cn{font-family:var(--head);font-weight:600;font-size:13.5px}
+  .tl .who{font-family:var(--mono)}
+  .tl .tm{color:var(--muted);border-left:1px solid var(--line);border-right:1px solid var(--line);padding:0 6px}
+  .tl .split{color:var(--muted);font-family:var(--mono)}
+  .tl li.now{background:var(--accent-soft)}
+  .tl li.now .tm{color:var(--fg)}
+  .tl li.lunch{background:transparent}
+  .after{border-top:1px dashed var(--line)}
+
+  /* homework: grid cells with dimension-line day headers, stroke-only chips */
+  .cal .dow{display:flex;align-items:center;gap:4px;font-family:var(--head);font-weight:600;letter-spacing:.12em;color:var(--muted)}
+  .cal .dow::before,.cal .dow::after{content:"";flex:1;height:7px;background:currentColor;opacity:.7}
+  .cal .dow::before{-webkit-mask:var(--arrow-l) left center/5px 7px no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat;mask:var(--arrow-l) left center/5px 7px no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat}
+  .cal .dow::after{-webkit-mask:var(--arrow-r) right center/5px 7px no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat;mask:var(--arrow-r) right center/5px 7px no-repeat,linear-gradient(#000 0 0) center/100% 1px no-repeat}
+  .cell{border-radius:0;background:var(--surface);border:1px solid var(--line)}
+  .cell .top b{font-family:var(--head);font-weight:600}
+  .cell.today .top b{background:var(--hi);color:var(--hi-ink);border-radius:0}
+  .cell.sel{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+  .cell.off{border-style:dashed}
+  .chip2{border:1px solid var(--cc);border-radius:0;background:transparent;font-size:11px}
+  .chip2.major{background:color-mix(in srgb,var(--cc) 14%,transparent);font-weight:600}
+
+  /* checklist: drafting squares; checking draws an X and adds a revision triangle */
+  .item{border-radius:0;background:transparent;border:1px solid var(--line);border-left:3px solid var(--cc)}
+  .item.major{background:color-mix(in srgb,var(--cc) 8%,transparent)}
+  .check{border-radius:0;border:1.2px solid var(--fg);background:transparent}
+  .check::after{width:13px;height:13px;border:0;transform:none;color:var(--fg);
+    background:linear-gradient(45deg,transparent calc(50% - .8px),currentColor calc(50% - .8px) calc(50% + .8px),transparent calc(50% + .8px)),
+      linear-gradient(-45deg,transparent calc(50% - .8px),currentColor calc(50% - .8px) calc(50% + .8px),transparent calc(50% + .8px))}
+  .check:checked{background:transparent}
+  .item.leaving.done .check::after{animation:bp-draw .28s ease-out}
+  .item.done .title::after{content:"1";display:inline-block;width:13px;height:12px;margin-left:6px;padding-top:3px;text-align:center;font-size:7.5px;font-weight:600;line-height:9px;
+    background:var(--hi);color:var(--hi-ink);clip-path:polygon(50% 0,100% 100%,0 100%);vertical-align:0;text-decoration:none}
+  .item.leaving.done .title::after{animation:bp-pop .2s .2s backwards}
+  .title{font-weight:500}
+  .chip{color:var(--fg);font-weight:500}
+  .tag{border-radius:0;background:transparent;color:var(--fg);border:1px solid var(--fg)}
+  .tag.bad{color:var(--bad);border-color:var(--bad);background:transparent}
+  .item.leaving{opacity:1}
+  .item.leaving.done{opacity:.6;transition:opacity .3s .35s}
+  .hw-note,.empty-state,.overdue-strip{border-radius:0}
+  .hw-note{background:transparent;border:1px solid var(--hi);color:var(--fg)}
+  .count{border-radius:0;background:var(--hi);color:var(--hi-ink)}
+
+  /* tests & quizzes: day counts as measurements ("6 D") */
+  .big li{border-radius:0;background:transparent;border:1px solid var(--line);border-left:3px solid var(--cc)}
+  .big li.today{background:var(--accent-soft)}
+  .big .d{color:var(--fg);font-family:var(--mono);font-weight:600;font-size:16px;white-space:nowrap}
+  .big .d small{display:inline;font-size:0}
+  .big .d small::after{content:"D";font-size:12px;margin-left:3px;color:var(--muted)}
+
+  /* rotation: precise cells, today as a highlighted section cut */
+  .seg{border-radius:0;background:transparent;border-color:var(--sheet-line)}
+  .seg button{border-radius:0;text-transform:uppercase;font-size:10.5px;letter-spacing:.06em}
+  .seg button[aria-pressed="true"]{background:var(--hi);color:var(--hi-ink);box-shadow:none}
+  .rot th{font-family:var(--head);font-weight:600;letter-spacing:.08em;border-radius:0}
+  .rot th.cur{background:var(--hi);color:var(--hi-ink)}
+  .rot td{border-radius:0;color:var(--fg);font-weight:500;background:color-mix(in srgb,var(--cc) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 65%,transparent)}
+  .rot td.x,.rot td.tm{box-shadow:none;background:none}
+  .rot td.cur{outline:1.5px solid var(--hi);outline-offset:-1.5px;
+    background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--hi) 22%,transparent) 0 1px,transparent 1px 6px),color-mix(in srgb,var(--cc) 14%,transparent)}
+  .rot td.lunch{box-shadow:none;background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+
+  /* extras: spec-table boxes */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:transparent;border:1px solid var(--line)}
+  .counts .n{color:var(--fg)}
+  .count-form input{border-radius:0}
+  .news .hl{font-family:var(--head);font-weight:500}
+  dialog{border-radius:0;border:1px solid var(--sheet-line)}
+
+  @media (max-width:600px){
+    .chip2{font-size:0;padding:0;height:5px;border:0;background:var(--cc)}
+  }
+}
+@keyframes bp-draw{from{clip-path:inset(0 100% 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes bp-pop{from{opacity:0;transform:scale(.4)}}

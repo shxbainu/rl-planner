@@ -1,0 +1,134 @@
+/* HERBARIUM: a careful botanist's specimen collection. Warm paper, ink-brown type, one rust accent.
+   Panels are sheets resting on a desk; chips are typed specimen labels; class colors are pressed-flower tones (fills and edges only, never text). */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+html[data-skin="herbarium"]:root{
+  --bg:#f3ede0; --surface:#faf6ec; --surface-2:#f6f0e3; --fg:#4a3f35; --muted:#6f6357; --line:#d8cdb8;
+  --accent:#a5522f; --accent-ink:#9c4f2f; --rust:#b5603c; --accent-fg:#fffaf2; --accent-soft:#f3e3d6; --done:#8f8477;
+  --warn:#8a5a1c; --warn-soft:#f1e5cc; --bad:#a3472a; --bad-soft:#f4e0d6;
+  --c-glee:#5e8c86; --c-latin:#a7803a; --c-eng:#5a7391; --c-msi:#6f8a5c; --c-fr:#8a7aa3; --c-fgc:#b5603c; --c-arts:#b07a82; --c-health:#7c8b4f; --c-other:#8f8477;
+  --sans:"Newsreader",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,monospace; --head:"Fraunces",Georgia,serif;
+  --seal-ink:#2b2119; --leave-ms:850;
+  color-scheme:light;
+}
+html[data-skin="herbarium"][data-mode="dark"]:root{
+  --bg:#1e1b17; --surface:#2a2620; --surface-2:#25221c; --fg:#ede4d3; --muted:#b4a895; --line:#463f35;
+  --accent:#d27a55; --accent-ink:#e08e6b; --rust:#d27a55; --accent-fg:#1e1b17; --accent-soft:#3b2c22; --done:#8a8072;
+  --warn:#e2b56e; --warn-soft:#3a3122; --bad:#e58a6c; --bad-soft:#3d2820;
+  --c-glee:#79a8a1; --c-latin:#c29a52; --c-eng:#7d95b3; --c-msi:#8ea878; --c-fr:#a596bd; --c-fgc:#d27a55; --c-arts:#c9959c; --c-health:#9aa866;
+  --seal-ink:#1e1b17; --seal-mix:58%;
+  color-scheme:dark;
+}
+
+html[data-skin="herbarium"]{
+  /* faint paper fiber on the page only; panels are flat paper */
+  body{background-color:var(--bg);font-size:14.5px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.035' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.27 0 0 0 0 0.17 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E")}
+  &[data-mode="dark"] body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.035' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.8 0 0 0 0 0.65 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E")}
+
+  /* top bar */
+  .bar{background:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgb(60 40 20 / .05)}
+  .bar-date{font-family:var(--head);font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:500;font-size:19px;letter-spacing:-.005em}
+  .bar-sub{font-style:italic}
+  /* the day letter as an embossed collection seal */
+  .letter-pick select{border-radius:50%;font-family:var(--head);font-variation-settings:"SOFT" 100;font-weight:600;background:var(--accent);color:var(--accent-fg);
+    box-shadow:inset 0 0 0 3px var(--accent),inset 0 0 0 4px color-mix(in srgb,var(--accent-fg) 55%,transparent),inset 0 -2px 0 4px rgb(0 0 0 / .12),0 1px 1px rgb(60 30 10 / .25)}
+  .bar-status span.pill{border-radius:3px;background:var(--surface);font-family:var(--mono);font-size:11.5px}
+  .btn,.icon-btn,.skin-pick{border-radius:3px;background:var(--surface)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+  .link{color:var(--accent-ink)}
+
+  /* panels: a sheet resting on the desk */
+  .panel,details.extra{border-radius:2px;border:1px solid var(--line);background:var(--surface);box-shadow:0 1px 2px rgb(60 40 20 / .08),0 3px 6px -4px rgb(60 40 20 / .18)}
+  &[data-mode="dark"] :is(.panel,details.extra){box-shadow:0 1px 2px rgb(0 0 0 / .35)}
+  .panel-h h2,.x-name{font-family:var(--head);font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:600;text-transform:none;letter-spacing:0;font-size:17px}
+  .x-name{font-size:15px}
+  .panel-h h2::before{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .panel-meta,.x-tease,.panel-foot{font-family:var(--mono);font-size:11px}
+
+  /* countdown: a pinned label */
+  .now-card{position:relative;border-radius:2px;background:var(--surface);border:1px solid var(--line);box-shadow:0 2px 4px -2px rgb(60 40 20 / .2);padding:16px 14px 12px}
+  .now-card::before{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--accent);box-shadow:0 1px 1px rgb(0 0 0 / .3)}
+  .now-card .num{font-family:var(--head);font-variation-settings:"SOFT" 100,"WONK" 1;font-weight:500;font-size:40px;color:var(--fg);letter-spacing:-.01em}
+  .now-card .lbl{font-style:italic;font-weight:500}
+  .prog{height:2px;border-radius:0;background:var(--line)}
+  .prog i{border-radius:0}
+
+  /* schedule: wax-seal discs */
+  .tl li{border-radius:2px}
+  .tl .blk{border-radius:50%;font-family:var(--head);font-variation-settings:"SOFT" 100;font-size:13px;color:#fffaf2;
+    background:color-mix(in oklab,var(--cc) var(--seal-mix,74%),var(--seal-ink));box-shadow:inset 0 0 0 2px color-mix(in oklab,var(--cc) 90%,#fff),0 1px 1px rgb(0 0 0 / .25)}
+  .tl .cn{font-weight:600}
+  .tl .tm{font-family:var(--mono)}
+  .tl .split{color:var(--muted);font-family:var(--mono);font-weight:500}
+  .tl li.now{background:var(--accent-soft)}
+  .tl li.now .tm{color:var(--accent-ink)}
+  .tl li.lunch{background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+  .after{font-style:italic}
+
+  /* homework grid: specimen sheets with typed labels */
+  .cal .dow{font-family:var(--mono);font-weight:500;letter-spacing:.08em}
+  .cell{border-radius:2px;background:var(--surface);border:1px solid var(--line);box-shadow:0 1px 1px rgb(60 40 20 / .06)}
+  .cell .top b{font-family:var(--head);font-variation-settings:"SOFT" 100;font-weight:500;font-size:15px}
+  .cell .top .lt{font-family:var(--mono)}
+  .cell.today .top b{background:var(--accent);color:var(--accent-fg);border-radius:2px;padding:0 5px}
+  .cell.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+  .cell.off{background:transparent}
+  .chip2{position:relative;border-radius:1px;background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--cc);padding:2px 30px 2px 5px;font-size:12px}
+  .chip2::after{content:attr(data-no);position:absolute;right:3px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:8.5px;letter-spacing:.02em;color:var(--muted)}
+  .chip2.major{background:color-mix(in srgb,var(--cc) 14%,var(--surface));font-weight:600}
+
+  /* today checklist: specimen labels with a line-drawn leaf */
+  .item{position:relative;border-radius:2px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--cc)}
+  .item.major{background:color-mix(in srgb,var(--cc) 9%,var(--surface))}
+  .check{border-radius:50%;border-width:1.5px;background:var(--surface)}
+  .check::after{border-color:#fffaf2}
+  .title{font-weight:500;font-size:15px}
+  .chip{color:var(--fg);display:inline-flex;align-items:center;gap:4px}
+  .chip::before{content:"";width:12px;height:12px;background:var(--cc);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M2.5 13.5C2.5 7 6.5 2.5 13.5 2.5c0 7-4.5 11-11 11z'/%3E%3Cpath d='M2.5 13.5 9 7M6 10.2V7.8M7.8 8.3h2'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M2.5 13.5C2.5 7 6.5 2.5 13.5 2.5c0 7-4.5 11-11 11z'/%3E%3Cpath d='M2.5 13.5 9 7M6 10.2V7.8M7.8 8.3h2'/%3E%3C/svg%3E") center/contain no-repeat}
+  .tag{border-radius:1px;background:transparent;color:var(--fg);border:1px solid var(--cc);font-family:var(--mono);font-weight:500}
+  .tag.bad{color:var(--bad);border-color:var(--bad);background:transparent}
+  .next{font-family:var(--mono)}
+  .hw-note{border-radius:2px;font-style:italic}
+  .empty-state{border-radius:2px}
+  .count{border-radius:2px;font-family:var(--mono);color:var(--accent-ink)}
+  /* collected: a rust stamp lands at a slight angle, then the row fades a little */
+  .item.leaving{opacity:1}
+  .item.leaving.done{opacity:.6;transition:opacity .35s .45s}
+  .item.leaving.done::after{content:"COLLECTED";position:absolute;right:46px;top:50%;width:64px;height:64px;margin-top:-32px;display:grid;place-items:center;
+    border:2.5px double var(--rust);border-radius:50%;font-family:var(--mono);font-size:8.5px;font-weight:500;letter-spacing:.12em;color:var(--accent-ink);
+    background:color-mix(in srgb,var(--surface) 70%,transparent);transform:rotate(calc(var(--rnd,0) * 8deg));animation:hb-stamp .22s ease-out;pointer-events:none}
+
+  /* tests & quizzes: inked numerals in a narrow ruled column */
+  .big li{border-radius:2px;background:transparent;border-left:0;border-bottom:1px solid var(--line);padding:6px 4px}
+  .big .d{color:var(--fg);font-family:var(--head);font-variation-settings:"SOFT" 100,"WONK" 1;font-weight:500;font-size:22px;border-right:1px solid var(--line);padding-right:10px}
+  .big .d small{font-family:var(--mono);font-weight:400;letter-spacing:.06em}
+  .big .w b{font-weight:600}
+
+  /* rotation: pressed-flower swatches, today outlined in rust */
+  .seg{border-radius:3px;background:var(--surface-2)}
+  .seg button{border-radius:2px;font-family:var(--mono);font-weight:500;font-size:11.5px}
+  .rot th{font-family:var(--mono);font-weight:400}
+  .rot th small{font-family:var(--head);font-variation-settings:"SOFT" 100;font-weight:600}
+  .rot th.cur{background:var(--accent);color:var(--accent-fg);border-radius:2px}
+  .rot td{border-radius:2px;color:var(--fg);font-weight:500;background:color-mix(in srgb,var(--cc) 22%,var(--surface));box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--cc) 60%,transparent)}
+  .rot td.x,.rot td.tm{box-shadow:none}
+  .rot td.cur{outline:1.5px solid var(--accent);outline-offset:-1.5px}
+  .rot td.lunch{box-shadow:none;background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);border-radius:0}
+
+  /* extras: plain labeled index slips */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:2px;background:var(--surface);border:1px solid var(--line)}
+  .counts .n{font-family:var(--head);font-variation-settings:"SOFT" 100;color:var(--accent-ink)}
+  .sb .row .sc,.score{font-family:var(--mono)}
+  .news li a{border-radius:2px}
+  .count-form input{border-radius:2px}
+  dialog{border-radius:3px}
+
+  @media (max-width:600px){
+    .chip2{font-size:0;padding:0;height:5px;border:0;border-radius:1px;background:var(--cc);box-shadow:none}
+    .chip2::after{display:none}
+  }
+}
+@keyframes hb-stamp{from{opacity:0;transform:rotate(calc(var(--rnd,0) * 8deg)) scale(1.5)}to{opacity:1;transform:rotate(calc(var(--rnd,0) * 8deg)) scale(1)}}

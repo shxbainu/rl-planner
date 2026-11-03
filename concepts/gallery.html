@@ -1,0 +1,270 @@
+<title>Planner Theme Proofs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: a printer's proof sheet. One spread per theme: notes and ink swatches on the left, light/dark and phone proofs on the right. */
+  :root {
+    --paper: #f4f2ee; --sheet: #ffffff; --ink: #1f1d1a; --soft: #5c5750; --rule: #dcd7cf; --mark: #7a1a22;
+    --sans: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --paper: #161514; --sheet: #1f1d1b; --ink: #ece8e2; --soft: #a9a39a; --rule: #34312d; --mark: #e0838b; color-scheme: dark } }
+  :root[data-theme="dark"] {
+    --paper: #161514; --sheet: #1f1d1b; --ink: #ece8e2; --soft: #a9a39a; --rule: #34312d; --mark: #e0838b; color-scheme: dark }
+
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px }
+  .wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 28px }
+  a { color: inherit }
+  :focus-visible { outline: 2px solid var(--mark); outline-offset: 2px }
+
+  header { display: grid; gap: 10px; border-bottom: 2px solid var(--ink); padding-bottom: 18px }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--soft) }
+  h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; letter-spacing: -.01em; text-wrap: balance }
+  header p { margin: 0; max-width: 68ch; color: var(--soft) }
+  header p b { color: var(--ink) }
+  .index { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--mono); font-size: 12.5px; padding: 0; margin: 4px 0 0; list-style: none }
+  .index a { text-decoration: none; border-bottom: 1px solid var(--rule) }
+  .index a:hover { border-color: var(--mark) }
+
+  .ref { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 12px; align-items: start }
+  .ref figure { margin: 0 }
+
+  section.theme { display: grid; grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); gap: 24px; padding-top: 22px; border-top: 1px solid var(--rule); scroll-margin-top: 16px }
+  .notes { display: grid; gap: 12px; align-content: start; min-width: 0 }
+  .num { font-family: var(--mono); font-size: 12px; color: var(--mark); letter-spacing: .06em }
+  h2 { margin: 0; font-size: 24px; line-height: 1.15; text-wrap: balance }
+  .mood { margin: 0; color: var(--soft); font-size: 14px }
+  .verdict { margin: 0; font-size: 15px }
+  .inks { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none }
+  .inks li { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--soft); min-width: 0 }
+  .inks i { width: 18px; height: 18px; flex: none; border: 1px solid var(--rule); border-radius: 2px; background: var(--c) }
+  .type { margin: 0; font-family: var(--mono); font-size: 12px; color: var(--soft) }
+  .try { margin: 0; font-size: 13px; color: var(--soft) }
+  .try code { font-family: var(--mono); font-size: 12px; color: var(--ink) }
+
+  .proofs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, .42fr) minmax(0, .42fr); gap: 10px; align-items: start; min-width: 0 }
+  figure { margin: 0; display: grid; gap: 4px; min-width: 0 }
+  figure a { display: block; background: var(--sheet); border: 1px solid var(--rule); line-height: 0 }
+  figure img { width: 100%; height: auto; display: block }
+  figcaption { font-family: var(--mono); font-size: 11px; color: var(--soft) }
+
+  .fine { border-top: 1px solid var(--rule); padding-top: 18px; display: grid; gap: 8px; color: var(--soft); font-size: 14px }
+  .fine h3 { margin: 0; color: var(--ink); font-size: 15px }
+  .fine ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; max-width: 80ch }
+
+  @media (max-width: 980px) {
+    section.theme { grid-template-columns: 1fr }
+  }
+  @media (max-width: 640px) {
+    .proofs { grid-template-columns: 1fr 1fr }
+    .proofs figure.wide { grid-column: 1 / -1 }
+    .ref { grid-template-columns: 1fr 1fr }
+    .ref figure:first-child { grid-column: 1 / -1 }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">RL Planner · reskin proofs · Tue Nov 3, 6:39 am</span>
+    <h1>Eight looks for the same planner</h1>
+    <p>Same layout, same data, same buttons in every proof. Only colors, type, borders, textures and small check-off moments change. <b>Every theme has a light and a dark version</b>, and the existing dark-mode button switches between them. Click any proof to open it full size.</p>
+    <ul class="index">
+      <li><a href="#herbarium">1 Herbarium</a></li>
+      <li><a href="#departure">2 Departure board</a></li>
+      <li><a href="#riso">3 Riso zine</a></li>
+      <li><a href="#starchart">4 Star chart</a></li>
+      <li><a href="#catalog">5 Card catalog</a></li>
+      <li><a href="#nautical">6 Nautical chart</a></li>
+      <li><a href="#blueprint">7 Blueprint</a></li>
+      <li><a href="#almanac">8 Seed almanac</a></li>
+    </ul>
+  </header>
+
+  <div class="ref">
+    <figure><a href="screens/0-original-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/0-original-desktop-light.jpg" alt="The current planner on a laptop, for comparison" loading="lazy"></a><figcaption>Original (stays the default) · desktop</figcaption></figure>
+    <figure><a href="screens/0-original-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/0-original-phone-light.jpg" alt="The current planner on a phone, for comparison" loading="lazy"></a><figcaption>Original · phone</figcaption></figure>
+  </div>
+
+  <section class="theme" id="herbarium">
+    <div class="notes">
+      <span class="num">01 / 08</span>
+      <h2>Herbarium field journal</h2>
+      <p class="mood">A botanist's specimen collection. Warm paper, ink-brown type, one rust accent.</p>
+      <p class="verdict">The calmest and most readable of the eight. Specimen numbers on the homework chips, wax-seal block letters and a pinned countdown label carry the idea without clutter. Checking off stamps a tilted rust COLLECTED mark.</p>
+      <ul class="inks">
+        <li><i style="--c:#f3ede0"></i>#F3EDE0 paper</li><li><i style="--c:#4a3f35"></i>#4A3F35 ink</li>
+        <li><i style="--c:#a5522f"></i>#A5522F rust</li><li><i style="--c:#1e1b17"></i>#1E1B17 soil</li>
+      </ul>
+      <p class="type">Fraunces · Newsreader · IBM Plex Mono</p>
+      <p class="try">Rust is a touch darker than the spec's #B5603C so white text on it passes contrast.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/1-herbarium-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/1-herbarium-desktop-light.jpg" alt="Herbarium theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light</figcaption></figure>
+      <figure class="wide"><a href="screens/1-herbarium-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/1-herbarium-desktop-dark.jpg" alt="Herbarium theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark</figcaption></figure>
+      <figure><a href="screens/1-herbarium-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/1-herbarium-phone-light.jpg" alt="Herbarium theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/1-herbarium-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/1-herbarium-phone-dark.jpg" alt="Herbarium theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="theme" id="departure">
+    <div class="notes">
+      <span class="num">02 / 08</span>
+      <h2>Departure board</h2>
+      <p class="mood">A European station at dawn. Split tiles, amber times, condensed sign lettering.</p>
+      <p class="verdict">The most fun to look at. The countdown is split-flap tiles that flip when the minute changes, a live clock sits by the homework pill, and each time tile says NOW, NEXT or DEPARTED. Checking off flips the row to a green DEPARTED.</p>
+      <ul class="inks">
+        <li><i style="--c:#141414"></i>#141414 board</li><li><i style="--c:#f2a93b"></i>#F2A93B amber</li>
+        <li><i style="--c:#6fcf7f"></i>#6FCF7F departed</li><li><i style="--c:#f2f0ea"></i>#F2F0EA enamel</li>
+      </ul>
+      <p class="type">Oswald · JetBrains Mono</p>
+      <p class="try">On phones the clock hides because there's no room beside the pill. Statuses sit under each time instead of in a new column, so rows don't wrap.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/2-departure-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/2-departure-desktop-light.jpg" alt="Departure board theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light (signage)</figcaption></figure>
+      <figure class="wide"><a href="screens/2-departure-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/2-departure-desktop-dark.jpg" alt="Departure board theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark (main look)</figcaption></figure>
+      <figure><a href="screens/2-departure-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/2-departure-phone-light.jpg" alt="Departure board theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/2-departure-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/2-departure-phone-dark.jpg" alt="Departure board theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="theme" id="riso">
+    <div class="notes">
+      <span class="num">03 / 08</span>
+      <h2>Risograph zine</h2>
+      <p class="mood">A student-printed two-ink zine. Pink and teal on cream, navy where they overprint.</p>
+      <p class="verdict">The loudest one. Classes are told apart by pattern (solid, halftone, outline, hatch) as well as ink, and every class name sits on a paper label so it stays readable. Hand-ruled frames, a pink scribble check and a marker strike-through on check-off.</p>
+      <ul class="inks">
+        <li><i style="--c:#f7f3ea"></i>#F7F3EA paper</li><li><i style="--c:#ff48b0"></i>#FF48B0 pink</li>
+        <li><i style="--c:#0078bf"></i>#0078BF teal</li><li><i style="--c:#3a2c6b"></i>#3A2C6B navy</li>
+      </ul>
+      <p class="type">Bricolage Grotesque · Space Mono</p>
+      <p class="try">Pink is too light for small text on cream, so small labels and buttons use navy. Pink stays for big numbers and stickers.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/3-riso-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/3-riso-desktop-light.jpg" alt="Riso zine theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light</figcaption></figure>
+      <figure class="wide"><a href="screens/3-riso-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/3-riso-desktop-dark.jpg" alt="Riso zine theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark (black paper)</figcaption></figure>
+      <figure><a href="screens/3-riso-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/3-riso-phone-light.jpg" alt="Riso zine theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/3-riso-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/3-riso-phone-dark.jpg" alt="Riso zine theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="theme" id="starchart">
+    <div class="notes">
+      <span class="num">04 / 08</span>
+      <h2>Star chart observatory</h2>
+      <p class="mood">An antique celestial atlas at night. Gold hairlines, parchment type, static stars.</p>
+      <p class="verdict">Elegant, and the quietest dark mode. The coordinate grid and stars stay outside the panels, tests get a star sized by how soon they are, and checking off draws a thin gold line to the Done header.</p>
+      <ul class="inks">
+        <li><i style="--c:#0e1a2b"></i>#0E1A2B sky</li><li><i style="--c:#c9a65b"></i>#C9A65B gold</li>
+        <li><i style="--c:#e8dfc8"></i>#E8DFC8 parchment</li><li><i style="--c:#efe7d3"></i>#EFE7D3 atlas page</li>
+      </ul>
+      <p class="type">Cormorant Garamond · Inter</p>
+      <p class="try">Cormorant's old-style "1" read like an "I", so numbers use lining figures.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/4-starchart-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/4-starchart-desktop-light.jpg" alt="Star chart theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light (atlas page)</figcaption></figure>
+      <figure class="wide"><a href="screens/4-starchart-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/4-starchart-desktop-dark.jpg" alt="Star chart theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark (main look)</figcaption></figure>
+      <figure><a href="screens/4-starchart-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/4-starchart-phone-light.jpg" alt="Star chart theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/4-starchart-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/4-starchart-phone-dark.jpg" alt="Star chart theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="theme" id="catalog">
+    <div class="notes">
+      <span class="num">05 / 08</span>
+      <h2>Library card catalog</h2>
+      <p class="mood">An old school library. Oak drawers, brass label holders, index cards, rubber stamps.</p>
+      <p class="verdict">The most physical. Every panel header is a drawer front with a riveted brass label, the countdown is a DATE DUE slip, and checking off thumps a purple DONE stamp with a slight tilt.</p>
+      <ul class="inks">
+        <li><i style="--c:#5b3e2b"></i>#5B3E2B oak</li><li><i style="--c:#fbf8f1"></i>#FBF8F1 card</li>
+        <li><i style="--c:#c0392b"></i>#C0392B top rule</li><li><i style="--c:#5b4e6d"></i>#5B4E6D stamp ink</li>
+      </ul>
+      <p class="type">Courier Prime · Newsreader</p>
+      <p class="try">The wood is the busiest background of the eight; it never sits behind text, but it's a lot of brown on a phone.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/5-catalog-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/5-catalog-desktop-light.jpg" alt="Card catalog theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light</figcaption></figure>
+      <figure class="wide"><a href="screens/5-catalog-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/5-catalog-desktop-dark.jpg" alt="Card catalog theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark (walnut)</figcaption></figure>
+      <figure><a href="screens/5-catalog-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/5-catalog-phone-light.jpg" alt="Card catalog theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/5-catalog-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/5-catalog-phone-dark.jpg" alt="Card catalog theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="theme" id="nautical">
+    <div class="notes">
+      <span class="num">06 / 08</span>
+      <h2>Nautical chart</h2>
+      <p class="mood">A ship's navigation chart. Calm sea with depth contours, sand-colored land, navy coastline.</p>
+      <p class="verdict">Subtle and easy to live with. A compass rose by the week arrows, red buoys on tests, and the checklist runs down a dotted route where each check fills the waypoint and inks that leg green.</p>
+      <ul class="inks">
+        <li><i style="--c:#dce7ea"></i>#DCE7EA sea</li><li><i style="--c:#e9dfc7"></i>#E9DFC7 sand</li>
+        <li><i style="--c:#1d2e44"></i>#1D2E44 navy</li><li><i style="--c:#c8442f"></i>#C8442F signal red</li>
+      </ul>
+      <p class="type">Libre Caslon Text · DM Mono · DM Sans</p>
+      <p class="try">The contours are evenly spaced; making them denser near busy panels was left out to keep it simple.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/6-nautical-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/6-nautical-desktop-light.jpg" alt="Nautical chart theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light</figcaption></figure>
+      <figure class="wide"><a href="screens/6-nautical-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/6-nautical-desktop-dark.jpg" alt="Nautical chart theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark (night chart)</figcaption></figure>
+      <figure><a href="screens/6-nautical-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/6-nautical-phone-light.jpg" alt="Nautical chart theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/6-nautical-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/6-nautical-phone-dark.jpg" alt="Nautical chart theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="theme" id="blueprint">
+    <div class="notes">
+      <span class="num">07 / 08</span>
+      <h2>Blueprint drafting table</h2>
+      <p class="mood">An architect's drawing. Blue sheets, fine linework, mono annotations, one yellow highlighter.</p>
+      <p class="verdict">Precise and clean. The countdown is a dimension line with arrowheads, day headers get little dimension arrows, each panel has a title block ("SCHEDULE — SHEET 2 OF 4"), and checking off draws an X plus a yellow revision triangle.</p>
+      <ul class="inks">
+        <li><i style="--c:#1f4e8c"></i>#1F4E8C blueprint</li><li><i style="--c:#f4f8ff"></i>#F4F8FF linework</li>
+        <li><i style="--c:#ffd45c"></i>#FFD45C highlight</li><li><i style="--c:#fbfcfe"></i>#FBFCFE white print</li>
+      </ul>
+      <p class="type">Space Grotesk · IBM Plex Mono</p>
+      <p class="try">Mono type everywhere means homework chips cut off a few letters sooner than in the original.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/7-blueprint-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/7-blueprint-desktop-light.jpg" alt="Blueprint theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light (white print)</figcaption></figure>
+      <figure class="wide"><a href="screens/7-blueprint-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/7-blueprint-desktop-dark.jpg" alt="Blueprint theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark (main look)</figcaption></figure>
+      <figure><a href="screens/7-blueprint-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/7-blueprint-phone-light.jpg" alt="Blueprint theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/7-blueprint-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/7-blueprint-phone-dark.jpg" alt="Blueprint theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="theme" id="almanac">
+    <div class="notes">
+      <span class="num">08 / 08</span>
+      <h2>Seed packet almanac</h2>
+      <p class="mood">A vintage seed catalog. Kraft paper, cream packets, tomato, mustard and leaf green.</p>
+      <p class="verdict">The warmest. Each panel is a packet with a printed band, a tiny flat vegetable and a scalloped foot. Checking off pops a sprout, and the Done counter grows a plant from sprout to bloom as the day goes.</p>
+      <ul class="inks">
+        <li><i style="--c:#e6d5b8"></i>#E6D5B8 kraft</li><li><i style="--c:#f6eedc"></i>#F6EEDC cream</li>
+        <li><i style="--c:#d9502f"></i>#D9502F tomato</li><li><i style="--c:#5e8c4a"></i>#5E8C4A leaf</li>
+      </ul>
+      <p class="type">Abril Fatface · Work Sans</p>
+      <p class="try">The header strip shows the moon phase and a real count ("1 school day to Founder's Day") instead of a motivational line, since you didn't want quote-of-the-day stuff. It only shows on wide screens.</p>
+    </div>
+    <div class="proofs">
+      <figure class="wide"><a href="screens/8-almanac-desktop-light.jpg" target="_blank" rel="noopener"><img src="screens/8-almanac-desktop-light.jpg" alt="Seed almanac theme, desktop, light" loading="lazy"></a><figcaption>Desktop · light</figcaption></figure>
+      <figure class="wide"><a href="screens/8-almanac-desktop-dark.jpg" target="_blank" rel="noopener"><img src="screens/8-almanac-desktop-dark.jpg" alt="Seed almanac theme, desktop, dark" loading="lazy"></a><figcaption>Desktop · dark (night garden)</figcaption></figure>
+      <figure><a href="screens/8-almanac-phone-light.jpg" target="_blank" rel="noopener"><img src="screens/8-almanac-phone-light.jpg" alt="Seed almanac theme, phone, light" loading="lazy"></a><figcaption>Phone · light</figcaption></figure>
+      <figure><a href="screens/8-almanac-phone-dark.jpg" target="_blank" rel="noopener"><img src="screens/8-almanac-phone-dark.jpg" alt="Seed almanac theme, phone, dark" loading="lazy"></a><figcaption>Phone · dark</figcaption></figure>
+    </div>
+  </section>
+
+  <div class="fine">
+    <h3>How the switcher works</h3>
+    <ul>
+      <li>A theme menu (palette icon) sits next to the light/dark button. Your pick is remembered in this browser under its own key; homework, check-offs and countdowns aren't touched.</li>
+      <li>On phones the top bar has no spare room, so the menu sits in the footer next to Export / Import.</li>
+      <li>Every text color passed an automated WCAG AA contrast check in all 16 theme and mode combinations. All motion turns off with Reduce Motion.</li>
+      <li>The game window (box score, play-by-play) keeps the original look in every theme for now.</li>
+      <li>Phone proofs show the top of the page. Proofs are scaled down by the browser pane, so the live menu is the best way to judge type.</li>
+    </ul>
+  </div>
+</div>

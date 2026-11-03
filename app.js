@@ -111,10 +111,11 @@
     return [...out.values()].sort((a, b) => a.due.localeCompare(b.due) || (MAJOR.has(b.type) - MAJOR.has(a.type)) || a.class.localeCompare(b.class));
   }
   const isDone = (it) => it.keys.some((k) => state.done[k]);
+  const pad4 = (id) => String(parseInt(hash(id), 36) % 10000).padStart(4, "0");
 
   // ---------- rendering ----------
   const cls = (name) => schedule.classes[name] || schedule.classes.Other;
-  const cc = (name) => `--cc:var(--c-${cls(name).color})`;
+  const cc = (name) => { const c = cls(name).color; return `--cc:var(--c-${c});--cp:var(--p-${c},var(--c-${c}));--ct:var(--t-${c},var(--surface))`; };
 
   // Next time a class meets, walking the day letters forward. "?" when a guessed or unknown letter is in the way.
   function nextMeeting(name) {
@@ -191,6 +192,7 @@
     const stale = hrs > STALE_HOURS;
     el.className = "bar-status" + (stale ? " stale" : "");
     el.innerHTML = `<span class="pill" title="Homework last updated ${esc(when)}"><span class="dot"></span>${stale ? `Homework is ${ago} old, check Blackbaud` : `Homework updated ${esc(when)} · ${ago}`}</span>`;
+    skinBar();
   }
 
   // One row per bell slot; a class in a split slot (the 4th block) gets one segment per part.
@@ -277,14 +279,15 @@
           const badge = r.kind === "lunch" ? "L" : c ? c.block : "·";
           const tm = r.bell.parts ? r.bell.parts.map((p) => p.join("–")).join("<br>") : `${r.bell.start}–${r.bell.end}`;
           const label = r.kind === "lunch" ? "Lunch" : c ? c.name : "Free";
-          const who = c ? [c.teacher, c.room].filter(Boolean).join(" · ") : "";
+          const who = c ? [c.teacher && `<span class="tch">${esc(c.teacher)}</span>`, c.room && `<span class="rm">${esc(c.room)}</span>`].filter(Boolean).join(" · ") : "";
           return `<li class="${r.kind} ${st}" style="${r.name ? cc(r.name) : ""}">
             <span class="blk">${badge}</span>
-            <span class="cn">${esc(label)}${r.bell.parts && c ? `<span class="split">25 + 15</span>` : ""}${who ? `<span class="who">${esc(who)}</span>` : ""}</span>
+            <span class="cn">${esc(label)}${r.bell.parts && c ? `<span class="split">25 + 15</span>` : ""}${who ? `<span class="who">${who}</span>` : ""}</span>
             <span class="tm">${tm}</span>
             ${live ? `<span class="prog"><i style="width:${pct}%"></i></span>` : ""}
           </li>`;
         }).join("");
+    skinSchedule();
     const af = schedule.after_school;
     $("#after").innerHTML = af ? `After school: <b>${esc(af.name)}</b>, ${esc(af.coach)}` : "";
   }
@@ -352,7 +355,7 @@
       if (off) return `<div class="cell off"><div class="top"><b>${num}</b></div><span class="offn">${esc(off)}</span></div>`;
       const list = (byDay.get(d) || []).sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
       const { letter } = letterFor(d);
-      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
+      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" data-no="${pad4(i.id)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
       const more = list.length > cap ? `<span class="more">+${list.length - cap} more</span>` : "";
       return `<button type="button" class="cell${d === t ? " today" : ""}${d === selDay && !showOverdue ? " sel" : ""}${d < t ? " past" : ""}" data-day="${d}" aria-label="${esc(fmt(d, { weekday: "long", month: "long", day: "numeric" }))}, ${list.length} due">
         <div class="top"><b>${num}</b><span class="lt">${letter || ""}</span></div>${chips}${more}</button>`;
@@ -376,6 +379,8 @@
 
     const done = items.filter(isDone).sort((a, b) => b.due.localeCompare(a.due));
     $("#done-count").textContent = done.length;
+    const doneToday = Object.values(state.done).filter((v) => typeof v === "string" && iso(new Date(v)) === today()).length;
+    $("#done-count").dataset.stage = Math.min(4, doneToday);
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
   }
   $("#cal").addEventListener("click", (e) => {
@@ -844,7 +849,7 @@
     $("#big-meta").textContent = list.length ? "next 4 weeks" : "";
     $("#big").innerHTML = list.length ? list.map((i) => {
       const n = daysBetween(t, i.due), done = isDone(i);
-      return `<li class="${done ? "done" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
+      return `<li class="${done ? "done" : ""}${n === 0 ? " today" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
         <span class="w"><b>${esc(i.title)}</b><small>${esc(cls(i.class).short || i.class)} · ${esc(i.type)} · ${esc(fmt(i.due))}</small></span></li>`;
     }).join("") : `<li class="empty-state" style="display:block;border:0">No tests or quizzes in the next 4 weeks.</li>`;
   }
@@ -887,8 +892,10 @@
       const id = li.dataset.id, on = e.target.checked;
       li.classList.toggle("done", on);
       setDone(id, on);
+      li.style.setProperty("--rnd", (Math.random() * 2 - 1).toFixed(2));
       li.classList.add("leaving");
-      setTimeout(() => { renderHomework(); renderBig(); }, 220);
+      if (on) skinFx(li);
+      setTimeout(() => { renderHomework(); renderBig(); }, leaveMs());
       if (on) {
         toast("Moved to Done", () => { setDone(id, false); renderHomework(); renderBig(); });
         // finished everything due that day? celebrate a little
@@ -1004,30 +1011,116 @@
     }
   };
 
-  // theme
+  // light / dark
   const icons = {
     dark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>`,
     light: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
   };
-  const isDark = () => document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme:dark)").matches;
-  const paintThemeBtn = () => { $("#theme-btn").innerHTML = isDark() ? icons.light : icons.dark; };
-  try { const t = localStorage.getItem(THEME); if (t) document.documentElement.dataset.theme = t; } catch {}
+  const root = document.documentElement;
+  const isDark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme:dark)").matches;
+  // data-mode always says which one is showing, so skins only need one dark selector
+  const paintThemeBtn = () => { $("#theme-btn").innerHTML = isDark() ? icons.light : icons.dark; root.dataset.mode = isDark() ? "dark" : "light"; };
+  try { const t = localStorage.getItem(THEME); if (t) root.dataset.theme = t; } catch {}
   $("#theme-btn").onclick = () => {
     const next = isDark() ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
+    root.dataset.theme = next;
     try { localStorage.setItem(THEME, next); } catch {}
     paintThemeBtn();
   };
+  matchMedia("(prefers-color-scheme:dark)").addEventListener("change", paintThemeBtn);
   paintThemeBtn();
 
-  // ?theme=ledger|timetable|riso|studyhall loads a concept skin from themes/ (default look otherwise)
-  const skin = new URLSearchParams(location.search).get("theme");
-  if (skin && /^[a-z]{2,20}$/.test(skin)) {
-    const l = document.createElement("link");
-    l.rel = "stylesheet";
-    l.href = `themes/${skin}.css`;
-    document.head.append(l);
-    document.documentElement.dataset.skin = skin;
+  // ---------- skins: optional looks from themes/, picked in the top bar (index.html applies the saved one before paint) ----------
+  const SKIN = "rlp-skin";
+  const SKINS = { original: "Original", herbarium: "Herbarium", departure: "Departure board", riso: "Riso zine", starchart: "Star chart", catalog: "Card catalog", nautical: "Nautical chart", blueprint: "Blueprint", almanac: "Seed almanac" };
+  const V = new URL(document.currentScript.src).searchParams.get("v") || "";
+  const skinNow = () => root.dataset.skin || "original";
+  function setSkin(name, remember = true) {
+    if (!SKINS[name]) name = "original";
+    document.getElementById("skin-css")?.remove();
+    if (name === "original") delete root.dataset.skin;
+    else {
+      const l = document.createElement("link");
+      l.rel = "stylesheet";
+      l.id = "skin-css";
+      l.href = `themes/${name}.css${V ? `?v=${V}` : ""}`;
+      document.head.append(l);
+      root.dataset.skin = name;
+    }
+    if (remember) try { localStorage.setItem(SKIN, name); } catch {}
+    if (schedule) { renderBar(); renderSchedule(); }
+  }
+  // one picker in the top bar, one in the footer for phones (the bar has no room there)
+  const skinSels = document.querySelectorAll(".skin-select");
+  skinSels.forEach((sel) => {
+    sel.innerHTML = Object.entries(SKINS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+    sel.value = skinNow();
+    sel.onchange = () => { setSkin(sel.value); skinSels.forEach((o) => { o.value = sel.value; }); };
+  });
+
+  const reduced = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
+  // a skin can hold a checked row on screen a moment for its stamp (--leave-ms in its CSS)
+  const leaveMs = () => reduced() ? 220 : parseInt(getComputedStyle(root).getPropertyValue("--leave-ms")) || 220;
+
+  // split text into one tile per character; tiles whose character changed since `prev` get .flip
+  function flaps(el, text, prev) {
+    el.setAttribute("aria-label", text);
+    el.innerHTML = [...text].map((ch, i) => ch === " " ? `<i class="gap" aria-hidden="true"></i>`
+      : `<i class="flap${prev && prev[i] !== ch ? " flip" : ""}" aria-hidden="true">${esc(ch)}</i>`).join("");
+    return text;
+  }
+
+  // Departure board: a station clock beside the homework pill
+  let clockTimer;
+  function skinBar() {
+    clearInterval(clockTimer);
+    $("#almanac").innerHTML = skinNow() === "almanac" ? almanacHTML() : "";
+    if (skinNow() !== "departure") return;
+    const c = document.createElement("span");
+    c.className = "skin-clock";
+    $("#updated").append(c);
+    let shown = "";
+    const tick = () => { const n = now(), t = `${pad(n.getHours())}:${pad(n.getMinutes())}`; if (t !== shown) shown = flaps(c, t, shown); };
+    tick();
+    clockTimer = setInterval(tick, 1000);
+  }
+  // Departure board: the countdown in split-flap tiles that flip when the minute changes
+  let lastNum = "";
+  function skinSchedule() {
+    const num = $("#now-card .num");
+    if (skinNow() !== "departure" || !num) { lastNum = ""; return; }
+    lastNum = flaps(num, num.textContent, lastNum);
+  }
+
+  // Seed almanac: moon phase and the school days left before the next day off
+  function almanacHTML() {
+    const n = now();
+    const p = (((n - Date.UTC(2000, 0, 6, 18, 14)) / 864e5 / 29.530588853) % 1 + 1) % 1;
+    const names = ["New moon", "Waxing crescent", "First quarter", "Waxing gibbous", "Full moon", "Waning gibbous", "Last quarter", "Waning crescent"];
+    const k = Math.cos(2 * Math.PI * p), rx = Math.abs(k) * 7, wax = p < 0.5;
+    const lit = `M8 1A7 7 0 0 ${wax ? 1 : 0} 8 15A${rx.toFixed(2)} 7 0 0 ${wax ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0)} 8 1Z`;
+    const moon = `<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" class="m-dark"/><path d="${lit}" class="m-lit"/></svg>`;
+    const t = today();
+    const off = Object.keys(homework?.off || {}).sort().find((d) => d > t);
+    let line = "";
+    if (off) {
+      const n2 = schoolDaysUntil(addDays(off, -1));
+      line = `${n2} school day${n2 === 1 ? "" : "s"} to ${esc(homework.off[off])}`;
+    }
+    return `${moon}<span><b>${names[Math.round(p * 8) % 8]}</b>${line ? `<small>${line}</small>` : ""}</span>`;
+  }
+
+  // check-off flourishes that need more than CSS
+  function skinFx(li) {
+    if (reduced() || skinNow() !== "starchart") return;
+    // Star chart: a gold line from the checked star to the Done header
+    const a = li.querySelector(".check").getBoundingClientRect(), b = $(".done-box summary").getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2, x2 = b.left + 60, y2 = b.top + b.height / 2;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "fx-line");
+    svg.innerHTML = `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" pathLength="1"/>`;
+    document.body.append(svg);
+    setTimeout(() => svg.remove(), 900);
   }
 
   // ?font=Some+Family tries another Google font without editing the CSS
