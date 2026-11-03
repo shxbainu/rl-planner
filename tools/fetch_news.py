@@ -11,7 +11,7 @@ from email.utils import parsedate_to_datetime
 
 # A wide spread of outlets per section (left, right, US, international). Each outlet is capped per section so the
 # busiest feeds can't crowd out the rest. Dead or blocked as of Nov 2026: old WSJ feeds.a.dj.com (stale since 2024),
-# CNN (stale), AP and Reuters (no public feed), Marketplace (403).
+# CNN (stale), AP and Reuters (no public feed), Marketplace (403), Bloomberg (no pictures, and its pages block GitHub).
 WSJ = "https://feeds.content.dowjones.io/public/rss/"
 FEEDS = {
     "top": [
@@ -49,7 +49,7 @@ FEEDS = {
         ("WSJ", WSJ + "socialeconomyfeed"),
         ("WSJ", WSJ + "RSSMarketsMain"),
         ("NYT", "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml"),
-        ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
+        ("The Guardian", "https://www.theguardian.com/business/rss"),
         ("CNBC", "https://www.cnbc.com/id/100003114/device/rss/rss.html"),
         ("BBC", "https://feeds.bbci.co.uk/news/business/rss.xml"),
         ("NPR", "https://feeds.npr.org/1006/rss.xml"),
