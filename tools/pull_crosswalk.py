@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import urllib.request
+from datetime import datetime
 
 BASE = "https://mcp.crosswalk.to/files/brianrlsite/site/"
 
@@ -21,6 +22,17 @@ def fantasy_ok(d):
 
 
 CHECKS = {"homework.json": homework_ok, "fantasy.json": fantasy_ok}
+
+
+def older_than_repo(name, data):
+    """True when the repo copy has a later updated_at, e.g. Claude loaded a newer post than Muse's saved file."""
+    try:
+        with open(name) as f:
+            mine = datetime.fromisoformat(json.load(f)["updated_at"].replace("Z", "+00:00"))
+        theirs = datetime.fromisoformat(str(data.get("updated_at")).replace("Z", "+00:00"))
+    except Exception:
+        return False
+    return theirs < mine
 
 
 def keep_claude_moves(data):
@@ -52,6 +64,9 @@ def main():
             continue
         if not ok(data):
             print(f"{name}: wrong shape; keeping repo copy", file=sys.stderr)
+            continue
+        if older_than_repo(name, data):
+            print(f"{name}: Crosswalk copy is older than the repo's; keeping repo copy")
             continue
         if name == "fantasy.json":
             data = keep_claude_moves(data)

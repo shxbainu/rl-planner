@@ -97,7 +97,7 @@
 
   function allItems() {
     const out = new Map();
-    const alias = { "Math-Sci": "MSI", "Math-Sci Investigations": "MSI", Art: "Arts", "Health & Wellness": "Health" };
+    const alias = { "Math-Sci": "MSI", "Math-Sci Investigations": "MSI", FGC: "Forces", "Forces of Global Change": "Forces", Art: "Arts", "Health & Wellness": "Health" };
     for (const raw of homework?.assignments || []) {
       if (!raw?.title || !raw?.due) continue;
       const a = alias[raw.class] ? { ...raw, class: alias[raw.class] } : raw;
@@ -140,6 +140,7 @@
     const meta = [
       `<span class="chip">${esc(it.class)}</span>`,
       major ? `<span class="tag">${esc(it.type)}</span>` : "",
+      it.unconfirmed ? `<span class="tag unsure">Unconfirmed</span>` : "",
       overdue ? `<span class="tag bad">Overdue</span>` : "",
       showDue ? `<span>due ${esc(relDay(it.due))}</span>` : "",
       it.manual ? `<span class="mine">yours</span>` : "",
