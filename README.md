@@ -27,3 +27,9 @@ Countdowns are added on the page and saved in the browser (included in Export/Im
 
 - Scores, game details (box score, play-by-play, team stats) and sports news load live from ESPN's public feeds in the browser.
 - Politics / world / tech headlines: `tools/fetch_news.py` builds `news.json` from public RSS feeds. The `Deploy site` workflow runs it on every push and hourly, then deploys to GitHub Pages. (GitHub pauses scheduled workflows after 60 days with no commits; any push restarts them.)
+
+## Daily homework, hands-off
+
+Muse saves the site-format JSON to the brianrlsite Crosswalk files at `site/homework.json` (and `site/fantasy.json`).
+The `Deploy site` workflow pulls both every hour with a read-only Crosswalk key stored as the `CROSSWALK_KEY` repo secret,
+checks their shape, and falls back to the repo copies if anything is missing or malformed.

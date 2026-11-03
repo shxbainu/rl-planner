@@ -1,4 +1,4 @@
-# Deploys the site to GitHub Pages on every push, and hourly to refresh news.json.
+# Deploys the site to GitHub Pages on every push, and hourly to refresh news and Muse's homework/fantasy files.
 name: Deploy site
 
 on:
@@ -30,6 +30,10 @@ jobs:
           python-version: "3.12"
       - name: Fetch headlines
         run: python tools/fetch_news.py news.json
+      - name: Pull latest homework and fantasy from Crosswalk
+        env:
+          CROSSWALK_KEY: ${{ secrets.CROSSWALK_KEY }}
+        run: python tools/pull_crosswalk.py
       - name: Collect site files
         run: |
           mkdir _site
