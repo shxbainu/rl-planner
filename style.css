@@ -131,15 +131,16 @@ details.extra[open] .x-tease{visibility:hidden}
 .tl .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right;white-space:nowrap;line-height:1.3}
 .tl .split{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--cc);margin-left:6px}
 /* stays plain under every skin */
-:root .tl li:is(.free,.lunch) .blk{background:transparent;color:var(--muted);border:1.5px dashed var(--line);box-shadow:none}
-.tl li.free .cn,.tl li.lunch .cn{font-weight:400;color:var(--muted)}
-.tl li.lunch{background:var(--surface-2)}
-.tl li.lunch .cn{font-style:italic}
+:root .tl li:is(.free,.ev) .blk{background:transparent;color:var(--muted);border:1.5px dashed var(--line);box-shadow:none}
+.tl li.free .cn,.tl li.ev .cn{font-weight:400;color:var(--muted)}
+.tl li.ev{background:var(--surface-2)}
+.tl li.ev .cn{font-style:italic}
 .tl li.now{background:var(--accent-soft)}
 .tl li.now .tm{color:var(--accent)}
 .tl li.now .prog{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:0}
 .tl li.past{opacity:.45}
 .tl .empty{color:var(--muted);padding:8px;display:block}
+.tl .pass{display:block;font-size:10px;color:var(--muted);letter-spacing:0}
 .after{margin:auto 0 0;font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
 .after b{color:var(--fg);font-weight:600}
 
@@ -198,7 +199,7 @@ details .list{margin-top:6px}
 .rot td.tm{font-family:var(--mono);font-weight:400;font-size:11px;color:var(--muted);background:none;text-align:right;padding-right:4px}
 .rot td.x{background:none}
 .rot td.cur{outline:1.5px solid var(--cc);outline-offset:-1.5px}
-.rot td.lunch{background:var(--surface-2);color:var(--muted);font-weight:400;font-style:italic;font-size:11.5px;padding:2px 0}
+.rot td.ev{background:var(--surface-2);color:var(--muted);font-weight:400;font-style:italic;font-size:11.5px;padding:2px 0}
 .rot col.tmc{width:42px}
 .rot.letters{font-size:11.5px}
 

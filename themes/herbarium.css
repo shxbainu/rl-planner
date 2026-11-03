@@ -63,7 +63,7 @@ html[data-skin="herbarium"]{
   .tl .split{color:var(--muted);font-family:var(--mono);font-weight:500}
   .tl li.now{background:var(--accent-soft)}
   .tl li.now .tm{color:var(--accent-ink)}
-  .tl li.lunch{background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+  .tl li.ev{background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
   .after{font-style:italic}
 
   /* homework grid: specimen sheets with typed labels */
@@ -116,7 +116,7 @@ html[data-skin="herbarium"]{
   .rot td{border-radius:2px;color:var(--fg);font-weight:500;background:color-mix(in srgb,var(--cc) 22%,var(--surface));box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--cc) 60%,transparent)}
   .rot td.x,.rot td.tm{box-shadow:none}
   .rot td.cur{outline:1.5px solid var(--accent);outline-offset:-1.5px}
-  .rot td.lunch{box-shadow:none;background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);border-radius:0}
+  .rot td.ev{box-shadow:none;background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);border-radius:0}
 
   /* extras: plain labeled index slips */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:2px;background:var(--surface);border:1px solid var(--line)}

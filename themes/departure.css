@@ -73,22 +73,23 @@ html[data-skin="departure"]{
   .tl .tm::after{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-align:right;line-height:1.4}
   .tl li.past .tm::after{content:"DEPARTED";color:#6fcf7f}
   .tl li.now .tm::after{content:"NOW";color:var(--amber)}
-  .tl li.class:not(.past,.now):is(.now + li,.past + li,.now + .lunch + li,.past + .lunch + li) .tm::after,
-  .tl:not(:has(li.now,li.past)) > li.class:first-child .tm::after{content:"NEXT";color:#ede6d6}
+  .tl li:is(.class,.ev):not(.past,.now):is(.now + li,.past + li) .tm::after,
+  .tl:not(:has(li.now,li.past)) > li:first-child .tm::after{content:"NEXT";color:#ede6d6}
   .tl .blk{position:relative;border-radius:3px;background:var(--tile);color:var(--tile-fg);font-family:var(--mono)}
   .tl .blk::after{content:"";position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:var(--cc);box-shadow:0 0 0 1.5px var(--surface)}
-  .tl li.lunch .blk::after,.tl li.free .blk::after{display:none}
+  .tl li.ev .blk::after,.tl li.free .blk::after{display:none}
   .tl .cn{font-family:var(--sign);font-weight:500;text-transform:uppercase;font-size:14px;letter-spacing:.04em}
   .tl .who{font-family:var(--mono);text-transform:none;font-weight:400;font-size:11px;letter-spacing:-.02em}
   .tl .split{font-family:var(--mono)}
   .tl .rm::before{content:"PLATFORM ";font-size:8.5px;font-weight:700;letter-spacing:.06em;color:var(--amber-ink)}
   .tl .tm{background:var(--tile);color:var(--amber);padding:2px 5px;border-radius:3px;font-size:11.5px;font-weight:500}
   .tl .split{color:var(--muted)}
+  .tl .pass{color:#b9b1a2;font-family:var(--mono);font-weight:400}
   .tl li.now{background:var(--accent-soft)}
   .tl li.now .tm{color:var(--amber)}
   .tl li.now .prog{background:transparent}
-  .tl li.lunch{background:transparent}
-  .tl li.lunch .cn{color:var(--muted)}
+  .tl li.ev{background:transparent}
+  .tl li.ev .cn{color:var(--muted)}
   .after{border-top-style:solid;text-transform:uppercase;font-size:11.5px}
 
   /* homework: dark tiles, single-line rows with a class lamp */
@@ -138,7 +139,7 @@ html[data-skin="departure"]{
   &[data-mode="dark"] .rot td.cur{background:#2a2a2a}
   .rot td.cur{outline:0;background:color-mix(in srgb,var(--amber) 16%,var(--surface))}
   .rot td.x,.rot td.tm{box-shadow:none;background:none}
-  .rot td.lunch{box-shadow:none;color:var(--muted)}
+  .rot td.ev{box-shadow:none;color:var(--muted)}
 
   /* extras */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:3px}

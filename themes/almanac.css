@@ -81,7 +81,7 @@ html[data-skin="almanac"]{
   .tl .split{color:var(--muted)}
   .tl li.now{background:var(--warn-soft)}
   .tl li.now .tm{color:var(--fg);font-weight:600}
-  .tl li.lunch{background:transparent}
+  .tl li.ev{background:transparent}
   .after{border-top:1px dashed var(--line)}
 
   /* homework: little packet cards, chips with a seed dot */
@@ -131,7 +131,7 @@ html[data-skin="almanac"]{
   .rot td{border-radius:0;color:var(--fg);font-weight:600;background:color-mix(in srgb,var(--cc) 20%,var(--surface));border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
   .rot td.x,.rot td.tm{border-right:0;background:none}
   .rot td.cur{outline:2px solid var(--accent);outline-offset:-2px}
-  .rot td.lunch{background:transparent}
+  .rot td.ev{background:transparent}
 
   /* extras: almanac-style boxed tables */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:var(--surface);border:1px solid var(--fg);border-top:3px double var(--fg)}

@@ -78,7 +78,7 @@ html[data-skin="riso"]{
   .tl .split{color:var(--muted)}
   .tl li.now{background:var(--warn-soft)}
   .tl li.now .tm{color:var(--fg);font-weight:700}
-  .tl li.lunch{background:transparent}
+  .tl li.ev{background:transparent}
   .after{border-top:2px dashed var(--ink-line)}
 
   /* homework: wobbly hand-ruled cells, sticker chips with a pattern swatch */
@@ -135,7 +135,7 @@ html[data-skin="riso"]{
   .rot td{border-radius:0;color:var(--fg);font-weight:700;background:linear-gradient(var(--surface) 0 0) center/calc(100% - 10px) calc(100% - 9px) no-repeat,var(--cp)}
   .rot td.x,.rot td.tm{background:none}
   .rot td.cur{outline:2px solid var(--ink-line);outline-offset:0}
-  .rot td.lunch{background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--teal) 25%,transparent) 0 1px,transparent 1px 6px);color:var(--muted)}
+  .rot td.ev{background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--teal) 25%,transparent) 0 1px,transparent 1px 6px);color:var(--muted)}
 
   /* extras: little sticker cards */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:10px;background:var(--surface);border:2px solid var(--ink-line);box-shadow:2px 2px 0 var(--pink)}

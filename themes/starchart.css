@@ -76,8 +76,8 @@ html[data-skin="starchart"]{
   .tl .split{color:var(--muted)}
   .tl li.now{background:var(--accent-soft)}
   .tl li.now .tm{color:var(--accent)}
-  .tl li.lunch{background:transparent}
-  .tl li.lunch .cn{font-style:normal}
+  .tl li.ev{background:transparent}
+  .tl li.ev .cn{font-style:normal}
 
   /* homework: gold hairline cells; today ringed like a highlighted constellation */
   .cal{gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
@@ -132,7 +132,7 @@ html[data-skin="starchart"]{
   .rot td{border-radius:0;background:transparent;color:var(--fg);font-weight:500;border:1px solid var(--line);border-width:0 1px 1px 0;box-shadow:inset 2px 0 0 var(--cc)}
   .rot td.x,.rot td.tm{box-shadow:none;border:0}
   .rot td.cur{outline:0;background:color-mix(in srgb,var(--gold) 14%,transparent)}
-  .rot td.lunch{background:transparent;font-style:normal;border-width:0 0 1px}
+  .rot td.ev{background:transparent;font-style:normal;border-width:0 0 1px}
 
   /* extras: engraved plates */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:transparent;border:3px double color-mix(in srgb,var(--gold) 55%,transparent)}

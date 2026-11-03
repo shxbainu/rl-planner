@@ -21,6 +21,7 @@
     "coach": "Coach Hyde"
   },
   "bells": [
+    {"homeroom": true, "start": "8:20", "end": "8:25"},
     {"slot": 1, "start": "8:30", "end": "9:15"},
     {"slot": 2, "start": "9:20", "end": "10:05"},
     {"slot": 3, "start": "10:10", "end": "10:55"},
@@ -30,7 +31,9 @@
     {"slot": 6, "start": "1:10", "end": "1:55"},
     {"slot": 7, "start": "2:00", "end": "2:45"}
   ],
-  "bells_note": "Start times are from the rotation. 45-minute blocks with 5-minute passing are assumed; the 4th block is 25 + 15 minutes, then a separate 25-minute lunch.",
+  "bells_note": "Start times are from the rotation. 45-minute blocks with 5 minutes of passing time between them; the 4th block is 25 + 15 minutes, then a separate 25-minute lunch. Homeroom is 8:20-8:25 every day.",
+  "passing": 5,
+  "hall": {"weekday": 2, "start": "8:30", "end": "9:15", "note": "Tuesdays only; fills the first block when it is free"},
   "rotations": {
     "A": {"confirmed": true, "periods": [["8:30", "Latin"], ["9:20", "English"], ["10:10", "MSI"], ["11:00", "French"], ["12:20", "Forces"], ["1:10", "Arts"]]},
     "B": {"confirmed": false, "periods": [["8:30", "English"], ["9:20", "MSI"], ["10:10", "French"], ["11:00", "Forces"], ["12:20", "Arts"], ["2:00", "Glee"]]},

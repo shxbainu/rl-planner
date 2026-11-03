@@ -196,13 +196,18 @@
   }
 
   // One row per bell slot; a class in a split slot (the 4th block) gets one segment per part.
-  function dayRows(letter) {
+  // Homeroom, lunch and the Tuesday hall block are events: not classes, but part of the day.
+  const hallOn = (day) => schedule.hall && day && parse(day).getDay() === schedule.hall.weekday;
+  function dayRows(letter, day) {
     const rot = letter && schedule.rotations[letter];
     if (!rot) return [];
     const at = Object.fromEntries(rot.periods);
+    const ev = (kind, b, label) => ({ kind, bell: b, segs: [{ start: b.start, end: b.end, label, ev: true, edge: kind !== "lunch" }] });
     return schedule.bells.map((b) => {
-      if (b.lunch) return { kind: "lunch", bell: b, segs: [{ start: b.start, end: b.end, label: "Lunch" }] };
+      if (b.lunch) return ev("lunch", b, "Lunch");
+      if (b.homeroom) return ev("homeroom", b, "Homeroom");
       const name = at[b.start];
+      if (!name && hallOn(day) && schedule.hall.start === b.start) return ev("hall", schedule.hall, "Hall");
       const label = name ? cls(name).name : "Free";
       const parts = b.parts || [[b.start, b.end]];
       return {
@@ -212,6 +217,7 @@
     });
   }
 
+  const passing = () => schedule.passing || 5;
   const dur = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${pad(m % 60)}m`);
   const where = (name) => (name ? cls(name).room || "" : "");
 
@@ -225,15 +231,15 @@
     }
     // ignore free time before the first class and after the last
     const segs = rows.flatMap((r) => r.segs);
-    const firstI = segs.findIndex((s) => s.name), lastI = segs.length - 1 - [...segs].reverse().findIndex((s) => s.name);
+    const firstI = segs.findIndex((s) => s.name || s.edge), lastI = segs.length - 1 - [...segs].reverse().findIndex((s) => s.name);
     const day_ = segs.slice(firstI, lastI + 1);
     const m = now().getHours() * 60 + now().getMinutes() + now().getSeconds() / 60;
-    const nextAfter = (i) => day_.slice(i + 1).find((s) => s.name || s.label === "Lunch");
+    const nextAfter = (i) => day_.slice(i + 1).find((s) => s.name || s.ev);
     const nextLine = (n) => n ? `Then <b>${esc(n.label)}</b> at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : "Last one today";
 
     if (m < minutes(day_[0].start)) {
       return `<div class="big"><span class="num">${dur(Math.ceil(minutes(day_[0].start) - m))}</span><span class="lbl">until school</span></div>
-        <div class="sub">First: <b>${esc(day_[0].label)}</b> at ${day_[0].start} in ${esc(where(day_[0].name))}</div>`;
+        <div class="sub">First: <b>${esc(day_[0].label)}</b> at ${day_[0].start}${day_[0].name ? ` in ${esc(where(day_[0].name))}` : ""}</div>`;
     }
     if (m >= minutes(day_.at(-1).end)) {
       return `<div class="big"><span class="lbl">Done with classes for today</span></div>${after ? `<div class="sub">Next: <b>${esc(after.name)}</b></div>` : ""}`;
@@ -242,9 +248,11 @@
       const s = day_[i], a = minutes(s.start), b = minutes(s.end);
       if (m >= a && m < b) {
         const pct = Math.round(((m - a) / (b - a)) * 100);
+        const nx = day_[i + 1], gap = nx ? minutes(nx.start) - b : 0;
+        const gapTxt = gap > 0 && gap <= passing() ? `${gap} min ${nx.name && nx.name === s.name ? "break" : "passing"} · ` : "";
         return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${dur(Math.ceil(b - m))}</span><span class="lbl">left in ${esc(s.label)}</span></div>
           <div class="prog" style="${s.name ? cc(s.name) : ""}"><i style="width:${pct}%"></i></div>
-          <div class="sub">Ends ${s.end} · ${nextLine(nextAfter(i))}</div>`;
+          <div class="sub">Ends ${s.end} · ${gapTxt}${nextLine(nextAfter(i))}</div>`;
       }
       const n = day_[i + 1];
       if (n && m >= b && m < minutes(n.start)) {
@@ -258,7 +266,7 @@
   function renderSchedule() {
     const t = today(), day = schoolDay(), isToday = day === t;
     const { letter } = letterFor(day);
-    const rows = dayRows(letter);
+    const rows = dayRows(letter, day);
     const classes = rows.filter((r) => r.kind === "class").length;
     $("#sched-h").textContent = isToday ? "Today" : relDay(day);
     $("#sched-meta").textContent = letter ? `${letter} day · ${classes} classes` : "";
@@ -267,23 +275,25 @@
     const m = now().getHours() * 60 + now().getMinutes();
     const first = rows.findIndex((r) => r.kind === "class");
     const last = rows.length - 1 - [...rows].reverse().findIndex((r) => r.kind === "class");
+    const shown = rows.filter((r, i) => !(r.kind === "free" && (i < first || i > last))); // no class yet / already out
     $("#timeline").innerHTML = !rows.length
       ? `<li class="empty">Set the day letter to see classes.</li>`
-      : rows.map((r, i) => {
-          if (r.kind === "free" && (i < first || i > last)) return ""; // no class yet / already out
+      : shown.map((r, i) => {
+          const nx = shown[i + 1], gap = nx ? minutes(nx.bell.start) - minutes(r.bell.end) : 0;
           const a = minutes(r.bell.start), b = minutes(r.bell.end);
           const live = isToday && r.segs.find((s) => m >= minutes(s.start) && m < minutes(s.end));
           const st = !isToday ? "" : m >= b ? "past" : live ? "now" : "";
           const pct = live ? Math.round(((m - minutes(live.start)) / (minutes(live.end) - minutes(live.start))) * 100) : 0;
           const c = r.name && cls(r.name);
-          const badge = r.kind === "lunch" ? "L" : c ? c.block : "·";
+          const isEv = ["lunch", "homeroom", "hall"].includes(r.kind);
+          const badge = { lunch: "L", homeroom: "HR", hall: "HL" }[r.kind] || (c ? c.block : "·");
           const tm = r.bell.parts ? r.bell.parts.map((p) => p.join("–")).join("<br>") : `${r.bell.start}–${r.bell.end}`;
-          const label = r.kind === "lunch" ? "Lunch" : c ? c.name : "Free";
+          const label = isEv ? r.segs[0].label : c ? c.name : "Free";
           const who = c ? [c.teacher && `<span class="tch">${esc(c.teacher)}</span>`, c.room && `<span class="rm">${esc(c.room)}</span>`].filter(Boolean).join(" · ") : "";
-          return `<li class="${r.kind} ${st}" style="${r.name ? cc(r.name) : ""}">
+          return `<li class="${r.kind}${isEv ? " ev" : ""} ${st}" style="${r.name ? cc(r.name) : ""}">
             <span class="blk">${badge}</span>
             <span class="cn">${esc(label)}${r.bell.parts && c ? `<span class="split">25 + 15</span>` : ""}${who ? `<span class="who">${who}</span>` : ""}</span>
-            <span class="tm">${tm}</span>
+            <span class="tm">${tm}${gap > 0 && gap <= passing() ? `<small class="pass">+${gap} passing</small>` : ""}</span>
             ${live ? `<span class="prog"><i style="width:${pct}%"></i></span>` : ""}
           </li>`;
         }).join("");
@@ -312,10 +322,10 @@
     const head = `<colgroup><col class="tmc">${cols.map(() => "<col>").join("")}</colgroup><thead><tr><th></th>${cols.map((c) =>
       `<th class="${c.cur ? "cur" : ""}"${c.off ? ` title="${esc(c.off)}"` : ""}>${esc(c.top)}<small>${c.off ? "Off" : c.letter || ""}${c.q ? `<span class="q">?</span>` : ""}</small></th>`).join("")}</tr></thead>`;
     const rows = schedule.bells.map((b) => {
-      if (b.lunch) return `<tr><td class="tm">${b.start}</td><td class="lunch" colspan="${cols.length}">Lunch</td></tr>`;
+      if (b.lunch || b.homeroom) return `<tr><td class="tm">${b.start}</td><td class="ev" colspan="${cols.length}">${b.lunch ? "Lunch" : "Homeroom"}</td></tr>`;
       return `<tr><td class="tm">${b.start}</td>${cols.map((c) => {
         const p = c.letter && schedule.rotations[c.letter]?.periods.find((x) => x[0] === b.start);
-        if (!p) return `<td class="x"></td>`;
+        if (!p) return view === "week" && hallOn(c.key) && schedule.hall.start === b.start ? `<td class="ev">Hall</td>` : `<td class="x"></td>`;
         return `<td class="${c.cur ? "cur" : ""}" style="${cc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
       }).join("")}</tr>`;
     }).join("");

@@ -79,7 +79,7 @@ html[data-skin="catalog"]{
   .tl .split{color:var(--muted)}
   .tl li.now{background:var(--accent-soft)}
   .tl li.now .tm{color:var(--accent)}
-  .tl li.lunch{background:var(--surface-2)}
+  .tl li.ev{background:var(--surface-2)}
 
   /* homework: each day an index card with a red top rule and blue lines */
   .cal .dow{font-family:var(--head);font-weight:600;font-size:12.5px;letter-spacing:.06em}
@@ -126,7 +126,7 @@ html[data-skin="catalog"]{
   .rot td.x{box-shadow:none}
   .rot td.tm{box-shadow:none;border-right:1.5px solid var(--red)}
   .rot td.cur{outline:2px solid var(--red);outline-offset:-2px}
-  .rot td.lunch{box-shadow:none;background:var(--surface-2)}
+  .rot td.ev{box-shadow:none;background:var(--surface-2)}
 
   /* extras: typed catalog cards */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:1px;background:var(--surface);border:1px solid var(--line);border-top:2px solid var(--red)}

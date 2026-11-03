@@ -69,7 +69,7 @@ html[data-skin="nautical"]{
   .tl .split{color:var(--muted);font-family:var(--mono);font-weight:500}
   .tl li.now{background:var(--accent-soft)}
   .tl li.now .tm{color:var(--fg);font-weight:500}
-  .tl li.lunch{background:transparent}
+  .tl li.ev{background:transparent}
   .after{border-top:1px dashed var(--coast)}
 
   /* homework: chart squares, waypoint dots, red buoys for tests */
@@ -120,7 +120,7 @@ html[data-skin="nautical"]{
   .rot td{border-radius:0;background:transparent;color:var(--fg);font-family:var(--mono);font-weight:500;border-bottom:1px solid color-mix(in srgb,var(--coast) 25%,transparent);box-shadow:inset 3px 0 0 var(--cc)}
   .rot td.x,.rot td.tm{box-shadow:none}
   .rot td.cur{outline:0;background:color-mix(in srgb,var(--coast) 9%,transparent)}
-  .rot td.lunch{box-shadow:none;background:transparent}
+  .rot td.ev{box-shadow:none;background:transparent}
 
   /* extras: chart-legend boxes */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:var(--surface-2);border:1px solid color-mix(in srgb,var(--coast) 45%,transparent)}
