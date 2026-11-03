@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#7a1a22">
+<title>Brian's RL Planner</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a1a22'/%3E%3Ctext x='32' y='43' font-family='Helvetica,Arial,sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ERL%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="bar-day">
+    <label class="letter-pick" title="Day letter (tap to change)">
+      <select id="letter-select" aria-label="Day letter"></select>
+    </label>
+    <div>
+      <div class="bar-date" id="bar-date"></div>
+      <div class="bar-sub" id="bar-sub"></div>
+    </div>
+  </div>
+  <div class="bar-status" id="updated" role="status"></div>
+  <div class="bar-actions">
+    <button class="btn primary" id="add-btn" type="button">+ Add</button>
+    <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch light or dark mode" title="Light / dark"></button>
+  </div>
+</header>
+
+<main class="dash">
+  <section class="panel p-today" aria-labelledby="today-h">
+    <div class="panel-h"><h2 id="today-h">Today</h2><span class="panel-meta" id="today-meta"></span></div>
+    <ol class="periods" id="periods"></ol>
+    <p class="after" id="after"></p>
+  </section>
+
+  <section class="panel p-hw" aria-labelledby="hw-h">
+    <div class="panel-h"><h2 id="hw-h">Homework</h2><span class="panel-meta" id="hw-meta"></span></div>
+    <div id="hw"></div>
+    <details class="done-box">
+      <summary>Done <span class="count" id="done-count">0</span></summary>
+      <ul class="list" id="done"></ul>
+    </details>
+  </section>
+
+  <section class="panel p-blocks" aria-labelledby="blocks-h">
+    <div class="panel-h"><h2 id="blocks-h">My blocks</h2></div>
+    <ul class="blocks" id="blocks"></ul>
+  </section>
+
+  <section class="panel p-rot" aria-labelledby="rot-h">
+    <div class="panel-h"><h2 id="rot-h">Rotation</h2><span class="panel-meta"><span class="unc-key">?</span> = times not confirmed yet</span></div>
+    <div class="rot-scroll"><table class="rot" id="rot"></table></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>Check-offs and your own assignments save in this browser.</span>
+  <button class="link" id="export-btn" type="button">Export</button>
+  <button class="link" id="import-btn" type="button">Import</button>
+  <input type="file" id="import-file" accept="application/json,.json" hidden>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dlg-h">
+  <form id="form" method="dialog">
+    <h2 id="dlg-h">Add assignment</h2>
+    <label>Class
+      <select name="class" id="f-class" required></select>
+    </label>
+    <label>What is it?
+      <input name="title" id="f-title" required maxlength="140" autocomplete="off" placeholder="e.g. Study Ch. 39 vocab">
+    </label>
+    <div class="row2">
+      <label>Due
+        <input name="due" id="f-due" type="date" required>
+      </label>
+      <label>Type
+        <select name="type" id="f-type">
+          <option value="homework">Homework</option>
+          <option value="reading">Reading</option>
+          <option value="quiz">Quiz</option>
+          <option value="test">Test</option>
+          <option value="essay">Essay</option>
+          <option value="project">Project</option>
+        </select>
+      </label>
+    </div>
+    <label>Notes <span class="opt">optional</span>
+      <textarea name="details" id="f-details" rows="2" maxlength="500"></textarea>
+    </label>
+    <div class="dlg-actions">
+      <button class="btn danger" type="button" id="f-delete" hidden>Delete</button>
+      <span class="grow"></span>
+      <button class="btn" type="button" id="f-cancel">Cancel</button>
+      <button class="btn primary" type="submit" id="f-save">Add</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

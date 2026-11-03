@@ -1,0 +1,11 @@
+{
+  "updated_at": "2026-11-03T03:15:00Z",
+  "source": "Crosswalk kickoff post (known MP2 dates); Muse's daily posts replace this",
+  "days": {},
+  "assignments": [
+    { "class": "English", "title": "AWWW Ch. 4 quiz",  "assigned": "2026-11-02", "due": "2026-11-04", "type": "quiz",  "details": "", "source": "syllabus" },
+    { "class": "English", "title": "Reading Quiz 3",   "assigned": "2026-11-02", "due": "2026-11-12", "type": "quiz",  "details": "", "source": "syllabus" },
+    { "class": "English", "title": "Reading Quiz 4",   "assigned": "2026-11-02", "due": "2026-11-19", "type": "quiz",  "details": "", "source": "syllabus" },
+    { "class": "English", "title": "Essay #2",         "assigned": "2026-11-02", "due": "2026-12-02", "type": "essay", "details": "", "source": "syllabus" }
+  ]
+}
