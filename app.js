@@ -51,7 +51,11 @@
     return d;
   }
   const today = () => iso(now());
-  const schoolDay = () => (isWeekend(today()) ? nextSchoolDay(today()) : today());
+  // After 3:30 the planner looks ahead to the next school day
+  const schoolDay = () => {
+    const n = now(), t = today();
+    return isWeekend(t) || n.getHours() * 60 + n.getMinutes() >= 15 * 60 + 30 ? nextSchoolDay(t) : t;
+  };
 
   function relDay(s) {
     const n = daysBetween(today(), s);
@@ -189,7 +193,7 @@
     if (!rows.length) return `<div class="big"><span class="lbl">Set the day letter to see your classes</span></div>`;
     const firstClass = rows.flatMap((r) => r.segs).find((s) => s.name);
     if (!isToday) {
-      return `<div class="big"><span class="lbl">${esc(fmt(day, { weekday: "long" }))} is ${/^[AEF]/.test(letter) ? "an" : "a"} ${letter} day</span></div>
+      return `<div class="big"><span class="lbl">${esc(fmt(day, { weekday: "long" }))} is ${/^[AEFH]/.test(letter) ? "an" : "a"} ${letter} day</span></div>
         <div class="sub">First class: <b>${esc(firstClass ? cls(firstClass.name).name : "none")}</b>${firstClass ? ` at ${firstClass.start} in ${esc(where(firstClass.name))}` : ""}</div>`;
     }
     // ignore free time before the first class and after the last
@@ -231,7 +235,7 @@
     const { letter } = letterFor(day);
     const rows = dayRows(letter);
     const classes = rows.filter((r) => r.kind === "class").length;
-    $("#sched-h").textContent = isToday ? "Today" : fmt(day, { weekday: "long" });
+    $("#sched-h").textContent = isToday ? "Today" : relDay(day);
     $("#sched-meta").textContent = letter ? `${letter} day · ${classes} classes` : "";
     $("#now-card").innerHTML = nowCard(rows, isToday, day, letter);
 
