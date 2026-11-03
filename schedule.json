@@ -12,6 +12,10 @@
     "Health": {"name": "Health & Wellness", "block": "H", "teacher": "Ms. Kuhlmann", "room": "P27", "color": "health", "note": "Wednesdays in fall", "short": "H&W"},
     "Other": {"name": "Other", "color": "other", "short": "—"}
   },
+  "teams": [
+    {"name": "Warriors", "sport": "basketball", "league": "nba", "id": "gs"},
+    {"name": "49ers", "sport": "football", "league": "nfl", "id": "sf"}
+  ],
   "after_school": {
     "name": "Soccer (Third)",
     "coach": "Coach Hyde"

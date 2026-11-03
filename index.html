@@ -57,6 +57,27 @@
     <div class="rot-scroll"><table class="rot" id="rot"></table></div>
     <p class="panel-foot" id="rot-note"></p>
   </section>
+  <div class="col-life">
+    <section class="panel p-sports" aria-labelledby="sports-h">
+      <div class="panel-h"><h2 id="sports-h">Teams</h2><span class="panel-meta" id="sports-meta"></span></div>
+      <div class="teams" id="teams"></div>
+    </section>
+
+    <section class="panel p-count" aria-labelledby="count-h">
+      <div class="panel-h"><h2 id="count-h">Countdowns</h2></div>
+      <ul class="counts" id="counts"></ul>
+      <form class="count-form" id="count-form" autocomplete="off">
+        <input id="c-title" maxlength="60" placeholder="What's coming up?" aria-label="Countdown name" required>
+        <input id="c-date" type="date" aria-label="Date" required>
+        <button class="btn" type="submit">Add</button>
+      </form>
+    </section>
+
+    <section class="panel p-ff" aria-labelledby="ff-h">
+      <div class="panel-h"><h2 id="ff-h">Fantasy</h2><span class="panel-meta" id="ff-meta"></span></div>
+      <div id="ff"></div>
+    </section>
+  </div>
 </main>
 
 <footer class="foot">

@@ -16,7 +16,7 @@
 
   // ---------- storage ----------
   function load() {
-    const empty = { done: {}, manual: [], letters: {} };
+    const empty = { done: {}, manual: [], letters: {}, countdowns: [] };
     try {
       const s = JSON.parse(localStorage.getItem(STORE) || "null");
       return s ? { ...empty, ...s } : empty;
@@ -353,11 +353,126 @@
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
   }
 
+  // ---------- teams (ESPN's public schedule feed) ----------
+  const teamData = {};
+  let teamTimer;
+  const gameTime = (iso_) => new Date(iso_).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" });
+  async function loadTeams() {
+    clearTimeout(teamTimer);
+    await Promise.all((schedule.teams || []).map(async (t) => {
+      try {
+        const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${t.sport}/${t.league}/teams/${t.id}/schedule`);
+        if (r.ok) teamData[t.id] = await r.json();
+      } catch {}
+    }));
+    renderTeams();
+    const live = Object.values(teamData).some((d) => d.events?.some((e) => e.competitions[0].status.type.state === "in"));
+    teamTimer = setTimeout(loadTeams, live ? 60_000 : 20 * 60_000);
+  }
+  function renderTeams() {
+    const html = (schedule.teams || []).map((t) => {
+      const d = teamData[t.id];
+      if (!d) return `<div class="team"><span></span><div><div class="tn">${esc(t.name)}</div><div class="ln">Scores unavailable right now</div></div></div>`;
+      const me = d.team, evs = d.events || [];
+      const st = (e) => e.competitions[0].status.type;
+      const live = evs.find((e) => st(e).state === "in");
+      const last = [...evs].reverse().find((e) => st(e).completed);
+      const next = evs.find((e) => st(e).state === "pre");
+      const sides = (e) => {
+        const c = e.competitions[0].competitors;
+        const us = c.find((x) => x.team.abbreviation === me.abbreviation) || c[0], them = c.find((x) => x !== us);
+        return { us, them, at: us.homeAway === "home" ? "vs" : "@" };
+      };
+      const lines = [];
+      if (live) {
+        const { us, them, at } = sides(live);
+        lines.push(`<div class="ln"><span class="live-dot"></span><b>${esc(st(live).shortDetail)}</b> <span class="score">${esc(us.score?.displayValue ?? 0)}–${esc(them.score?.displayValue ?? 0)}</span> ${at} ${esc(them.team.abbreviation)}</div>`);
+      }
+      if (last && last !== live) {
+        const { us, them, at } = sides(last);
+        lines.push(`<div class="ln"><span class="${us.winner ? "w" : "l"}">${us.winner ? "W" : "L"}</span> <span class="score">${esc(us.score?.displayValue)}–${esc(them.score?.displayValue)}</span> ${at} ${esc(them.team.abbreviation)} · ${esc(new Date(last.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }))}</div>`);
+      }
+      if (next) {
+        const { them, at } = sides(next);
+        const tv = next.competitions[0].broadcasts?.map((b) => b.media?.shortName).filter(Boolean)[0];
+        lines.push(`<div class="ln">Next <b>${at} ${esc(them.team.shortDisplayName || them.team.abbreviation)}</b> ${esc(gameTime(next.date))}${tv ? ` · ${esc(tv)}` : ""}</div>`);
+      } else if (!live) lines.push(`<div class="ln">No upcoming games listed</div>`);
+      return `<div class="team${live ? " live" : ""}"><img src="${esc(me.logo)}" alt="" loading="lazy">
+        <div><div class="tn">${esc(t.name)} <span class="rec">${esc(me.recordSummary || "")}${me.standingSummary ? ` · ${esc(me.standingSummary.replace(/ Division$/, ""))}` : ""}</span></div>${lines.join("")}</div></div>`;
+    }).join("");
+    $("#teams").innerHTML = html;
+    $("#sports-meta").textContent = "ESPN";
+  }
+
+  // ---------- countdowns (yours, saved in this browser) ----------
+  function schoolDaysUntil(d) {
+    let n = 0;
+    for (let x = addDays(today(), 1); x <= d; x = addDays(x, 1)) if (!isWeekend(x)) n++;
+    return n;
+  }
+  function renderCounts() {
+    const t = today();
+    const list = (state.countdowns || []).filter((c) => c.date >= t).sort((a, b) => a.date.localeCompare(b.date));
+    $("#counts").innerHTML = list.length
+      ? list.map((c) => {
+          const n = daysBetween(t, c.date);
+          return `<li class="${n <= 3 ? "soon" : ""}"><span class="n">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
+            <span class="t">${esc(c.title)}<small>${esc(fmt(c.date, { weekday: "short", month: "short", day: "numeric" }))}${n > 1 ? ` · ${schoolDaysUntil(c.date)} school days` : ""}</small></span>
+            <button class="x" type="button" data-count="${esc(c.id)}" aria-label="Remove ${esc(c.title)}">×</button></li>`;
+        }).join("")
+      : `<li class="empty-state" style="display:block">Add a break, a game, a trip, anything with a date.</li>`;
+  }
+  $("#count-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const title = $("#c-title").value.trim(), date = $("#c-date").value;
+    if (!title || !date) return;
+    (state.countdowns ||= []).push({ id: "c" + Date.now().toString(36), title, date });
+    save();
+    $("#c-title").value = "";
+    $("#c-date").value = "";
+    renderCounts();
+  });
+  $("#counts").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-count]");
+    if (!b) return;
+    const i = state.countdowns.findIndex((c) => c.id === b.dataset.count);
+    const [gone] = state.countdowns.splice(i, 1);
+    save();
+    renderCounts();
+    toast("Removed", () => { state.countdowns.splice(i, 0, gone); save(); renderCounts(); });
+  });
+
+  // ---------- fantasy (fantasy.json, posted by Muse; moves from Muse and Claude) ----------
+  let fantasy = null;
+  function renderFantasy() {
+    const f = fantasy;
+    if (!f || !f.lineup?.length) {
+      $("#ff-meta").textContent = "";
+      $("#ff").innerHTML = `<p class="empty-state">Waiting on Muse to post your lineup. Suggested moves from Muse and Claude will show here too.</p>`;
+      return;
+    }
+    const at = f.updated_at ? new Date(f.updated_at) : null;
+    $("#ff-meta").textContent = [f.week ? `Week ${f.week}` : "", f.record, at ? `updated ${at.toLocaleDateString(undefined, { weekday: "short" })}` : ""].filter(Boolean).join(" · ");
+    const m = f.matchup;
+    const score = (a, b) => (a ?? b ?? "–");
+    const row = (p) => {
+      const out = /^(O|IR|OUT)$/i.test(p.status || "");
+      return `<tr><td class="slot">${esc(p.slot || "")}</td><td class="pl">${esc(p.player)}${p.status ? `<span class="st${out ? " out" : ""}">${esc(p.status)}</span>` : ""}<small>${esc([p.team, p.opp, p.kickoff ? gameTime(p.kickoff) : ""].filter(Boolean).join(" · "))}</small></td><td class="pj">${p.points ?? p.proj ?? ""}</td></tr>`;
+    };
+    $("#ff").innerHTML = `
+      ${m ? `<div class="ff-match"><div class="side"><b>${score(m.my_score, m.my_proj)}</b>${esc(f.team || "You")}</div><span class="vs">${m.my_score != null ? "LIVE" : "PROJ"}</span><div class="side"><b>${score(m.opp_score, m.opp_proj)}</b>${esc(m.opponent || "")}</div></div>` : ""}
+      ${f.moves?.length ? `<div class="sub-h">Suggested moves</div><ul class="moves">${f.moves.map((x) => `<li><span class="by"><i>${esc(x.by || "")}</i>${x.kind ? ` · ${esc(x.kind)}` : ""}</span>${esc(x.text)}${x.why ? `<span class="why">${esc(x.why)}</span>` : ""}</li>`).join("")}</ul>` : ""}
+      <div class="sub-h">Starters</div><table class="ff-table">${f.lineup.map(row).join("")}</table>
+      ${f.bench?.length ? `<details><summary>Bench <span class="count">${f.bench.length}</span></summary><table class="ff-table">${f.bench.map(row).join("")}</table></details>` : ""}`;
+  }
+
   function render() {
     renderBar();
     renderSchedule();
     renderHomework();
     renderRotation();
+    renderCounts();
+    renderFantasy();
   }
 
   // ---------- interactions ----------
@@ -479,6 +594,8 @@
       // merge: union of check-offs and own items, imported day letters win
       Object.assign(state.done, d.done || {});
       Object.assign(state.letters, d.letters || {});
+      const haveC = new Set((state.countdowns ||= []).map((c) => c.id));
+      for (const c of d.countdowns || []) if (c?.id && !haveC.has(c.id)) state.countdowns.push(c);
       const have = new Set(state.manual.map((m) => m.uid));
       for (const m of d.manual || []) if (m?.uid && !have.has(m.uid)) state.manual.push(m);
       save();
@@ -521,12 +638,14 @@
     if (!r.ok) throw new Error(`${path}: ${r.status}`);
     return r.json();
   }
-  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null)])
-    .then(([s, h]) => {
+  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null)])
+    .then(([s, h, f]) => {
       schedule = s;
       homework = h;
+      fantasy = f;
       document.title = s.owner ? `${s.owner}'s RL Planner` : "RL Planner";
       render();
+      loadTeams();
       setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
     })
     .catch((err) => {
