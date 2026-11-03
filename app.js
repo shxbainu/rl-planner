@@ -211,6 +211,11 @@
   }
 
   const dur = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${pad(m % 60)}m`);
+  // under an hour the card ticks in m:ss
+  const clock = (minsLeft) => {
+    const sec = Math.max(0, Math.ceil(minsLeft * 60));
+    return sec < 3600 ? `${Math.floor(sec / 60)}:${pad(sec % 60)}` : dur(Math.ceil(minsLeft));
+  };
   const where = (name) => (name ? cls(name).room || "" : "");
 
   function nowCard(rows, isToday, day, letter) {
@@ -230,8 +235,7 @@
     const nextLine = (n) => n ? `Then <b>${esc(n.label)}</b> at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : "Last one today";
 
     if (m < minutes(day_[0].start)) {
-      const left = Math.ceil(minutes(day_[0].start) - m);
-      return `<div class="big"><span class="num">${dur(left)}</span><span class="lbl">until school</span></div>
+      return `<div class="big"><span class="num">${clock(minutes(day_[0].start) - m)}</span><span class="lbl">until school</span></div>
         <div class="sub">First: <b>${esc(day_[0].label)}</b> at ${day_[0].start} in ${esc(where(day_[0].name))}</div>`;
     }
     if (m >= minutes(day_.at(-1).end)) {
@@ -240,19 +244,33 @@
     for (let i = 0; i < day_.length; i++) {
       const s = day_[i], a = minutes(s.start), b = minutes(s.end);
       if (m >= a && m < b) {
-        const left = Math.ceil(b - m), pct = Math.round(((m - a) / (b - a)) * 100);
-        return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${dur(left)}</span><span class="lbl">left in ${esc(s.label)}</span></div>
+        const pct = Math.round(((m - a) / (b - a)) * 100);
+        return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${clock(b - m)}</span><span class="lbl">left in ${esc(s.label)}</span></div>
           <div class="prog" style="${s.name ? cc(s.name) : ""}"><i style="width:${pct}%"></i></div>
           <div class="sub">Ends ${s.end} · ${nextLine(nextAfter(i))}</div>`;
       }
       const n = day_[i + 1];
       if (n && m >= b && m < minutes(n.start)) {
-        const left = Math.ceil(minutes(n.start) - m);
-        return `<div class="big" style="${n.name ? cc(n.name) : ""}"><span class="num">${dur(left)}</span><span class="lbl">until ${esc(n.label)}</span></div>
+        return `<div class="big" style="${n.name ? cc(n.name) : ""}"><span class="num">${clock(minutes(n.start) - m)}</span><span class="lbl">until ${esc(n.label)}</span></div>
           <div class="sub">${n.name && n.name === s.name ? "Short break · same room" : `Passing time${n.name ? ` · head to <b>${esc(where(n.name))}</b>` : ""}`}</div>`;
       }
     }
     return "";
+  }
+
+  function tickNow() {
+    const day = schoolDay(), { letter } = letterFor(day);
+    const num = $("#now-card .num");
+    if (!num) return;
+    const tmp = document.createElement("div");
+    tmp.innerHTML = nowCard(dayRows(letter), day === today(), day, letter);
+    const fresh = tmp.querySelector(".num"), bar = tmp.querySelector(".prog i");
+    if (!fresh || fresh.textContent === num.textContent) return;
+    // only the label changes during a block; swap the whole card when the block itself changes
+    if (tmp.querySelector(".lbl")?.textContent !== $("#now-card .lbl")?.textContent) { renderSchedule(); return; }
+    num.textContent = fresh.textContent;
+    const old = $("#now-card .prog i");
+    if (old && bar) old.style.width = bar.style.width;
   }
 
   function renderSchedule() {
@@ -283,7 +301,7 @@
           const tm = r.bell.parts ? r.bell.parts.map((p) => p.join("–")).join("<br>") : `${r.bell.start}–${r.bell.end}`;
           const label = r.kind === "lunch" ? "Lunch" : c ? c.name : "Free";
           const who = c ? [c.teacher, c.room].filter(Boolean).join(" · ") : "";
-          return `<li class="${r.kind} ${st}" style="${r.name ? cc(r.name) : ""}">
+          return `<li class="${r.kind} ${st}" style="${r.name ? cc(r.name) : ""}"${r.name ? ` data-cls="${esc(r.name)}"` : ""}>
             <span class="blk">${badge}</span>
             <span class="cn">${esc(label)}${r.bell.parts && c ? `<span class="split">25 + 15</span>` : ""}${who ? `<span class="who">${esc(who)}</span>` : ""}</span>
             <span class="tm">${tm}</span>
@@ -318,7 +336,7 @@
       return `<tr><td class="tm">${b.start}</td>${cols.map((c) => {
         const p = c.letter && schedule.rotations[c.letter]?.periods.find((x) => x[0] === b.start);
         if (!p) return `<td class="x"></td>`;
-        return `<td class="${c.cur ? "cur" : ""}" style="${cc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
+        return `<td class="${c.cur ? "cur" : ""}" style="${cc(p[1])}" data-cls="${esc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
       }).join("")}</tr>`;
     }).join("");
     $("#rot").className = "rot " + view;
@@ -357,7 +375,7 @@
       if (off) return `<div class="cell off"><div class="top"><b>${num}</b></div><span class="offn">${esc(off)}</span></div>`;
       const list = (byDay.get(d) || []).sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
       const { letter } = letterFor(d);
-      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
+      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" data-cls="${esc(i.class)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
       const more = list.length > cap ? `<span class="more">+${list.length - cap} more</span>` : "";
       return `<button type="button" class="cell${d === t ? " today" : ""}${d === selDay && !showOverdue ? " sel" : ""}${d < t ? " past" : ""}" data-day="${d}" aria-label="${esc(fmt(d, { weekday: "long", month: "long", day: "numeric" }))}, ${list.length} due">
         <div class="top"><b>${num}</b><span class="lt">${letter || ""}</span></div>${chips}${more}</button>`;
@@ -624,13 +642,6 @@
     const lum = (h) => { const n = parseInt(h.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
     return lum(p) < 0.12 && lum(a) > lum(p) ? a : p;
   }
-  function countUp(el, to) {
-    if (!el || !Number.isFinite(to) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t0 = performance.now(), dur = 700;
-    const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
-    requestAnimationFrame(step);
-  }
-
   function renderGame() {
     const d = game.d, comp = d.header.competitions[0], st = comp.status.type;
     const teams = [...comp.competitors].sort((x) => (x.homeAway === "away" ? -1 : 1));
@@ -652,11 +663,9 @@
     head.style.setProperty("--ac", game.colors[away.team.id]);
     head.style.setProperty("--hc", game.colors[home.team.id]);
     $("#g-score").innerHTML = `<div class="g-sc">${side(away)}${mid}${side(home)}</div>${lines}`;
-    if (game.fresh) document.querySelectorAll("#g-score .pts").forEach((el) => countUp(el, Number(el.dataset.pts)));
     document.querySelectorAll("#g-tabs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tab === gTab)));
     const body = $("#g-body");
     body.innerHTML = gTab === "box" ? winProbHTML(d, away, home) + boxHTML(d) : gTab === "plays" ? playsHTML(d) : teamStatsHTML(d);
-    body.classList.remove("swap"); void body.offsetWidth; body.classList.add("swap");
     if (gTab === "box") wireWinProb(d, away, home);
   }
 
@@ -858,7 +867,9 @@
     $("#big-meta").textContent = list.length ? "next 4 weeks" : "";
     $("#big").innerHTML = list.length ? list.map((i) => {
       const n = daysBetween(t, i.due), done = isDone(i);
-      return `<li class="${done ? "done" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
+      // urgency ring: fuller and redder as the day gets closer
+      const urg = Math.max(0, Math.min(1, 1 - n / 14));
+      return `<li class="${done ? "done" : ""}${n <= 1 ? " soon" : ""}" style="${cc(i.class)};--u:${Math.round(urg * 100)}%" data-cls="${esc(i.class)}"><span class="d"><span class="ring"></span><span class="dn">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span></span>
         <span class="w"><b>${esc(i.title)}</b><small>${esc(cls(i.class).short || i.class)} · ${esc(i.type)} · ${esc(fmt(i.due))}</small></span></li>`;
     }).join("") : `<li class="empty-state" style="display:block;border:0">No tests or quizzes in the next 4 weeks.</li>`;
   }
@@ -877,19 +888,15 @@
   }
 
   // ---------- interactions ----------
-  function confetti(x, y) {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const colors = ["--c-latin", "--c-eng", "--c-msi", "--c-fr", "--c-fgc", "--c-arts", "--accent"];
-    for (let i = 0; i < 28; i++) {
-      const c = document.createElement("i");
-      c.className = "confetti";
-      const a = Math.random() * Math.PI - Math.PI, dist = 60 + Math.random() * 120;
-      c.style.cssText = `left:${x}px;top:${y}px;background:var(${colors[i % colors.length]});--dx:${Math.cos(a) * dist}px;--dy:${Math.sin(a) * dist + 160}px;--r:${Math.random() * 720 - 360}deg`;
-      document.body.append(c);
-      setTimeout(() => c.remove(), 1200);
-    }
-    toast("Everything due that day is done 🎉");
-  }
+  let hoverCls = null;
+  document.addEventListener("pointerover", (e) => {
+    const el = e.target.closest?.("[data-cls]"), c = el?.dataset.cls || null;
+    if (c === hoverCls) return;
+    hoverCls = c;
+    document.body.classList.toggle("cls-hover", !!c);
+    document.querySelectorAll(".hl-cls").forEach((x) => x.classList.remove("hl-cls"));
+    if (c) document.querySelectorAll(`[data-cls="${CSS.escape(c)}"]`).forEach((x) => x.classList.add("hl-cls"));
+  });
   let toastTimer;
   function toast(msg, undo) {
     const el = $("#toast");
@@ -921,7 +928,7 @@
         // finished everything due that day? celebrate a little
         const day = allItems().find((i) => i.id === id)?.due;
         const left = allItems().filter((i) => i.due === day && !isDone(i)).length;
-        if (day && !left) { const r = e.target.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top); }
+        if (day && !left) toast(`Everything due ${relDay(day).toLowerCase()} is done`);
       }
     }
     if (e.target.id === "letter-select") {
@@ -1071,15 +1078,12 @@
       fantasy = f;
       document.title = s.owner ? `${s.owner}'s RL Planner` : "RL Planner";
       render();
-      requestAnimationFrame(() => {
-        document.body.classList.add("enter");
-        setTimeout(() => document.body.classList.remove("enter"), 1200);
-      });
       loadTeams();
       loadBoards();
       loadSportsNews();
       setInterval(loadSportsNews, 15 * 60_000);
       setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
+      setInterval(tickNow, 1000);
     })
     .catch((err) => {
       $(".dash").innerHTML = `<p class="empty-state">Couldn't load the schedule (${esc(err.message)}). If you opened the file directly, serve the folder instead: <code>python3 -m http.server</code>.</p>`;
