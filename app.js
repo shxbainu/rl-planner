@@ -38,10 +38,10 @@
   const fmt = (s, o = { weekday: "short", month: "short", day: "numeric" }) => parse(s).toLocaleDateString(undefined, o);
   const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
 
-  function now() {
-    // ?date=YYYY-MM-DD&time=HH:MM previews another day
+  // ?date=YYYY-MM-DD&time=HH:MM previews another day; the preview clock runs on from page load
+  const shift = (() => {
     const q = new URLSearchParams(location.search);
-    const d = new Date();
+    const d = new Date(), t0 = d.getTime();
     if (/^\d{4}-\d{2}-\d{2}$/.test(q.get("date") || "")) {
       const [y, m, dd] = q.get("date").split("-").map(Number);
       d.setFullYear(y, m - 1, dd);
@@ -50,8 +50,9 @@
       const [h, mi] = q.get("time").split(":").map(Number);
       d.setHours(h, mi, 0, 0);
     }
-    return d;
-  }
+    return d.getTime() - t0;
+  })();
+  const now = () => new Date(Date.now() + shift);
   const today = () => iso(now());
   // After 3:30 the planner looks ahead to the next school day
   const schoolDay = () => {
@@ -218,7 +219,11 @@
   }
 
   const passing = () => schedule.passing || 5;
-  const dur = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${pad(m % 60)}m`);
+  // the card counts down to the second: m:ss, or h:mm:ss over an hour
+  const clock = (minsLeft) => {
+    const sec = Math.max(0, Math.ceil(minsLeft * 60)), h = Math.floor(sec / 3600), mm = Math.floor((sec % 3600) / 60);
+    return h ? `${h}:${pad(mm)}:${pad(sec % 60)}` : `${mm}:${pad(sec % 60)}`;
+  };
   const where = (name) => (name ? cls(name).room || "" : "");
 
   function nowCard(rows, isToday, day, letter) {
@@ -238,7 +243,7 @@
     const nextLine = (n) => n ? `Then <b>${esc(n.label)}</b> at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : "Last one today";
 
     if (m < minutes(day_[0].start)) {
-      return `<div class="big"><span class="num">${dur(Math.ceil(minutes(day_[0].start) - m))}</span><span class="lbl">until school</span></div>
+      return `<div class="big"><span class="num">${clock(minutes(day_[0].start) - m)}</span><span class="lbl">until school</span></div>
         <div class="sub">First: <b>${esc(day_[0].label)}</b> at ${day_[0].start}${day_[0].name ? ` in ${esc(where(day_[0].name))}` : ""}</div>`;
     }
     if (m >= minutes(day_.at(-1).end)) {
@@ -250,17 +255,35 @@
         const pct = Math.round(((m - a) / (b - a)) * 100);
         const nx = day_[i + 1], gap = nx ? minutes(nx.start) - b : 0;
         const gapTxt = gap > 0 && gap <= passing() ? `${gap} min ${nx.name && nx.name === s.name ? "break" : "passing"} · ` : "";
-        return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${dur(Math.ceil(b - m))}</span><span class="lbl">left in ${esc(s.label)}</span></div>
+        return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${clock(b - m)}</span><span class="lbl">left in ${esc(s.label)}</span></div>
           <div class="prog" style="${s.name ? cc(s.name) : ""}"><i style="width:${pct}%"></i></div>
           <div class="sub">Ends ${s.end} · ${gapTxt}${nextLine(nextAfter(i))}</div>`;
       }
       const n = day_[i + 1];
       if (n && m >= b && m < minutes(n.start)) {
-        return `<div class="big" style="${n.name ? cc(n.name) : ""}"><span class="num">${dur(Math.ceil(minutes(n.start) - m))}</span><span class="lbl">until ${esc(n.label)}</span></div>
+        return `<div class="big" style="${n.name ? cc(n.name) : ""}"><span class="num">${clock(minutes(n.start) - m)}</span><span class="lbl">until ${esc(n.label)}</span></div>
           <div class="sub">${n.name && n.name === s.name ? "Short break · same room" : `Passing time${n.name ? ` · head to <b>${esc(where(n.name))}</b>` : ""}`}</div>`;
       }
     }
     return "";
+  }
+
+  // once a second: update the number and bar in place; redraw the card when the block changes
+  function tickNow() {
+    const day = schoolDay(), { letter } = letterFor(day);
+    const num = $("#now-card .num");
+    if (!num) return;
+    const tmp = document.createElement("div");
+    tmp.innerHTML = nowCard(dayRows(letter, day), day === today(), day, letter);
+    const fresh = tmp.querySelector(".num"), bar = tmp.querySelector(".prog i");
+    if (!fresh) return;
+    if (tmp.querySelector(".lbl")?.textContent !== $("#now-card .lbl")?.textContent) { renderSchedule(); return; }
+    if (fresh.textContent === (num.dataset.t || num.textContent)) return;
+    num.textContent = fresh.textContent;
+    num.dataset.t = fresh.textContent;
+    const old = $("#now-card .prog i");
+    if (old && bar) old.style.width = bar.style.width;
+    skinSchedule();
   }
 
   function renderSchedule() {
@@ -1162,6 +1185,7 @@
       loadSportsNews();
       setInterval(loadSportsNews, 15 * 60_000);
       setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
+      setInterval(tickNow, 1000);
     })
     .catch((err) => {
       $(".dash").innerHTML = `<p class="empty-state">Couldn't load the schedule (${esc(err.message)}). If you opened the file directly, serve the folder instead: <code>python3 -m http.server</code>.</p>`;
