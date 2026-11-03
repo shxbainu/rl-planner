@@ -23,6 +23,20 @@ def fantasy_ok(d):
 CHECKS = {"homework.json": homework_ok, "fantasy.json": fantasy_ok}
 
 
+def keep_claude_moves(data):
+    """Claude's moves live in the repo copy; carry them over when Muse's file is for the same week."""
+    try:
+        with open("fantasy.json") as f:
+            repo = json.load(f)
+    except Exception:
+        return data
+    if repo.get("week") != data.get("week"):
+        return data
+    claude = [m for m in repo.get("moves", []) if m.get("by") == "Claude"]
+    data["moves"] = claude + [m for m in data.get("moves", []) if m.get("by") != "Claude"]
+    return data
+
+
 def main():
     key = os.environ.get("CROSSWALK_KEY", "").strip()
     if not key:
@@ -39,6 +53,8 @@ def main():
         if not ok(data):
             print(f"{name}: wrong shape; keeping repo copy", file=sys.stderr)
             continue
+        if name == "fantasy.json":
+            data = keep_claude_moves(data)
         with open(name, "w") as f:
             json.dump(data, f, ensure_ascii=False, indent=1)
         print(f"{name}: pulled (updated_at {data.get('updated_at')}, {len(data.get('assignments', data.get('lineup', [])))} rows)")
