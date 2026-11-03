@@ -139,6 +139,7 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .item.done .title{text-decoration:line-through;color:var(--done)}
 .item.done{opacity:.75}
 .item.leaving{opacity:0;transition:opacity .2s}
+.hw-note{margin:0 0 6px;font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:6px 10px}
 .empty-state{color:var(--muted);font-size:13px;background:var(--surface-2);border-radius:8px;padding:10px 12px;margin:0 0 10px}
 
 details{border-top:1px solid var(--line);margin-top:auto}

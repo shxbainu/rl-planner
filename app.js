@@ -32,7 +32,9 @@
   const parse = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return iso(d); };
   const isWeekend = (s) => [0, 6].includes(parse(s).getDay());
-  const nextSchoolDay = (s) => { let d = addDays(s, 1); while (isWeekend(d)) d = addDays(d, 1); return d; };
+  const offName = (s) => homework?.off?.[s] || null; // holidays from Muse
+  const isSchoolDay = (s) => !isWeekend(s) && !offName(s);
+  const nextSchoolDay = (s) => { let d = addDays(s, 1); while (!isSchoolDay(d)) d = addDays(d, 1); return d; };
   const fmt = (s, o = { weekday: "short", month: "short", day: "numeric" }) => parse(s).toLocaleDateString(undefined, o);
   const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
 
@@ -54,7 +56,7 @@
   // After 3:30 the planner looks ahead to the next school day
   const schoolDay = () => {
     const n = now(), t = today();
-    return isWeekend(t) || n.getHours() * 60 + n.getMinutes() >= 15 * 60 + 30 ? nextSchoolDay(t) : t;
+    return !isSchoolDay(t) || n.getHours() * 60 + n.getMinutes() >= 15 * 60 + 30 ? nextSchoolDay(t) : t;
   };
 
   function relDay(s) {
@@ -75,6 +77,7 @@
 
   // ---------- day letters ----------
   function letterFor(date) {
+    if (offName(date)) return { letter: null, from: "off" };
     if (state.letters[date]) return { letter: state.letters[date], from: "you" };
     const muse = homework?.days?.[date];
     if (muse) return { letter: muse, from: "blackbaud" };
@@ -114,9 +117,9 @@
   // Next time a class meets, walking the day letters forward. "?" when a guessed or unknown letter is in the way.
   function nextMeeting(name) {
     const t = today(), mins = now().getHours() * 60 + now().getMinutes();
-    let d = t, unsure = false;
+    let d = schoolDay(), unsure = false; // after school, start from tomorrow
     for (let i = 0; i < 21; i++, d = addDays(d, 1)) {
-      if (isWeekend(d)) continue;
+      if (!isSchoolDay(d)) continue;
       const { letter, from } = letterFor(d);
       if (!letter) { unsure = true; continue; }
       if (from === "guess") unsure = true;
@@ -169,6 +172,8 @@
       if (from === "you") sub.push("set by you");
       if (rot && !rot.confirmed) sub.push("<b>times unconfirmed</b>");
     }
+    const sp = homework?.special?.[day];
+    if (sp) sub.push(`<b>${esc(sp)}</b>`);
     $("#bar-sub").innerHTML = sub.join(" · ");
 
     const el = $("#updated");
@@ -294,14 +299,15 @@
       const mon = addDays(day, 1 - d.getDay());
       cols = [0, 1, 2, 3, 4].map((i) => {
         const date = addDays(mon, i), { letter, from } = letterFor(date);
-        return { key: date, cur: date === day, top: fmt(date, { weekday: "short" }), letter, q: !letter || from === "guess" };
+        const off = offName(date);
+        return { key: date, cur: date === day, top: fmt(date, { weekday: "short" }), letter, off, q: !off && (!letter || from === "guess") };
       });
     } else {
       const { letter: curL } = letterFor(day);
       cols = LETTERS.map((l) => ({ key: l, cur: l === curL, top: "", letter: l, q: !schedule.rotations[l]?.confirmed }));
     }
     const head = `<colgroup><col class="tmc">${cols.map(() => "<col>").join("")}</colgroup><thead><tr><th></th>${cols.map((c) =>
-      `<th class="${c.cur ? "cur" : ""}">${esc(c.top)}<small>${c.letter || ""}${c.q ? `<span class="q">?</span>` : ""}</small></th>`).join("")}</tr></thead>`;
+      `<th class="${c.cur ? "cur" : ""}"${c.off ? ` title="${esc(c.off)}"` : ""}>${esc(c.top)}<small>${c.off ? "Off" : c.letter || ""}${c.q ? `<span class="q">?</span>` : ""}</small></th>`).join("")}</tr></thead>`;
     const rows = schedule.bells.map((b) => {
       if (b.lunch) return `<tr><td class="tm">${b.start}</td><td class="lunch" colspan="${cols.length}">Lunch</td></tr>`;
       return `<tr><td class="tm">${b.start}</td>${cols.map((c) => {
@@ -347,6 +353,7 @@
       html += `<div class="grp"><div class="grp-h"><span class="rel">${esc(relDay(d))}</span>${daysBetween(t, d) < 7 ? `<span>${esc(fmt(d, { month: "short", day: "numeric" }))}</span>` : ""}<span class="ltr">${ltr}</span></div><ul class="list">${list.map((i) => itemHTML(i)).join("")}</ul></div>`;
     }
     if (!upcoming.length && !overdue.length) html += `<p class="empty-state">Nothing on the list yet.</p>`;
+    for (const n of homework?.notes || []) html += `<p class="hw-note">${esc(n)}</p>`;
     $("#hw").innerHTML = html;
 
     $("#done-count").textContent = done.length;
@@ -407,7 +414,7 @@
   // ---------- countdowns (yours, saved in this browser) ----------
   function schoolDaysUntil(d) {
     let n = 0;
-    for (let x = addDays(today(), 1); x <= d; x = addDays(x, 1)) if (!isWeekend(x)) n++;
+    for (let x = addDays(today(), 1); x <= d; x = addDays(x, 1)) if (isSchoolDay(x)) n++;
     return n;
   }
   function renderCounts() {
