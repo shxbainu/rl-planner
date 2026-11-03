@@ -1,12 +1,209 @@
 {
-  "updated_at": null,
-  "source": "Muse posts the lineup; Claude and Muse add recommended moves",
-  "league": "",
-  "team": "",
-  "week": null,
-  "record": "",
-  "matchup": null,
-  "lineup": [],
-  "bench": [],
-  "moves": []
+  "updated_at": "2026-11-03T17:43:00-05:00",
+  "source": "Muse, Crosswalk post zsysbb (Tue Nov 3, 5:44pm)",
+  "league": "FFantasy Football",
+  "team": "#1 Substation Hater",
+  "week": 9,
+  "record": "4-4-0",
+  "matchup": {
+    "my_proj": 131.5,
+    "my_score": null,
+    "opp_proj": 112.9,
+    "opp_score": null,
+    "opponent": "tkum"
+  },
+  "lineup": [
+    {
+      "kickoff": "2026-11-09T20:15:00-05:00",
+      "opp": "vs LV",
+      "player": "Brock Purdy",
+      "points": null,
+      "proj": 22.1,
+      "slot": "QB",
+      "status": "",
+      "team": "SF"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "at MIA",
+      "player": "Jahmyr Gibbs",
+      "points": null,
+      "proj": 26.5,
+      "slot": "RB",
+      "status": "",
+      "team": "DET"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "at CAR",
+      "player": "Jonah Coleman",
+      "points": null,
+      "proj": 14.4,
+      "slot": "RB",
+      "status": "",
+      "team": "DEN"
+    },
+    {
+      "kickoff": "2026-11-09T20:15:00-05:00",
+      "opp": "vs LV",
+      "player": "Mike Evans",
+      "points": null,
+      "proj": 15.8,
+      "slot": "WR",
+      "status": "Q",
+      "team": "SF"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "at KC",
+      "player": "Garrett Wilson",
+      "points": null,
+      "proj": 12.7,
+      "slot": "WR",
+      "status": "",
+      "team": "NYJ"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "at MIN",
+      "player": "Dalton Kincaid",
+      "points": null,
+      "proj": 8.6,
+      "slot": "TE",
+      "status": "",
+      "team": "BUF"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "vs DET",
+      "player": "Ollie Gordon II",
+      "points": null,
+      "proj": 16.4,
+      "slot": "FLEX",
+      "status": "",
+      "team": "MIA"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "vs BUF",
+      "player": "Vikings D/ST",
+      "points": null,
+      "proj": 4.1,
+      "slot": "D/ST",
+      "status": "",
+      "team": "MIN"
+    },
+    {
+      "kickoff": "2026-11-08T16:25:00-05:00",
+      "opp": "vs DAL",
+      "player": "Spencer Shrader",
+      "points": null,
+      "proj": 10.9,
+      "slot": "K",
+      "status": "",
+      "team": "IND"
+    }
+  ],
+  "bench": [
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "at MIN",
+      "player": "DJ Moore",
+      "points": null,
+      "proj": 12.5,
+      "slot": "WR",
+      "status": "Q",
+      "team": "BUF"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "vs DEN",
+      "player": "Bryce Young",
+      "points": null,
+      "proj": 15.7,
+      "slot": "QB",
+      "status": "",
+      "team": "CAR"
+    },
+    {
+      "kickoff": null,
+      "opp": "BYE",
+      "player": "Jaylen Warren",
+      "points": null,
+      "proj": null,
+      "slot": "RB",
+      "status": "",
+      "team": "PIT"
+    },
+    {
+      "kickoff": "2026-11-08T16:25:00-05:00",
+      "opp": "vs LAR",
+      "player": "Rachaad White",
+      "points": null,
+      "proj": 11.8,
+      "slot": "RB",
+      "status": "",
+      "team": "WSH"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "at KC",
+      "player": "Omar Cooper Jr.",
+      "points": null,
+      "proj": 9.3,
+      "slot": "WR",
+      "status": "",
+      "team": "NYJ"
+    },
+    {
+      "kickoff": "2026-11-08T16:25:00-05:00",
+      "opp": "vs LAR",
+      "player": "Antonio Williams",
+      "points": null,
+      "proj": 9.3,
+      "slot": "WR",
+      "status": "",
+      "team": "WSH"
+    },
+    {
+      "kickoff": "2026-11-09T20:15:00-05:00",
+      "opp": "vs LV",
+      "player": "Kaelon Black",
+      "points": null,
+      "proj": 8.2,
+      "slot": "RB",
+      "status": "",
+      "team": "SF"
+    },
+    {
+      "kickoff": "2026-11-08T13:00:00-05:00",
+      "opp": "vs CLE",
+      "player": "Jordyn Tyson",
+      "points": null,
+      "proj": null,
+      "slot": "IR",
+      "status": "IR",
+      "team": "NO"
+    }
+  ],
+  "moves": [
+    {
+      "by": "Muse",
+      "kind": "start/sit",
+      "text": "Keep Brock Purdy starting over Bryce Young.",
+      "why": "Purdy projects 22.1 vs Young 15.7, both in favorable matchups, Purdy on Monday night vs LV."
+    },
+    {
+      "by": "Muse",
+      "kind": "start/sit",
+      "text": "Decide the Evans/Moore question before Sunday 1pm, not Monday.",
+      "why": "Evans is Q and starts Monday vs LV, Moore is Q on the bench at 12.5 and locks Sunday 1pm at MIN, close to Wilson at 12.7, so a Monday wait is not possible if you want Moore as the swap."
+    },
+    {
+      "by": "Muse",
+      "kind": "start/sit",
+      "text": "Keep Ollie Gordon II at flex over Rachaad White.",
+      "why": "Gordon projects 16.4 vs DET, White projects 11.8 vs LAR."
+    }
+  ]
 }

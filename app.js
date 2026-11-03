@@ -229,8 +229,15 @@
   };
   const where = (name) => (name ? cls(name).room || "" : "");
 
+  // a special schedule shifts the times, so the normal ones for that letter are never shown
+  const special = (day) => homework?.special?.[day] || "";
+
   function nowCard(rows, isToday, day, letter) {
     const after = schedule.after_school;
+    if (special(day)) {
+      return `<div class="big"><span class="lbl">${isToday ? "Special schedule today" : `${esc(fmt(day, { weekday: "long" }))} is a special schedule`}</span></div>
+        <div class="sub"><b>${esc(special(day))}</b> · check the portal for times</div>`;
+    }
     if (!rows.length) return `<div class="big"><span class="lbl">Set the day letter to see your classes</span></div>`;
     const firstClass = rows.flatMap((r) => r.segs).find((s) => s.name);
     if (!isToday) {
@@ -295,8 +302,14 @@
     const rows = dayRows(letter, day);
     const classes = rows.filter((r) => r.kind === "class").length;
     $("#sched-h").textContent = isToday ? "Today" : relDay(day);
-    $("#sched-meta").textContent = letter ? `${letter} day · ${classes} classes` : "";
+    $("#sched-meta").textContent = letter ? `${letter} day · ${special(day) ? "special schedule" : `${classes} classes`}` : "";
     $("#now-card").innerHTML = nowCard(rows, isToday, day, letter);
+    if (special(day)) {
+      $("#timeline").innerHTML = `<li class="empty">Times for this special schedule aren't posted yet.</li>`;
+      skinSchedule();
+      $("#after").innerHTML = "";
+      return;
+    }
 
     const m = now().getHours() * 60 + now().getMinutes();
     const first = rows.findIndex((r) => r.kind === "class");
@@ -339,17 +352,20 @@
       cols = [0, 1, 2, 3, 4].map((i) => {
         const date = addDays(mon, i), { letter, from } = letterFor(date);
         const off = offName(date);
-        return { key: date, cur: date === day, top: fmt(date, { weekday: "short" }), letter, off, q: !off && (!letter || from === "guess") };
+        return { key: date, cur: date === day, top: fmt(date, { weekday: "short" }), letter, off, sp: !off && special(date), q: !off && (!letter || from === "guess") };
       });
     } else {
       const { letter: curL } = letterFor(day);
       cols = LETTERS.map((l) => ({ key: l, cur: l === curL, top: "", letter: l, q: !schedule.rotations[l]?.confirmed }));
     }
     const head = `<colgroup><col class="tmc">${cols.map(() => "<col>").join("")}</colgroup><thead><tr><th></th>${cols.map((c) =>
-      `<th class="${c.cur ? "cur" : ""}"${c.off ? ` title="${esc(c.off)}"` : ""}>${esc(c.top)}<small>${c.off ? "Off" : c.letter || ""}${c.q ? `<span class="q">?</span>` : ""}</small></th>`).join("")}</tr></thead>`;
+      `<th class="${c.cur ? "cur" : ""}"${c.off || c.sp ? ` title="${esc(c.off || c.sp)}"` : ""}>${esc(c.top)}<small>${c.off ? "Off" : c.letter || ""}${c.sp ? `<span class="q">*</span>` : ""}${c.q ? `<span class="q">?</span>` : ""}</small></th>`).join("")}</tr></thead>`;
+    // a special day's column says so once, at the top, instead of the normal times
+    const firstClassBell = schedule.bells.find((b) => !b.lunch && !b.homeroom);
     const rows = schedule.bells.map((b) => {
       if (b.lunch || b.homeroom) return `<tr><td class="tm">${b.start}</td><td class="ev" colspan="${cols.length}">${b.lunch ? "Lunch" : "Homeroom"}</td></tr>`;
       return `<tr><td class="tm">${b.start}</td>${cols.map((c) => {
+        if (c.sp) return b === firstClassBell ? `<td class="ev" title="${esc(c.sp)}">Special</td>` : `<td class="x"></td>`;
         const p = c.letter && schedule.rotations[c.letter]?.periods.find((x) => x[0] === b.start);
         if (!p) return view === "week" && hallOn(c.key) && schedule.hall.start === b.start ? `<td class="ev">Hall</td>` : `<td class="x"></td>`;
         return `<td class="${c.cur ? "cur" : ""}" style="${cc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
@@ -357,8 +373,9 @@
     }).join("");
     $("#rot").className = "rot " + view;
     $("#rot").innerHTML = head + `<tbody>${rows}</tbody>`;
+    const sps = view === "week" ? cols.filter((c) => c.sp) : [];
     $("#rot-note").textContent = view === "week"
-      ? "? = day letter is a guess. Tap the letter in the top bar to fix today's."
+      ? "? = day letter is a guess. Tap the letter in the top bar to fix today's." + sps.map((c) => ` * ${c.top}: ${c.sp}.`).join("")
       : "? = B, E and G times aren't confirmed yet.";
   }
 
