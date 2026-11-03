@@ -22,3 +22,8 @@ then open http://localhost:8765. Add `?date=2026-11-04&time=10:15` to preview an
 
 Teams (Warriors, 49ers) come live from ESPN's public schedule feed; edit `teams` in schedule.json to change them.
 Countdowns are added on the page and saved in the browser (included in Export/Import).
+
+## Sports and news
+
+- Scores, game details (box score, play-by-play, team stats) and sports news load live from ESPN's public feeds in the browser.
+- Politics / world / tech headlines: `tools/fetch_news.py` builds `news.json` from public RSS feeds. The `Deploy site` workflow runs it on every push and hourly, then deploys to GitHub Pages. (GitHub pauses scheduled workflows after 60 days with no commits; any push restarts them.)
