@@ -157,6 +157,8 @@
     </li>`;
   }
 
+  const phone = matchMedia("(max-width:759px)");
+  phone.addEventListener("change", () => { if (schedule) renderBar(); });
   function renderBar() {
     const t = today(), day = schoolDay();
     const { letter, from } = letterFor(day);
@@ -164,8 +166,9 @@
     sel.innerHTML = `<option value="">?</option>` + LETTERS.map((l) => `<option ${l === letter ? "selected" : ""}>${l}</option>`).join("");
     sel.dataset.date = day;
 
+    // phones share the top row with the theme icon, so the date is shortened there
     $("#bar-date").textContent = day === t
-      ? fmt(t, { weekday: "long", month: "long", day: "numeric" })
+      ? fmt(t, phone.matches ? { weekday: "short", month: "short", day: "numeric" } : { weekday: "long", month: "long", day: "numeric" })
       : `Next up: ${fmt(day, { weekday: "short", month: "short", day: "numeric" })}`;
     const rot = letter && schedule.rotations[letter];
     const sub = [];
@@ -1010,40 +1013,6 @@
     toast("Deleted", () => { state.manual.splice(idx, 0, removed); save(); renderHomework(); });
   };
 
-  // export / import
-  $("#export-btn").onclick = () => {
-    const blob = new Blob([JSON.stringify({ app: "rl-planner", version: 1, exported_at: new Date().toISOString(), ...state }, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `rl-planner-${today()}.json`;
-    document.body.append(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  };
-  $("#import-btn").onclick = () => $("#import-file").click();
-  $("#import-file").onchange = async (e) => {
-    const f = e.target.files[0];
-    e.target.value = "";
-    if (!f) return;
-    try {
-      const d = JSON.parse(await f.text());
-      if (d.app !== "rl-planner") throw new Error("not a planner export");
-      // merge: union of check-offs and own items, imported day letters win
-      Object.assign(state.done, d.done || {});
-      Object.assign(state.letters, d.letters || {});
-      const haveC = new Set((state.countdowns ||= []).map((c) => c.id));
-      for (const c of d.countdowns || []) if (c?.id && !haveC.has(c.id)) state.countdowns.push(c);
-      const have = new Set(state.manual.map((m) => m.uid));
-      for (const m of d.manual || []) if (m?.uid && !have.has(m.uid)) state.manual.push(m);
-      save();
-      render();
-      toast("Imported");
-    } catch {
-      toast("That file isn't a planner export");
-    }
-  };
-
   // light / dark
   const icons = {
     dark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>`,
@@ -1083,7 +1052,6 @@
     if (remember) try { localStorage.setItem(SKIN, name); } catch {}
     if (schedule) { renderBar(); renderSchedule(); }
   }
-  // one picker in the top bar, one in the footer for phones (the bar has no room there)
   const skinSels = document.querySelectorAll(".skin-select");
   skinSels.forEach((sel) => {
     sel.innerHTML = Object.entries(SKINS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");

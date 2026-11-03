@@ -4,7 +4,7 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 
 - `schedule.json`: `owner` (first name shown in the page title), classes, blocks, day-letter rotations (B, E, G marked unconfirmed).
 - `homework.json`: latest assignments (`assignments`), optional day letters (`days`, `"YYYY-MM-DD": "H"`), and `updated_at`. The daily update only touches this file.
-- Check-offs and added assignments live in the browser's localStorage; Export / Import moves them between devices.
+- Check-offs and added assignments live in the browser's localStorage (they stay on the device you used).
 
 Preview locally:
 
@@ -21,7 +21,7 @@ then open http://localhost:8765. Add `?date=2026-11-04&time=10:15` to preview an
      "moves":[{"by":"Muse|Claude","kind":"start/sit|waiver|trade|drop","text":"","why":""}]}
 
 Teams (Warriors, 49ers) come live from ESPN's public schedule feed; edit `teams` in schedule.json to change them.
-Countdowns are added on the page and saved in the browser (included in Export/Import).
+Countdowns are added on the page and saved in the browser.
 
 ## Sports and news
 

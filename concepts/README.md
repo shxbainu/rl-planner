@@ -3,7 +3,7 @@
 Eight reskins of the same planner. Layout, data and buttons are identical in all of them; only colors, type, borders, textures and small check-off moments change. Each has a light and a dark version, so the existing dark-mode button keeps working.
 
 - **Gallery:** open `gallery.html` in this folder (or the published copy) for every theme in light and dark, desktop (1440×900) and phone (390 wide), with notes.
-- **Try them for real:** pick one from the palette menu next to the light/dark button (in the footer on phones), or add `?theme=name` to the address to preview one without saving it. Names: `herbarium`, `departure`, `riso`, `starchart`, `catalog`, `nautical`, `blueprint`, `almanac`.
+- **Try them for real:** pick one from the palette menu next to the light/dark button (just the palette icon on phones), or add `?theme=name` to the address to preview one without saving it. Names: `herbarium`, `departure`, `riso`, `starchart`, `catalog`, `nautical`, `blueprint`, `almanac`.
 - Your pick is saved in this browser under `rlp-skin`. Homework, check-offs and countdowns (`rlp-v1`) are untouched. The original look stays the default.
 
 All proofs show Tuesday, Nov 3 at 6:39am (`?date=2026-11-03&time=06:39`).
