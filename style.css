@@ -68,30 +68,57 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .panel-meta{font-size:12px;color:var(--muted);text-align:right}
 .panel-foot{margin:0;font-size:12px;color:var(--muted)}
 
-.col-life{grid-area:life;display:flex;flex-direction:column;gap:12px;min-width:0}
-.p-scores{grid-area:scores}
-.col-news{grid-area:news;display:grid;gap:12px;min-width:0;align-content:start}
-.dash{grid-template-areas:"sched" "hw" "life" "week" "scores" "news"}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0}
+.col-a{grid-area:a}.p-hw{grid-area:hw}.col-c{grid-area:c}
+.dash{grid-template-areas:"a" "hw" "c"}
 
-@media (min-width:760px){
-  .dash{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-template-areas:"sched hw" "week life" "scores news"}
+@media (min-width:900px){
+  .dash{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);grid-template-areas:"a hw" "c c"}
+  .col-c{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
 }
-/* laptop: the school day fills the first screen, sports + news sit below */
+/* laptop and up: three columns, school first, each column scrolls on its own */
 @media (min-width:1280px){
-  .dash{grid-template-columns:minmax(280px,1fr) minmax(0,1.2fr) minmax(320px,1fr) minmax(290px,.95fr);
-    grid-template-areas:"sched hw week life" "scores news news news";grid-template-rows:calc(100dvh - var(--bar-h) - 34px) 72vh}
-  .panel{overflow:auto;scrollbar-width:thin}
-  .col-life{overflow:auto;scrollbar-width:thin}
-  .col-life .panel{overflow:visible;flex:none}
-  .col-news{grid-template-columns:repeat(2,minmax(0,1fr));overflow:hidden}
-  .col-news .panel{min-height:0}
+  .dash{grid-template-columns:minmax(290px,1fr) minmax(0,1.65fr) minmax(330px,1.1fr);grid-template-areas:"a hw c";
+    height:calc(100dvh - var(--bar-h) - 34px);max-width:none}
+  .col-c{display:flex}
+  .col,.p-hw{overflow:auto;scrollbar-width:thin}
+  .col > .panel{flex:none}
+  .p-big{flex:1 0 auto}
+  /* the rotation grid stretches to take whatever height the dropdowns leave */
+  .col-c > .p-week{flex:1 0 auto}
+  .p-week .rot-scroll{flex:1;display:flex}
+  .p-week .rot{height:100%}
 }
-/* big monitors: everything side by side */
-@media (min-width:1760px){
-  .dash{max-width:none;grid-template-columns:minmax(270px,1fr) minmax(0,1.15fr) minmax(300px,.95fr) minmax(280px,.9fr) minmax(280px,.9fr) minmax(320px,1.05fr);
-    grid-template-areas:"sched hw week life scores news";grid-template-rows:calc(100dvh - var(--bar-h) - 34px)}
-  .col-news{grid-template-columns:1fr;grid-template-rows:minmax(0,1.1fr) minmax(0,1fr)}
+/* wide monitors: homework spreads into two columns */
+@media (min-width:1680px){
+  #hw{columns:2;column-gap:14px}
+  #hw .grp,#hw .hw-note,#hw .empty-state{break-inside:avoid}
 }
+
+/* tests & quizzes */
+.big{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.big li{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--cc)}
+.big .d{text-align:center;font-weight:700;font-size:18px;line-height:1;color:var(--cc)}
+.big .d small{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.big .w{min-width:0;line-height:1.3}
+.big .w b{font-weight:600}
+.big .w small{display:block;font-size:12px;color:var(--muted)}
+.big li.done{opacity:.5}
+.big li.done b{text-decoration:line-through}
+
+/* extras: collapsed dropdowns with a one-line preview */
+.extras{display:grid;gap:8px}
+details.extra{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;margin:0}
+details.extra > summary{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:10px 0;font-family:var(--sans);font-size:13px;color:var(--fg);list-style:none}
+details.extra > summary::before{display:none}
+details.extra > summary::after{content:"";width:7px;height:7px;border:solid var(--muted);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .15s;margin:0 4px 3px 0}
+details.extra[open] > summary::after{transform:rotate(-135deg);margin-bottom:-3px}
+.x-name{font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.x-tease{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;text-align:right}
+.x-tease .live-dot{vertical-align:middle}
+details.extra[open] .x-tease{visibility:hidden}
+.x-body{padding:0 0 12px;display:grid;gap:8px;max-height:62vh;overflow:auto;scrollbar-width:thin}
+.x-tools{display:flex;justify-content:space-between;align-items:center;gap:8px}
 
 /* schedule: live "now" card + the day's timeline */
 .now-card{border-radius:10px;padding:12px 14px;background:var(--accent-soft);display:grid;gap:6px;--cc:var(--accent)}
@@ -253,6 +280,8 @@ details .list{margin-top:6px}
 .news li a{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 6px;border-radius:8px;color:inherit;text-decoration:none}
 .news li a:hover{background:var(--surface-2)}
 .news .hl{font-weight:600;line-height:1.3;font-size:13.5px}
+.news .sum{grid-column:1;font-size:12px;color:var(--muted);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news .ago{grid-row:1 / span 3 !important}
 .news .src{grid-column:1;font-size:11.5px;color:var(--muted)}
 .news .ago{grid-row:1 / span 2;grid-column:2;font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
 .news .img{grid-row:1 / span 2;grid-column:2;width:56px;height:40px;object-fit:cover;border-radius:6px}

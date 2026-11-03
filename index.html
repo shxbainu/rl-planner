@@ -31,12 +31,18 @@
 </header>
 
 <main class="dash">
-  <section class="panel p-sched" aria-labelledby="sched-h">
-    <div class="panel-h"><h2 id="sched-h">Schedule</h2><span class="panel-meta" id="sched-meta"></span></div>
-    <div class="now-card" id="now-card"></div>
-    <ol class="tl" id="timeline"></ol>
-    <p class="after" id="after"></p>
-  </section>
+  <div class="col col-a">
+    <section class="panel p-sched" aria-labelledby="sched-h">
+      <div class="panel-h"><h2 id="sched-h">Schedule</h2><span class="panel-meta" id="sched-meta"></span></div>
+      <div class="now-card" id="now-card"></div>
+      <ol class="tl" id="timeline"></ol>
+      <p class="after" id="after"></p>
+    </section>
+    <section class="panel p-big" aria-labelledby="big-h">
+      <div class="panel-h"><h2 id="big-h">Tests &amp; quizzes</h2><span class="panel-meta" id="big-meta"></span></div>
+      <ul class="big" id="big"></ul>
+    </section>
+  </div>
 
   <section class="panel p-hw" aria-labelledby="hw-h">
     <div class="panel-h"><h2 id="hw-h">Homework</h2><span class="panel-meta" id="hw-meta"></span></div>
@@ -47,61 +53,69 @@
     </details>
   </section>
 
-  <section class="panel p-week" aria-labelledby="week-h">
-    <div class="panel-h"><h2 id="week-h">Rotation</h2>
-      <div class="seg" role="group" aria-label="Rotation view">
-        <button type="button" data-view="week" aria-pressed="true">This week</button>
-        <button type="button" data-view="letters" aria-pressed="false">All letters</button>
+  <div class="col col-c">
+    <section class="panel p-week" aria-labelledby="week-h">
+      <div class="panel-h"><h2 id="week-h">Rotation</h2>
+        <div class="seg" role="group" aria-label="Rotation view">
+          <button type="button" data-view="week" aria-pressed="true">This week</button>
+          <button type="button" data-view="letters" aria-pressed="false">All letters</button>
+        </div>
       </div>
+      <div class="rot-scroll"><table class="rot" id="rot"></table></div>
+      <p class="panel-foot" id="rot-note"></p>
+    </section>
+
+    <div class="extras" id="extras">
+      <details class="extra" data-x="count">
+        <summary><span class="x-name">Countdowns</span><span class="x-tease" id="t-count"></span></summary>
+        <div class="x-body">
+          <ul class="counts" id="counts"></ul>
+          <form class="count-form" id="count-form" autocomplete="off">
+            <input id="c-title" maxlength="60" placeholder="What's coming up?" aria-label="Countdown name" required>
+            <input id="c-date" type="date" aria-label="Date" required>
+            <button class="btn" type="submit">Add</button>
+          </form>
+        </div>
+      </details>
+
+      <details class="extra" data-x="teams">
+        <summary><span class="x-name">Warriors &amp; 49ers</span><span class="x-tease" id="t-teams"></span></summary>
+        <div class="x-body"><div class="teams" id="teams"></div></div>
+      </details>
+
+      <details class="extra p-scores" data-x="scores">
+        <summary><span class="x-name">Scores</span><span class="x-tease" id="t-scores"></span></summary>
+        <div class="x-body">
+          <div class="x-tools">
+            <span class="panel-meta" id="sb-meta"></span>
+            <div class="seg" role="group" aria-label="League">
+              <button type="button" data-league="nba" aria-pressed="true">NBA</button>
+              <button type="button" data-league="nfl" aria-pressed="false">NFL</button>
+            </div>
+          </div>
+          <ul class="sb" id="scoreboard"></ul>
+        </div>
+      </details>
+
+      <details class="extra" data-x="news">
+        <summary><span class="x-name">News</span><span class="x-tease" id="t-news"></span></summary>
+        <div class="x-body">
+          <div class="x-tools"><div class="seg" role="group" aria-label="News section" id="news-tabs"></div></div>
+          <ul class="news" id="news"></ul>
+          <p class="panel-foot" id="news-foot"></p>
+        </div>
+      </details>
+
+      <details class="extra" data-x="snews">
+        <summary><span class="x-name">Sports news</span><span class="x-tease" id="t-snews"></span></summary>
+        <div class="x-body"><ul class="news" id="snews"></ul></div>
+      </details>
+
+      <details class="extra" data-x="ff">
+        <summary><span class="x-name">Fantasy</span><span class="x-tease" id="t-ff"></span></summary>
+        <div class="x-body"><span class="panel-meta" id="ff-meta"></span><div id="ff"></div></div>
+      </details>
     </div>
-    <div class="rot-scroll"><table class="rot" id="rot"></table></div>
-    <p class="panel-foot" id="rot-note"></p>
-  </section>
-  <div class="col-life">
-    <section class="panel p-sports" aria-labelledby="sports-h">
-      <div class="panel-h"><h2 id="sports-h">Teams</h2><span class="panel-meta" id="sports-meta"></span></div>
-      <div class="teams" id="teams"></div>
-    </section>
-
-    <section class="panel p-count" aria-labelledby="count-h">
-      <div class="panel-h"><h2 id="count-h">Countdowns</h2></div>
-      <ul class="counts" id="counts"></ul>
-      <form class="count-form" id="count-form" autocomplete="off">
-        <input id="c-title" maxlength="60" placeholder="What's coming up?" aria-label="Countdown name" required>
-        <input id="c-date" type="date" aria-label="Date" required>
-        <button class="btn" type="submit">Add</button>
-      </form>
-    </section>
-
-    <section class="panel p-ff" aria-labelledby="ff-h">
-      <div class="panel-h"><h2 id="ff-h">Fantasy</h2><span class="panel-meta" id="ff-meta"></span></div>
-      <div id="ff"></div>
-    </section>
-  </div>
-
-  <section class="panel p-scores" aria-labelledby="scores-h">
-    <div class="panel-h"><h2 id="scores-h">Scores</h2>
-      <div class="seg" role="group" aria-label="League">
-        <button type="button" data-league="nba" aria-pressed="true">NBA</button>
-        <button type="button" data-league="nfl" aria-pressed="false">NFL</button>
-      </div>
-    </div>
-    <div class="sb-meta panel-meta" id="sb-meta"></div>
-    <ul class="sb" id="scoreboard"></ul>
-  </section>
-
-  <div class="col-news">
-    <section class="panel p-news" aria-labelledby="news-h">
-      <div class="panel-h"><h2 id="news-h">News</h2>
-        <div class="seg" role="group" aria-label="News section" id="news-tabs"></div>
-      </div>
-      <ul class="news" id="news"></ul>
-      <p class="panel-foot" id="news-foot"></p>
-    </section>
-    <section class="panel p-snews" aria-labelledby="snews-h">
-      <div class="panel-h"><h2 id="snews-h">Sports news</h2><span class="panel-meta">ESPN</span></div>
-      <ul class="news" id="snews"></ul>
-    </section>
   </div>
 </main>
 

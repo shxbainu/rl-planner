@@ -412,6 +412,17 @@
         <div><div class="tn">${esc(t.name)} <span class="rec">${esc(me.recordSummary || "")}${me.standingSummary ? ` · ${esc(me.standingSummary.replace(/ Division$/, ""))}` : ""}</span></div>${lines.join("")}</div></div>`;
     }).join("");
     $("#teams").innerHTML = html;
+    const liveT = (schedule.teams || []).map((t) => {
+      const ev = boards[t.league]?.events?.find((e) => evState(e).state === "in" && e.competitions[0].competitors.some((c) => c.team.abbreviation === t.id.toUpperCase()));
+      if (!ev) return "";
+      const c = ev.competitions[0].competitors, us = c.find((x) => x.team.abbreviation === t.id.toUpperCase()), them = c.find((x) => x !== us);
+      return `<span class="live-dot"></span>${esc(t.name)} ${esc(us.score)}–${esc(them.score)} · ${esc(evState(ev).shortDetail)}`;
+    }).filter(Boolean);
+    const nextT = (schedule.teams || []).map((t) => {
+      const n = teamData[t.id]?.events?.find((e) => evState(e).state === "pre");
+      return n ? `${t.name} ${new Date(n.date).toLocaleDateString(undefined, { weekday: "short" })}` : "";
+    }).filter(Boolean);
+    tease("t-teams", liveT.length ? liveT.join(" · ") : nextT.length ? `Next: ${esc(nextT.join(", "))}` : "");
     $("#sports-meta").textContent = "ESPN";
   }
 
@@ -424,6 +435,7 @@
   function renderCounts() {
     const t = today();
     const list = (state.countdowns || []).filter((c) => c.date >= t).sort((a, b) => a.date.localeCompare(b.date));
+    tease("t-count", list[0] ? `${esc(list[0].title)} · ${daysBetween(t, list[0].date)}d` : "Add one");
     $("#counts").innerHTML = list.length
       ? list.map((c) => {
           const n = daysBetween(t, c.date);
@@ -459,12 +471,14 @@
     const f = fantasy;
     if (!f || !f.lineup?.length) {
       $("#ff-meta").textContent = "";
+      tease("t-ff", "Waiting on Muse");
       $("#ff").innerHTML = `<p class="empty-state">Waiting on Muse to post your lineup. Suggested moves from Muse and Claude will show here too.</p>`;
       return;
     }
     const at = f.updated_at ? new Date(f.updated_at) : null;
     $("#ff-meta").textContent = [f.week ? `Week ${f.week}` : "", f.record, at ? `updated ${at.toLocaleDateString(undefined, { weekday: "short" })}` : ""].filter(Boolean).join(" · ");
     const m = f.matchup;
+    tease("t-ff", esc([f.week ? `Wk ${f.week}` : "", m ? `${m.my_score ?? m.my_proj}–${m.opp_score ?? m.opp_proj}${m.my_score != null ? "" : " proj"}` : "", f.moves?.length ? `${f.moves.length} moves` : ""].filter(Boolean).join(" · ")));
     const score = (a, b) => (a ?? b ?? "–");
     const row = (p) => {
       const out = /^(O|IR|OUT)$/i.test(p.status || "");
@@ -501,6 +515,8 @@
     const mine = myAbbrs();
     const label = b.week?.number ? `Week ${b.week.number}` : b.day?.date ? fmt(b.day.date.slice(0, 10), { weekday: "long", month: "short", day: "numeric" }) : "";
     $("#sb-meta").textContent = [label, `${b.events.length} games`].filter(Boolean).join(" · ");
+    const liveN = (lg) => boards[lg]?.events?.filter((e) => evState(e).state === "in").length || 0;
+    tease("t-scores", ["nba", "nfl"].map((lg) => boards[lg] ? `${lg.toUpperCase()} ${boards[lg].events.length}${liveN(lg) ? ` (${liveN(lg)} live)` : ""}` : "").filter(Boolean).join(" · "));
     const order = { in: 0, pre: 1, post: 2 };
     const evs = [...b.events].sort((x, y) => order[evState(x).state] - order[evState(y).state] || x.date.localeCompare(y.date));
     $("#scoreboard").innerHTML = evs.length ? evs.map((e) => {
@@ -654,7 +670,8 @@
     if (!secs.includes(newsTab)) newsTab = secs[0];
     $("#news-tabs").innerHTML = secs.map((k) => `<button type="button" data-news="${esc(k)}" aria-pressed="${k === newsTab}">${esc(k[0].toUpperCase() + k.slice(1))}</button>`).join("");
     $("#news").innerHTML = news.sections[newsTab].slice(0, 25).map((n) =>
-      `<li><a href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"><span class="hl">${esc(n.title)}</span><span class="src">${esc(n.source)}</span>${n.published ? `<span class="ago">${ago(n.published)}</span>` : ""}</a></li>`).join("");
+      `<li><a href="${esc(n.link)}" target="_blank" rel="noopener noreferrer"><span class="hl">${esc(n.title)}</span>${n.summary ? `<span class="sum">${esc(n.summary)}</span>` : ""}<span class="src">${esc(n.source)}</span>${n.published ? `<span class="ago">${ago(n.published)}</span>` : ""}</a></li>`).join("");
+    tease("t-news", esc(news.sections[newsTab][0]?.title || ""));
     $("#news-foot").textContent = news.updated_at ? `Updated ${ago(news.updated_at)} ago · ${[...new Set(news.sections[newsTab].map((n) => n.source))].join(", ")}` : "";
   }
   $("#news-tabs").addEventListener("click", (e) => {
@@ -671,15 +688,31 @@
     const mine = (schedule.teams || []).map((t) => t.name.toLowerCase());
     const all = lists.flat().filter((a) => a.links?.web?.href && a.type !== "Media")
       .sort((a, b) => (mine.some((m) => b.headline.toLowerCase().includes(m)) - mine.some((m) => a.headline.toLowerCase().includes(m))) || b.published.localeCompare(a.published));
+    tease("t-snews", esc(all[0]?.headline || ""));
     $("#snews").innerHTML = all.length ? all.slice(0, 20).map((a) =>
       `<li><a href="${esc(a.links.web.href)}" target="_blank" rel="noopener noreferrer"><span class="hl">${esc(a.headline)}</span><span class="src">${a.lg.toUpperCase()} · ${ago(a.published)} ago</span>${a.images?.[0]?.url ? `<img class="img" src="${esc(a.images[0].url)}" alt="" loading="lazy">` : ""}</a></li>`).join("")
       : `<li class="empty-state">Sports news unavailable right now.</li>`;
   }
 
+  // ---------- tests & quizzes (from homework) ----------
+  function renderBig() {
+    const t = today(), until = addDays(t, 28);
+    const list = allItems().filter((i) => MAJOR.has(i.type) && i.due >= t && i.due <= until);
+    $("#big-meta").textContent = list.length ? "next 4 weeks" : "";
+    $("#big").innerHTML = list.length ? list.map((i) => {
+      const n = daysBetween(t, i.due), done = isDone(i);
+      return `<li class="${done ? "done" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
+        <span class="w"><b>${esc(i.title)}</b><small>${esc(cls(i.class).short || i.class)} · ${esc(i.type)} · ${esc(fmt(i.due))}</small></span></li>`;
+    }).join("") : `<li class="empty-state" style="display:block;border:0">No tests or quizzes in the next 4 weeks.</li>`;
+  }
+
+  const tease = (id, html) => { const el = $("#" + id); if (el) el.innerHTML = html; };
+
   function render() {
     renderBar();
     renderSchedule();
     renderHomework();
+    renderBig();
     renderRotation();
     renderCounts();
     renderFantasy();
@@ -712,7 +745,7 @@
       li.classList.toggle("done", on);
       setDone(id, on);
       li.classList.add("leaving");
-      setTimeout(renderHomework, 220);
+      setTimeout(() => { renderHomework(); renderBig(); }, 220);
       if (on) toast("Moved to Done", () => { setDone(id, false); renderHomework(); });
     }
     if (e.target.id === "letter-select") {
@@ -729,6 +762,11 @@
     state.view = b.dataset.view;
     save();
     renderRotation();
+  });
+
+  document.querySelectorAll("details.extra").forEach((d) => {
+    if (state.open?.[d.dataset.x]) d.open = true;
+    d.addEventListener("toggle", () => { (state.open ||= {})[d.dataset.x] = d.open; save(); });
   });
 
   // add / edit dialog
