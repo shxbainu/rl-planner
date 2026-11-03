@@ -575,6 +575,21 @@
       ${f.bench?.length ? `<details><summary>Bench <span class="count">${f.bench.length}</span></summary><table class="ff-table">${f.bench.map(row).join("")}</table></details>` : ""}`;
   }
 
+  // ---------- opening a box scrolls just enough to show all of it (or its top, if it's taller than the space) ----------
+  document.querySelectorAll("details.extra").forEach((d) => d.addEventListener("toggle", () => {
+    if (!d.open) return;
+    {
+      let sc = d.parentElement;
+      while (sc && sc !== document.body && !(/(auto|scroll)/.test(getComputedStyle(sc).overflowY) && sc.scrollHeight > sc.clientHeight)) sc = sc.parentElement;
+      const page = !sc || sc === document.body;
+      const box = page ? { top: $(".bar").getBoundingClientRect().bottom, bottom: innerHeight } : sc.getBoundingClientRect();
+      const r = d.getBoundingClientRect();
+      let dy = Math.max(0, r.bottom - (box.bottom - 8));
+      if (r.top - dy < box.top + 8) dy = r.top - (box.top + 8);
+      if (Math.abs(dy) > 1) (page ? window : sc).scrollBy({ top: dy, behavior: reduced() ? "auto" : "smooth" });
+    }
+  }));
+
   // ---------- expanded view: a side box opens big; its contents move into the dialog and back ----------
   const xdlg = $("#xdlg");
   let xHome = null;

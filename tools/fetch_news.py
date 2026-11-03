@@ -39,7 +39,13 @@ PER_FEED = 10
 ATOM = "{http://www.w3.org/2005/Atom}"
 MEDIA = "{http://search.yahoo.com/mrss/}"
 CONTENT = "{http://purl.org/rss/1.0/modules/content/}encoded"
-IMG = re.compile(r"""<img[^>]+src=["'](https://[^"']+)["']""", re.I)
+IMG = re.compile(r"""<img[^>]+src=["'](https://[^"']+)["'][^>]*>""", re.I)
+PIXEL = re.compile(r"pixel|tracking|spacer|beacon|\b1x1\b|[?&](w|width|h|height)=1\b", re.I)
+
+
+def sized(u):
+    """Ask image CDNs that resize on the fly for ~800px instead of the full-size original."""
+    return re.sub(r"/resize/\d+x\d+!?/", "/resize/800/", u) if "brightspotcdn.com/dims" in u else u
 
 
 def when(text):
@@ -75,14 +81,33 @@ def image(it, *html_bits):
         if w > best_w:
             best, best_w = u, w
     if best:
-        return best
+        return sized(best)
     for el in it.iter("enclosure"):
         if (el.get("type") or "").startswith("image") and el.get("url", "").startswith("https://"):
-            return el.get("url")
-    for bit in html_bits:
-        m = IMG.search(html.unescape(bit or ""))
-        if m:
-            return m.group(1)
+            return sized(el.get("url"))
+    for bit in html_bits:  # skip tracking pixels, which some feeds put before the real picture
+        for m in IMG.finditer(html.unescape(bit or "")):
+            if not PIXEL.search(m.group(0)):
+                return sized(m.group(1))
+    return None
+
+
+OG = re.compile(r"""<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]*>""", re.I)
+CONTENT_ATTR = re.compile(r"""content=["'](https://[^"']+)["']""", re.I)
+
+
+def page_image(link):
+    """Fallback for items whose feed has no picture (NPR audio stories, WSJ): the article's own preview image."""
+    try:
+        req = urllib.request.Request(link, headers={"User-Agent": "Mozilla/5.0 (rl-planner-news/1.0)"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            head = r.read(300_000).decode("utf-8", "replace")
+    except Exception:
+        return None
+    for tag in OG.findall(head):
+        m = CONTENT_ATTR.search(tag)
+        if m and not PIXEL.search(m.group(1)):
+            return sized(html.unescape(m.group(1)))
     return None
 
 
@@ -128,8 +153,12 @@ def main(path):
             else:
                 mixed.append(rest.pop(0))
         items = mixed
+        items = items[:30]
+        for x in items:
+            if not x["image"]:
+                x["image"] = page_image(x["link"])
         if items:
-            sections[name] = items[:30]
+            sections[name] = items
     data = {"updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "sections": sections}
     with open(path, "w") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
