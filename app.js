@@ -211,11 +211,6 @@
   }
 
   const dur = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${pad(m % 60)}m`);
-  // under an hour the card ticks in m:ss
-  const clock = (minsLeft) => {
-    const sec = Math.max(0, Math.ceil(minsLeft * 60));
-    return sec < 3600 ? `${Math.floor(sec / 60)}:${pad(sec % 60)}` : dur(Math.ceil(minsLeft));
-  };
   const where = (name) => (name ? cls(name).room || "" : "");
 
   function nowCard(rows, isToday, day, letter) {
@@ -235,7 +230,7 @@
     const nextLine = (n) => n ? `Then <b>${esc(n.label)}</b> at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : "Last one today";
 
     if (m < minutes(day_[0].start)) {
-      return `<div class="big"><span class="num">${clock(minutes(day_[0].start) - m)}</span><span class="lbl">until school</span></div>
+      return `<div class="big"><span class="num">${dur(Math.ceil(minutes(day_[0].start) - m))}</span><span class="lbl">until school</span></div>
         <div class="sub">First: <b>${esc(day_[0].label)}</b> at ${day_[0].start} in ${esc(where(day_[0].name))}</div>`;
     }
     if (m >= minutes(day_.at(-1).end)) {
@@ -245,32 +240,17 @@
       const s = day_[i], a = minutes(s.start), b = minutes(s.end);
       if (m >= a && m < b) {
         const pct = Math.round(((m - a) / (b - a)) * 100);
-        return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${clock(b - m)}</span><span class="lbl">left in ${esc(s.label)}</span></div>
+        return `<div class="big" style="${s.name ? cc(s.name) : ""}"><span class="num">${dur(Math.ceil(b - m))}</span><span class="lbl">left in ${esc(s.label)}</span></div>
           <div class="prog" style="${s.name ? cc(s.name) : ""}"><i style="width:${pct}%"></i></div>
           <div class="sub">Ends ${s.end} · ${nextLine(nextAfter(i))}</div>`;
       }
       const n = day_[i + 1];
       if (n && m >= b && m < minutes(n.start)) {
-        return `<div class="big" style="${n.name ? cc(n.name) : ""}"><span class="num">${clock(minutes(n.start) - m)}</span><span class="lbl">until ${esc(n.label)}</span></div>
+        return `<div class="big" style="${n.name ? cc(n.name) : ""}"><span class="num">${dur(Math.ceil(minutes(n.start) - m))}</span><span class="lbl">until ${esc(n.label)}</span></div>
           <div class="sub">${n.name && n.name === s.name ? "Short break · same room" : `Passing time${n.name ? ` · head to <b>${esc(where(n.name))}</b>` : ""}`}</div>`;
       }
     }
     return "";
-  }
-
-  function tickNow() {
-    const day = schoolDay(), { letter } = letterFor(day);
-    const num = $("#now-card .num");
-    if (!num) return;
-    const tmp = document.createElement("div");
-    tmp.innerHTML = nowCard(dayRows(letter), day === today(), day, letter);
-    const fresh = tmp.querySelector(".num"), bar = tmp.querySelector(".prog i");
-    if (!fresh || fresh.textContent === num.textContent) return;
-    // only the label changes during a block; swap the whole card when the block itself changes
-    if (tmp.querySelector(".lbl")?.textContent !== $("#now-card .lbl")?.textContent) { renderSchedule(); return; }
-    num.textContent = fresh.textContent;
-    const old = $("#now-card .prog i");
-    if (old && bar) old.style.width = bar.style.width;
   }
 
   function renderSchedule() {
@@ -281,9 +261,6 @@
     $("#sched-h").textContent = isToday ? "Today" : relDay(day);
     $("#sched-meta").textContent = letter ? `${letter} day · ${classes} classes` : "";
     $("#now-card").innerHTML = nowCard(rows, isToday, day, letter);
-    // tint the card with the class that's on right now
-    const tinted = $("#now-card [style*='--cc']");
-    $("#now-card").style.setProperty("--cc", tinted ? tinted.style.getPropertyValue("--cc") : "var(--accent)");
 
     const m = now().getHours() * 60 + now().getMinutes();
     const first = rows.findIndex((r) => r.kind === "class");
@@ -301,7 +278,7 @@
           const tm = r.bell.parts ? r.bell.parts.map((p) => p.join("–")).join("<br>") : `${r.bell.start}–${r.bell.end}`;
           const label = r.kind === "lunch" ? "Lunch" : c ? c.name : "Free";
           const who = c ? [c.teacher, c.room].filter(Boolean).join(" · ") : "";
-          return `<li class="${r.kind} ${st}" style="${r.name ? cc(r.name) : ""}"${r.name ? ` data-cls="${esc(r.name)}"` : ""}>
+          return `<li class="${r.kind} ${st}" style="${r.name ? cc(r.name) : ""}">
             <span class="blk">${badge}</span>
             <span class="cn">${esc(label)}${r.bell.parts && c ? `<span class="split">25 + 15</span>` : ""}${who ? `<span class="who">${esc(who)}</span>` : ""}</span>
             <span class="tm">${tm}</span>
@@ -336,7 +313,7 @@
       return `<tr><td class="tm">${b.start}</td>${cols.map((c) => {
         const p = c.letter && schedule.rotations[c.letter]?.periods.find((x) => x[0] === b.start);
         if (!p) return `<td class="x"></td>`;
-        return `<td class="${c.cur ? "cur" : ""}" style="${cc(p[1])}" data-cls="${esc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
+        return `<td class="${c.cur ? "cur" : ""}" style="${cc(p[1])}" title="${esc(cls(p[1]).name)}">${esc(cls(p[1]).short)}</td>`;
       }).join("")}</tr>`;
     }).join("");
     $("#rot").className = "rot " + view;
@@ -375,7 +352,7 @@
       if (off) return `<div class="cell off"><div class="top"><b>${num}</b></div><span class="offn">${esc(off)}</span></div>`;
       const list = (byDay.get(d) || []).sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
       const { letter } = letterFor(d);
-      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" data-cls="${esc(i.class)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
+      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
       const more = list.length > cap ? `<span class="more">+${list.length - cap} more</span>` : "";
       return `<button type="button" class="cell${d === t ? " today" : ""}${d === selDay && !showOverdue ? " sel" : ""}${d < t ? " past" : ""}" data-day="${d}" aria-label="${esc(fmt(d, { weekday: "long", month: "long", day: "numeric" }))}, ${list.length} due">
         <div class="top"><b>${num}</b><span class="lt">${letter || ""}</span></div>${chips}${more}</button>`;
@@ -867,9 +844,7 @@
     $("#big-meta").textContent = list.length ? "next 4 weeks" : "";
     $("#big").innerHTML = list.length ? list.map((i) => {
       const n = daysBetween(t, i.due), done = isDone(i);
-      // urgency ring: fuller and redder as the day gets closer
-      const urg = Math.max(0, Math.min(1, 1 - n / 14));
-      return `<li class="${done ? "done" : ""}${n <= 1 ? " soon" : ""}" style="${cc(i.class)};--u:${Math.round(urg * 100)}%" data-cls="${esc(i.class)}"><span class="d"><span class="ring"></span><span class="dn">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span></span>
+      return `<li class="${done ? "done" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
         <span class="w"><b>${esc(i.title)}</b><small>${esc(cls(i.class).short || i.class)} · ${esc(i.type)} · ${esc(fmt(i.due))}</small></span></li>`;
     }).join("") : `<li class="empty-state" style="display:block;border:0">No tests or quizzes in the next 4 weeks.</li>`;
   }
@@ -888,15 +863,6 @@
   }
 
   // ---------- interactions ----------
-  let hoverCls = null;
-  document.addEventListener("pointerover", (e) => {
-    const el = e.target.closest?.("[data-cls]"), c = el?.dataset.cls || null;
-    if (c === hoverCls) return;
-    hoverCls = c;
-    document.body.classList.toggle("cls-hover", !!c);
-    document.querySelectorAll(".hl-cls").forEach((x) => x.classList.remove("hl-cls"));
-    if (c) document.querySelectorAll(`[data-cls="${CSS.escape(c)}"]`).forEach((x) => x.classList.add("hl-cls"));
-  });
   let toastTimer;
   function toast(msg, undo) {
     const el = $("#toast");
@@ -1083,7 +1049,6 @@
       loadSportsNews();
       setInterval(loadSportsNews, 15 * 60_000);
       setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
-      setInterval(tickNow, 1000);
     })
     .catch((err) => {
       $(".dash").innerHTML = `<p class="empty-state">Couldn't load the schedule (${esc(err.message)}). If you opened the file directly, serve the folder instead: <code>python3 -m http.server</code>.</p>`;

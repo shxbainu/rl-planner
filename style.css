@@ -462,31 +462,6 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
   .foot{height:auto}
 }
 
-/* ---- color, flat: classes carry their own colors; nothing glows, bounces or fades in ---- */
-/* the class on right now is filled with its color */
-.tl li.now{background:color-mix(in srgb,var(--cc) 16%,var(--surface))}
-.tl li.now .tm{color:var(--fg)}
-.tl li.now .blk{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--cc)}
-.now-card{background:color-mix(in srgb,var(--cc) 12%,var(--surface))}
-.now-card .num{font-variant-numeric:tabular-nums}
-
-/* pastel class chips on the calendar */
-.chip2{background:color-mix(in srgb,var(--cc) 14%,var(--surface))}
-.chip2.major{background:color-mix(in srgb,var(--cc) 28%,var(--surface))}
-
-/* hover a class anywhere and every block of it stands out; the rest steps back */
-.cls-hover .chip2:not(.hl-cls),.cls-hover .rot td[data-cls]:not(.hl-cls),.cls-hover .tl li[data-cls]:not(.hl-cls),.cls-hover .big li[data-cls]:not(.hl-cls){opacity:.35}
-.rot td.hl-cls{background:color-mix(in srgb,var(--cc) 30%,transparent);color:var(--fg)}
-.chip2.hl-cls{background:color-mix(in srgb,var(--cc) 34%,var(--surface))}
-.big li.hl-cls{box-shadow:inset 0 0 0 1.5px var(--cc)}
-
-/* tests & quizzes: a ring that fills as the date gets close */
-.big .d{position:relative;width:44px;height:44px;display:grid;place-items:center}
-.big .ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--cc) var(--u),color-mix(in srgb,var(--cc) 14%,transparent) 0);
-  -webkit-mask:radial-gradient(circle,transparent 58%,#000 60%);mask:radial-gradient(circle,transparent 58%,#000 60%)}
-.big .dn{position:relative;display:grid;line-height:1;font-size:15px}
-.big .dn small{font-size:8.5px}
-
 /* plain section markers */
 .panel-h h2{display:flex;align-items:center;gap:8px}
 .panel-h h2::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--accent)}
