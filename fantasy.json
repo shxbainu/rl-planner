@@ -1,6 +1,6 @@
 {
   "updated_at": "2026-11-03T17:43:00-05:00",
-  "source": "Muse, Crosswalk post zsysbb (Tue Nov 3, 5:44pm)",
+  "source": "Muse, Crosswalk post zsysbb (Tue Nov 3, 5:44pm); kickoffs checked against ESPN's Week 9 schedule, Claude's moves added Tue Nov 3",
   "league": "FFantasy Football",
   "team": "#1 Substation Hater",
   "week": 9,
@@ -14,7 +14,7 @@
   },
   "lineup": [
     {
-      "kickoff": "2026-11-09T20:15:00-05:00",
+      "kickoff": "2026-11-08T16:25:00-05:00",
       "opp": "vs LV",
       "player": "Brock Purdy",
       "points": null,
@@ -44,7 +44,7 @@
       "team": "DEN"
     },
     {
-      "kickoff": "2026-11-09T20:15:00-05:00",
+      "kickoff": "2026-11-08T16:25:00-05:00",
       "opp": "vs LV",
       "player": "Mike Evans",
       "points": null,
@@ -64,7 +64,7 @@
       "team": "NYJ"
     },
     {
-      "kickoff": "2026-11-08T13:00:00-05:00",
+      "kickoff": "2026-11-09T20:15:00-05:00",
       "opp": "at MIN",
       "player": "Dalton Kincaid",
       "points": null,
@@ -84,7 +84,7 @@
       "team": "MIA"
     },
     {
-      "kickoff": "2026-11-08T13:00:00-05:00",
+      "kickoff": "2026-11-09T20:15:00-05:00",
       "opp": "vs BUF",
       "player": "Vikings D/ST",
       "points": null,
@@ -94,7 +94,7 @@
       "team": "MIN"
     },
     {
-      "kickoff": "2026-11-08T16:25:00-05:00",
+      "kickoff": "2026-11-08T13:00:00-05:00",
       "opp": "vs DAL",
       "player": "Spencer Shrader",
       "points": null,
@@ -106,7 +106,7 @@
   ],
   "bench": [
     {
-      "kickoff": "2026-11-08T13:00:00-05:00",
+      "kickoff": "2026-11-09T20:15:00-05:00",
       "opp": "at MIN",
       "player": "DJ Moore",
       "points": null,
@@ -136,7 +136,7 @@
       "team": "PIT"
     },
     {
-      "kickoff": "2026-11-08T16:25:00-05:00",
+      "kickoff": "2026-11-08T13:00:00-05:00",
       "opp": "vs LAR",
       "player": "Rachaad White",
       "points": null,
@@ -156,7 +156,7 @@
       "team": "NYJ"
     },
     {
-      "kickoff": "2026-11-08T16:25:00-05:00",
+      "kickoff": "2026-11-08T13:00:00-05:00",
       "opp": "vs LAR",
       "player": "Antonio Williams",
       "points": null,
@@ -166,7 +166,7 @@
       "team": "WSH"
     },
     {
-      "kickoff": "2026-11-09T20:15:00-05:00",
+      "kickoff": "2026-11-08T16:25:00-05:00",
       "opp": "vs LV",
       "player": "Kaelon Black",
       "points": null,
@@ -188,16 +188,22 @@
   ],
   "moves": [
     {
-      "by": "Muse",
+      "by": "Claude",
       "kind": "start/sit",
-      "text": "Keep Brock Purdy starting over Bryce Young.",
-      "why": "Purdy projects 22.1 vs Young 15.7, both in favorable matchups, Purdy on Monday night vs LV."
+      "text": "Keep Evans in at WR until the 49ers' inactives (about 2:55pm ET Sunday); if he's out, swap in DJ Moore.",
+      "why": "Corrects the earlier Evans/Moore note: per ESPN's schedule Evans (Achilles, Q, expected back after the bye) plays Sunday 4:25pm and Moore (knee, Q, says he's okay) plays Monday 8:15pm at MIN, so Moore is still open when Evans' status is known. Watch Moore's Thursday-Friday practice reports too."
+    },
+    {
+      "by": "Claude",
+      "kind": "waiver",
+      "text": "Look for a better D/ST on waivers than the Vikings.",
+      "why": "Vikings D/ST projects only 4.1 against a Bills offense that just scored 36 on the Ravens, on Monday night. Any defense facing a weak offense on Sunday is likely an upgrade."
     },
     {
       "by": "Muse",
       "kind": "start/sit",
-      "text": "Decide the Evans/Moore question before Sunday 1pm, not Monday.",
-      "why": "Evans is Q and starts Monday vs LV, Moore is Q on the bench at 12.5 and locks Sunday 1pm at MIN, close to Wilson at 12.7, so a Monday wait is not possible if you want Moore as the swap."
+      "text": "Keep Brock Purdy starting over Bryce Young.",
+      "why": "Purdy projects 22.1 vs Young 15.7, both in favorable matchups; Purdy plays Sunday 4:25pm vs LV."
     },
     {
       "by": "Muse",
