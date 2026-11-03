@@ -26,7 +26,7 @@ Countdowns are added on the page and saved in the browser.
 ## Sports and news
 
 - Scores, game details (box score, play-by-play, team stats) and sports news load live from ESPN's public feeds in the browser.
-- Politics / world / tech headlines: `tools/fetch_news.py` builds `news.json` from public RSS feeds. The `Deploy site` workflow runs it on every push and hourly, then deploys to GitHub Pages. (GitHub pauses scheduled workflows after 60 days with no commits; any push restarts them.)
+- Headlines in seven sections (top, politics, world, business, tech, science, health) from about 25 outlets, including WSJ, NYT, BBC, Fox News, NBC, Al Jazeera and Bloomberg: `tools/fetch_news.py` builds `news.json` from their public RSS feeds, caps each outlet per section, and saves a picture for each story. The `Deploy site` workflow runs it on every push and hourly, then deploys to GitHub Pages. (GitHub pauses scheduled workflows after 60 days with no commits; any push restarts them.)
 
 ## Daily homework, hands-off
 

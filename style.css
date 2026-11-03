@@ -323,7 +323,13 @@ details .list{margin-top:6px}
 .news li.lead .pic{aspect-ratio:16 / 9;max-height:210px;width:100%;border-radius:8px}
 .news li.lead .pic:not(:has(img))::after{font-size:26px}
 .news li.lead .hl{font-size:16px}
-#news-tabs button::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cc);margin-right:5px;vertical-align:1px}
+/* news sections as colored pills that wrap; the open one is filled with its color */
+#news-tabs{display:flex;flex-wrap:wrap;gap:5px;flex:1;min-width:0}
+#news-tabs button{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font-family:var(--sans);font-size:12px;font-weight:600;padding:3px 10px 3px 8px;cursor:pointer}
+#news-tabs button::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cc)}
+#news-tabs button[aria-pressed="true"]{background:var(--cc);border-color:var(--cc);color:var(--ct)}
+#news-tabs button[aria-pressed="true"]::before{background:var(--ct)}
+.x-tools:has(#news-tabs){align-items:flex-start}
 
 /* game dialog */
 /* a definite height so the scrolling body below the score gets real space (Safari collapses it otherwise) */

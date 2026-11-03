@@ -892,7 +892,7 @@
   const PAL = ["eng", "fgc", "msi", "fr", "glee", "arts", "latin", "health"];
   const tintOf = (c) => `--cc:var(--c-${c});--ct:var(--t-${c},var(--surface))`;
   const tint = (key) => tintOf(PAL[parseInt(hash(key), 36) % PAL.length]);
-  const SECTION_C = { top: "fgc", politics: "eng", world: "msi", tech: "fr" };
+  const SECTION_C = { top: "fgc", politics: "eng", world: "msi", business: "latin", tech: "fr", science: "glee", health: "health" };
   const initials = (s) => s.split(/\s+/).filter((w) => !/^the$/i.test(w)).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
   // first story leads with a big picture; the rest get thumbnails (or the outlet's initials)
   const story = (x, lead) => `<li class="${lead ? "lead" : ""}"><a href="${esc(x.link)}" target="_blank" rel="noopener noreferrer" style="${tint(x.chip)}">
@@ -913,7 +913,7 @@
     }
     if (!secs.includes(newsTab)) newsTab = secs[0];
     $("#news-tabs").innerHTML = secs.map((k) => `<button type="button" data-news="${esc(k)}" aria-pressed="${k === newsTab}" style="${tintOf(SECTION_C[k] || "other")}">${esc(k[0].toUpperCase() + k.slice(1))}</button>`).join("");
-    $("#news").innerHTML = news.sections[newsTab].slice(0, 25).map((n, i) =>
+    $("#news").innerHTML = news.sections[newsTab].slice(0, 40).map((n, i) =>
       story({ link: n.link, title: n.title, summary: n.summary, chip: n.source, img: n.image, when: n.published }, i === 0)).join("");
     wake($("#news"));
     tease("t-news", esc(news.sections[newsTab][0]?.title || ""));
