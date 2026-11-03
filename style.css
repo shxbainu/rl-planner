@@ -73,12 +73,12 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .dash{grid-template-areas:"a" "hw" "c"}
 
 @media (min-width:900px){
-  .dash{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);grid-template-areas:"a hw" "c c"}
+  .dash{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);grid-template-areas:"hw a" "c c"}
   .col-c{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
 }
 /* laptop and up: three columns, school first, each column scrolls on its own */
 @media (min-width:1280px){
-  .dash{grid-template-columns:minmax(290px,1fr) minmax(0,1.65fr) minmax(330px,1.1fr);grid-template-areas:"a hw c";
+  .dash{grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr) minmax(330px,1.05fr);grid-template-areas:"hw a c";
     height:calc(100dvh - var(--bar-h) - 34px);max-width:none}
   .col-c{display:flex}
   .col,.p-hw{overflow:auto;scrollbar-width:thin}
@@ -89,12 +89,6 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
   .p-week .rot-scroll{flex:1;display:flex}
   .p-week .rot{height:100%}
 }
-/* wide monitors: homework spreads into two columns */
-@media (min-width:1680px){
-  #hw{columns:2;column-gap:14px}
-  #hw .grp,#hw .hw-note,#hw .empty-state{break-inside:avoid}
-}
-
 /* tests & quizzes */
 .big{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .big li{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--cc)}
@@ -342,6 +336,32 @@ details .list{margin-top:6px}
 .ts th{font-size:12px;color:var(--muted);padding:4px 6px}
 .g-filter{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
 
+/* homework calendar + day checklist */
+.cal-nav{display:flex;align-items:center;gap:6px}
+.icon-btn.sm{width:28px;height:28px;border-radius:7px;font-size:16px;line-height:1}
+.cal-nav .link{font-size:12.5px;text-decoration:none;color:var(--muted);font-weight:600;min-width:120px;text-align:center}
+.cal{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.cal .dow{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;padding-bottom:2px}
+.cell{background:var(--surface-2);border:1px solid transparent;border-radius:8px;padding:5px;min-height:96px;display:flex;flex-direction:column;gap:3px;cursor:pointer;text-align:left;font:inherit;color:inherit;min-width:0}
+.cell:hover{border-color:var(--line)}
+.cell .top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--muted)}
+.cell .top b{font-size:14px;color:var(--fg);font-weight:600}
+.cell .top .lt{font-family:var(--mono);font-size:10.5px}
+.cell.today .top b{background:var(--accent);color:var(--accent-fg);border-radius:999px;padding:0 6px}
+.cell.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.cell.past{opacity:.55}
+.cell.off{background:transparent;border:1px dashed var(--line);cursor:default}
+.cell.off .offn{font-size:11.5px;color:var(--muted);font-style:italic;margin-top:auto}
+.chip2{display:block;font-size:11.5px;line-height:1.25;padding:2px 5px;border-radius:5px;border-left:3px solid var(--cc);background:var(--surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip2.major{background:color-mix(in srgb,var(--cc) 16%,var(--surface));font-weight:600}
+.chip2.done{text-decoration:line-through;color:var(--done)}
+.cell .more{font-size:11px;color:var(--muted);padding-left:4px}
+.overdue-strip{display:flex;align-items:center;gap:8px;background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;border:0;width:100%;text-align:left}
+.agenda{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}
+.agenda-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.agenda-h b{font-size:14px}
+#hw-notes .hw-note{margin-top:4px}
+
 .foot{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);padding:6px 16px 10px;height:34px}
 
 /* dialog */
@@ -361,6 +381,12 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast button{border:0;background:transparent;color:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
 
+@media (max-width:600px){
+  /* phone: chips become colored bars; the checklist below has the words */
+  .cell{min-height:58px;gap:2px}
+  .chip2{font-size:0;padding:0;height:5px;border:0;background:var(--cc);border-radius:3px}
+  .chip2.done{opacity:.35}
+}
 @media (max-width:759px){
   .bar{flex-wrap:wrap;gap:10px 12px}
   .bar-day{flex:1}

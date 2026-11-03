@@ -45,8 +45,21 @@
   </div>
 
   <section class="panel p-hw" aria-labelledby="hw-h">
-    <div class="panel-h"><h2 id="hw-h">Homework</h2><span class="panel-meta" id="hw-meta"></span></div>
-    <div id="hw"></div>
+    <div class="panel-h">
+      <h2 id="hw-h">Homework</h2>
+      <div class="cal-nav">
+        <button class="icon-btn sm" type="button" data-cal="-1" aria-label="Earlier weeks">‹</button>
+        <button class="link" type="button" data-cal="0" id="cal-range"></button>
+        <button class="icon-btn sm" type="button" data-cal="1" aria-label="Later weeks">›</button>
+      </div>
+    </div>
+    <div id="overdue-bar"></div>
+    <div class="cal" id="cal" role="grid" aria-label="Homework calendar"></div>
+    <div class="agenda">
+      <div class="agenda-h"><b id="ag-h"></b><span class="panel-meta" id="hw-meta"></span></div>
+      <ul class="list" id="agenda"></ul>
+      <div id="hw-notes"></div>
+    </div>
     <details class="done-box">
       <summary>Done <span class="count" id="done-count">0</span></summary>
       <ul class="list" id="done"></ul>

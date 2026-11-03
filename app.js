@@ -331,36 +331,70 @@
     return g;
   }
 
+  // Two school weeks (Mon–Fri) of chips by due date; the picked day's full checklist sits underneath.
+  let calWeek = 0, selDay = null, showOverdue = false;
   function renderHomework() {
     const t = today();
     const items = allItems();
     const open = items.filter((i) => !isDone(i));
     const overdue = open.filter((i) => i.due < t);
-    const upcoming = open.filter((i) => i.due >= t);
+    const byDay = groupBy(items);
+    if (!selDay) selDay = schoolDay();
+
+    const anchor = addDays(schoolDay(), 7 * calWeek);
+    const mon = addDays(anchor, 1 - (parse(anchor).getDay() || 7));
+    const days = [0, 1, 2, 3, 4, 7, 8, 9, 10, 11].map((n) => addDays(mon, n));
+    $("#cal-range").textContent = `${fmt(days[0], { month: "short", day: "numeric" })} – ${fmt(days.at(-1), { month: "short", day: "numeric" })}`;
+    $("#cal-range").title = calWeek ? "Back to this week" : "";
+
+    const cap = 4;
+    $("#cal").innerHTML = ["Mon", "Tue", "Wed", "Thu", "Fri"].map((d) => `<span class="dow">${d}</span>`).join("") + days.map((d) => {
+      const off = offName(d);
+      const num = parse(d).getDate();
+      if (off) return `<div class="cell off"><div class="top"><b>${num}</b></div><span class="offn">${esc(off)}</span></div>`;
+      const list = (byDay.get(d) || []).sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
+      const { letter } = letterFor(d);
+      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
+      const more = list.length > cap ? `<span class="more">+${list.length - cap} more</span>` : "";
+      return `<button type="button" class="cell${d === t ? " today" : ""}${d === selDay && !showOverdue ? " sel" : ""}${d < t ? " past" : ""}" data-day="${d}" aria-label="${esc(fmt(d, { weekday: "long", month: "long", day: "numeric" }))}, ${list.length} due">
+        <div class="top"><b>${num}</b><span class="lt">${letter || ""}</span></div>${chips}${more}</button>`;
+    }).join("");
+
+    $("#overdue-bar").innerHTML = overdue.length
+      ? `<button type="button" class="overdue-strip" data-overdue>${overdue.length} overdue · tap to see</button>` : "";
+
+    // the checklist for the picked day (or the overdue list)
+    let list, head;
+    if (showOverdue && overdue.length) { list = overdue; head = "Overdue"; }
+    else { showOverdue = false; list = (byDay.get(selDay) || []); head = `${relDay(selDay)}${daysBetween(t, selDay) >= 2 && daysBetween(t, selDay) < 7 ? `, ${fmt(selDay, { month: "short", day: "numeric" })}` : ""}`; }
+    list = [...list].sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
+    const openN = list.filter((i) => !isDone(i)).length;
+    $("#ag-h").textContent = head;
+    $("#hw-meta").textContent = list.length ? `${openN} of ${list.length} left` : "";
+    $("#agenda").innerHTML = list.length
+      ? list.map((i) => itemHTML(i, { overdue: showOverdue, showDue: showOverdue })).join("")
+      : `<li class="empty-state">Nothing due${offName(selDay) ? ` (${esc(offName(selDay))})` : ""}.</li>`;
+    $("#hw-notes").innerHTML = (homework?.notes || []).map((n) => `<p class="hw-note">${esc(n)}</p>`).join("");
+
     const done = items.filter(isDone).sort((a, b) => b.due.localeCompare(a.due));
-    const soonEnd = nextSchoolDay(t);
-    const soonCount = upcoming.filter((i) => i.due <= soonEnd).length;
-    $("#hw-meta").textContent = `${open.length} open · ${soonCount} due by ${relDay(soonEnd).toLowerCase()}`;
-
-    let html = "";
-    if (overdue.length) {
-      html += `<div class="grp overdue"><div class="grp-h"><span class="rel">Overdue</span></div><ul class="list">${overdue.map((i) => itemHTML(i, { showDue: true, overdue: true })).join("")}</ul></div>`;
-    }
-    if (!upcoming.some((i) => i.due <= soonEnd)) {
-      html += `<p class="empty-state">Nothing due ${isWeekend(t) ? "before " + esc(fmt(soonEnd, { weekday: "long" })) : "today or " + esc(relDay(soonEnd).toLowerCase())}.</p>`;
-    }
-    for (const [d, list] of groupBy(upcoming)) {
-      const { letter, from } = letterFor(d);
-      const ltr = letter && !isWeekend(d) ? `${letter} day${from === "guess" && daysBetween(t, d) > 1 ? "?" : ""}` : "";
-      html += `<div class="grp"><div class="grp-h"><span class="rel">${esc(relDay(d))}</span>${daysBetween(t, d) < 7 ? `<span>${esc(fmt(d, { month: "short", day: "numeric" }))}</span>` : ""}<span class="ltr">${ltr}</span></div><ul class="list">${list.map((i) => itemHTML(i)).join("")}</ul></div>`;
-    }
-    if (!upcoming.length && !overdue.length) html += `<p class="empty-state">Nothing on the list yet.</p>`;
-    for (const n of homework?.notes || []) html += `<p class="hw-note">${esc(n)}</p>`;
-    $("#hw").innerHTML = html;
-
     $("#done-count").textContent = done.length;
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
   }
+  $("#cal").addEventListener("click", (e) => {
+    const c = e.target.closest("[data-day]");
+    if (c) { selDay = c.dataset.day; showOverdue = false; renderHomework(); }
+  });
+  $("#overdue-bar").addEventListener("click", (e) => {
+    if (e.target.closest("[data-overdue]")) { showOverdue = !showOverdue; renderHomework(); }
+  });
+  document.querySelector(".cal-nav").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-cal]");
+    if (!b) return;
+    const n = Number(b.dataset.cal);
+    calWeek = n === 0 ? 0 : calWeek + n * 2;
+    if (n === 0) selDay = schoolDay();
+    renderHomework();
+  });
 
   // ---------- teams (ESPN's public schedule feed) ----------
   const teamData = {};
