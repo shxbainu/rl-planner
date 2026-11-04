@@ -59,10 +59,8 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .icon-btn svg{width:17px;height:17px}
 .link{border:0;background:none;padding:0;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 
-/* dashboard grid */
-.dash{display:grid;gap:12px;padding:12px 16px;max-width:1500px;margin:0 auto;
-  grid-template-columns:1fr;grid-template-areas:"sched" "hw" "week"}
-.p-sched{grid-area:sched}.p-hw{grid-area:hw}.p-week{grid-area:week}
+/* dashboard: what matters stays open (Today, Homework, Music); everything else sits behind one tab strip */
+.dash{display:grid;gap:12px;padding:12px 16px;max-width:1500px;margin:0 auto;grid-template-columns:minmax(0,1fr)}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0;display:flex;flex-direction:column;gap:8px}
 .panel-h{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:24px}
 .panel-meta{font-size:12px;color:var(--muted);text-align:right}
@@ -74,8 +72,7 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 
 @media (min-width:900px){
   .dash{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);grid-template-areas:"hw a" "c c"}
-  .col-c{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
-  .col-c > .p-week{grid-area:auto} /* its page-level area name would add phantom columns here */
+  .col-c{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);align-items:start}
 }
 /* laptop and up: three columns, school first, each column scrolls on its own */
 @media (min-width:1280px){
@@ -87,11 +84,40 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
   .col,.p-hw{overflow:auto;scrollbar-width:thin}
   .col > .panel{flex:none}
   .p-big{flex:1 0 auto}
-  /* the rotation grid stretches to take whatever height the dropdowns leave */
-  .col-c > .p-week{flex:1 0 auto}
+  /* music keeps its size; the tabbed panel takes the rest of the column and scrolls inside */
+  .col-c > .p-more{flex:1 0 340px;min-height:0}
+  .p-more .pane:not([hidden]){flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
   .p-week .rot-scroll{flex:1;display:flex}
   .p-week .rot{height:100%}
 }
+/* the tab strip: Week | Sports | News | Fantasy | Countdowns */
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin-top:-4px}
+.tabs button{flex:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;padding:6px 10px 8px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.tabs button:hover{color:var(--fg)}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.pane{display:grid;gap:8px;align-content:start}
+.p-week.pane{display:flex;flex-direction:column}
+.pane[hidden]{display:none}
+.pane .x-body{max-height:none;overflow:visible;padding:0}
+.sub-tools{margin-top:8px}
+.sub-tools .sub-h{margin:0}
+/* phones: a bottom tab bar picks Today, Homework, Music or More instead of one long column */
+.tabbar{display:none}
+@media (max-width:759px){
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));
+    background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgb(0 0 0 / .08)}
+  .tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;padding:6px 0 5px;border-radius:10px;font:inherit;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer}
+  .tabbar svg{width:22px;height:22px}
+  .tabbar [aria-current]{color:var(--accent)}
+  .dash{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .toast{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+  html[data-tab="today"] .dash > :not(.col-a),
+  html[data-tab="homework"] .dash > :not(.p-hw),
+  html[data-tab="music"] .dash > :not(.col-c),html[data-tab="music"] .p-more,
+  html[data-tab="more"] .dash > :not(.col-c),html[data-tab="more"] .p-music{display:none}
+}
+html.studying .tabbar{display:none}
+html.studying .p-music{display:flex!important}
 /* tests & quizzes */
 .big{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .big li{display:grid;grid-template-columns:minmax(44px,auto) 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--cc)}
@@ -107,17 +133,6 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
   color:var(--fg);background:color-mix(in srgb,var(--cc,var(--accent)) 16%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc,var(--accent)) 50%,transparent)}
 .meta .studied-mk{margin-left:0}
 
-/* extras: collapsed dropdowns with a one-line preview */
-.extras{display:grid;gap:8px}
-details.extra{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;margin:0}
-details.extra > summary{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:10px 0;font-family:var(--sans);font-size:13px;color:var(--fg);list-style:none}
-details.extra > summary::before{display:none}
-details.extra > summary::after{content:"";width:7px;height:7px;border:solid var(--muted);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .15s;margin:0 4px 3px 0}
-details.extra[open] > summary::after{transform:rotate(-135deg);margin-bottom:-3px}
-.x-name{font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-.x-tease{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;text-align:right}
-.x-tease .live-dot{vertical-align:middle}
-details.extra[open] .x-tease{visibility:hidden}
 .x-body{padding:0 0 12px;display:grid;gap:8px;max-height:62vh;overflow:auto;scrollbar-width:thin}
 .x-tools{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .x-expand{display:inline-flex;align-items:center;gap:5px;margin-left:auto;flex:none;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:7px;padding:4px 9px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer}
@@ -281,7 +296,39 @@ details .list{margin-top:6px}
 .sp-form input{font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-height:36px;min-width:0;color:var(--fg)}
 .sp-form .btn{min-height:36px;padding:6px 12px;color:var(--fg)} /* the card may set a light text color for a dark frame */
 .sp-err{margin:0;font-size:12px;color:var(--bad)}
+/* now playing on Brian's Spotify account; secondary text fades from the card's own color so dark cards work too */
+.sp.np .sp-head{display:none}
+.sp-np{display:grid;grid-template-columns:96px minmax(0,1fr);grid-template-areas:"art info" "art prog" "ctl ctl";gap:6px 12px;align-items:center}
+.np-art{grid-area:art;width:96px;height:96px;border-radius:8px;object-fit:cover;background:color-mix(in srgb,currentColor 10%,transparent);box-shadow:0 4px 12px rgb(0 0 0 / .18)}
+.np-info{grid-area:info;min-width:0;display:grid;gap:1px;line-height:1.25}
+.np-info b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#np-artist{font-size:13px;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-dev{font-size:11.5px;opacity:.68}
+.np-prog{grid-area:prog;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-family:var(--mono);font-size:11px;opacity:.85;font-variant-numeric:tabular-nums}
+.np-bar{height:5px;border-radius:3px;background:color-mix(in srgb,currentColor 16%,transparent);overflow:hidden}
+.np-bar i{display:block;height:100%;border-radius:inherit;background:var(--accent)}
+.np-ctl{grid-area:ctl;display:flex;justify-content:center;align-items:center;gap:14px}
+.np-ctl[hidden]{display:none}
+.np-ctl button{width:38px;height:38px;border-radius:50%;border:1.5px solid color-mix(in srgb,currentColor 30%,transparent);background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer;padding:0}
+.np-ctl .np-main{width:46px;height:46px;border-color:var(--accent);background:var(--accent);color:var(--accent-fg)}
+.np-ctl svg{width:18px;height:18px;fill:currentColor}
+/* Lofi Girl: YouTube's player at 16:9 */
+.sp .sp-yt iframe{height:auto;aspect-ratio:16 / 9}
+.yt-cap{display:none}
+.sp.lofi .sp-k::before{content:"Lofi Girl · live"}
+/* connecting a Spotify account */
+.sp-acct{display:grid;gap:6px;font-size:12.5px}
+.sp-acct:empty{display:none}
+.sp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}
+.sp-ok,.sp-paused{opacity:.78}
+.sp-setup{display:grid;gap:8px;padding:10px 12px;border-radius:10px;background:var(--surface);color:var(--fg);border:1px solid var(--line);font-size:13px;line-height:1.45}
+.sp-setup p{margin:0}
+.sp-setup ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.sp-setup code{font-family:var(--mono);font-size:12px;padding:1px 5px;border-radius:4px;background:var(--surface-2);word-break:break-all}
+.sp-setup a,.sp-setup .link{color:var(--accent)}
+.sp-setup .sp-note{color:var(--muted)}
 .sp-note{margin:0;font-size:11.5px;color:var(--muted)}
+.sp-note:empty{display:none}
 .sp-note .link{font-size:11.5px}
 
 /* fantasy */
@@ -582,37 +629,8 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 .dock a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--fg);text-decoration:none;font-size:11.5px;font-weight:600}
 .dock a svg{width:20px;height:20px;color:var(--accent)}
 .dock a:hover{border-color:var(--muted)}
-/* voyage to Ithaca */
-.voyage svg{display:block;width:100%;height:auto}
-.vy-sea{fill:color-mix(in srgb,var(--c-eng) 12%,var(--surface-2))}
-.vy-wave{fill:none;stroke:color-mix(in srgb,var(--c-eng) 35%,transparent);stroke-width:1}
-.vy-route{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:2 3;opacity:.7}
-.vy-done{fill:none;stroke:var(--accent);stroke-width:2}
-.vy-stop{fill:var(--surface);stroke:var(--muted);stroke-width:1.2}
-.vy-stop.on{fill:var(--accent);stroke:var(--accent)}
-.vy-stop.home{stroke:var(--fg);stroke-width:2}
-.vy-ship path{fill:var(--fg)}
-.vy-ship .vy-sail{fill:var(--surface);stroke:var(--fg);stroke-width:1}
-.vy-name{font:600 10px var(--sans);fill:var(--fg)}
-.vy-home{fill:var(--muted);font-style:italic}
-.vy-note{margin:6px 0 0;font-size:12px;color:var(--muted)}
-/* player card: the frame upgrades with the stats */
-.pcard-wrap{display:grid;justify-items:center;gap:6px}
-.pcard{--fr:#a97c50;width:min(240px,100%);aspect-ratio:5 / 7;border-radius:14px;padding:9px;background:var(--fr);display:flex;flex-direction:column;gap:7px;box-shadow:0 6px 18px rgb(0 0 0 / .18)}
-.pcard.rare{--fr:linear-gradient(135deg,#dfe3e8,#9ba4ae 50%,#e9ecf0)}
-.pcard.epic{--fr:linear-gradient(135deg,#f1d27f,#b9872c 50%,#f4e1a4)}
-.pcard.legend{--fr:conic-gradient(from 210deg,#cfe7f5,#e6d3f2,#f5e1c8,#d3f0de,#cfe7f5)}
-.pc-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:var(--surface);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--muted)}
-.pc-top b{font-family:var(--head,var(--sans));font-size:18px;color:var(--fg);text-transform:uppercase;letter-spacing:.06em}
-.pc-art{position:relative;flex:1;border-radius:8px;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--accent) 22%,var(--surface)),var(--surface-2) 70%)}
-.pc-mono{font-family:var(--head,var(--sans));font-size:76px;font-weight:700;line-height:1;color:var(--accent)}
-.pc-pos{position:absolute;left:9px;bottom:6px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0}
-.pc-stats div{background:var(--surface);border-radius:6px;padding:4px 8px}
-.pc-stats dt{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.pc-stats dd{margin:0;font-family:var(--mono);font-weight:700;font-size:16px;color:var(--fg)}
-.pc-foot{display:flex;justify-content:space-between;padding:0 4px;font:700 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#1d160f}
 /* snow day odds */
+.vy-note{margin:6px 0 0;font-size:12px;color:var(--muted)}
 .snow-day{font-weight:600}
 .snow-meter{position:relative;height:12px;margin:12px 6px 8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line)}
 .snow-meter i{display:block;height:100%;border-radius:inherit;background:color-mix(in srgb,var(--c-eng) 55%,transparent)}
@@ -671,9 +689,10 @@ html.studying body{overflow:hidden}
 .st-music{flex:none;min-height:80px}
 /* the Music card pinned over its slot */
 html.studying .p-music{position:fixed;z-index:61;margin:0}
-html.studying .p-music > summary{display:none}
-html.studying .p-music .x-body{max-height:none;overflow:visible;padding:12px 0}
 html.studying .sp-note{display:none}
+/* in study mode the video stays a sensible size so the clock keeps its room */
+html.studying:not(.st-dock) .sp .sp-yt iframe{max-height:min(30vh,260px)}
+html.studying:not(.st-dock) .sp-acct{display:none}
 /* now working on: one task, one big box */
 .st-now{display:flex;gap:14px;align-items:flex-start;font-size:clamp(19px,1.7vw,24px);font-weight:700;line-height:1.25;cursor:pointer;margin-top:8px}
 .st-check{appearance:none;-webkit-appearance:none;width:34px;height:34px;flex:none;margin:-2px 0 0;border:2.5px solid var(--cc);border-radius:9px;background:var(--surface);display:grid;place-items:center;cursor:pointer}
@@ -702,8 +721,15 @@ html.studying .sp-note{display:none}
 .st-nudge .link{color:inherit}
 /* phones, and phones held sideways: one scrolling column (or two short ones), Spotify's slim player docked at the bottom */
 html.st-dock .p-music{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));top:auto;width:auto}
-html.st-dock .p-music .x-body{padding:8px 0}
-html.st-dock .sp-head,html.st-dock .sp-form{display:none}
+html.st-dock .p-music{padding:8px}
+html.st-dock .p-music .panel-h,html.st-dock .sp-head,html.st-dock .sp-form,html.st-dock .sp-acct,html.st-dock .sp-note{display:none}
+html.st-dock .sp{padding:6px 8px}
+html.st-dock .sp-np{grid-template-columns:56px minmax(0,1fr) auto;grid-template-areas:"art info ctl" "art prog ctl";gap:2px 10px}
+html.st-dock .np-art{width:56px;height:56px}
+html.st-dock .np-dev,html.st-dock .np-ctl button:not(.np-main){display:none}
+html.st-dock .sp-yt{display:flex;align-items:center;gap:12px}
+html.st-dock .sp-yt iframe{flex:none;width:142px;aspect-ratio:auto}
+html.st-dock .yt-cap{display:block;font-weight:600}
 html.st-dock .sp .sp-frame iframe{height:80px}
 html.st-dock .study{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 html.st-dock .st-music{display:none}

@@ -628,49 +628,59 @@
       ${f.bench?.length ? `<details><summary>Bench <span class="count">${f.bench.length}</span></summary><table class="ff-table">${f.bench.map(row).join("")}</table></details>` : ""}`;
   }
 
-  // ---------- opening a box scrolls just enough to show all of it (or its top, if it's taller than the space) ----------
-  document.querySelectorAll("details.extra").forEach((d) => d.addEventListener("toggle", () => {
-    if (!d.open) return;
-    wake(d);
-    {
-      let sc = d.parentElement;
-      while (sc && sc !== document.body && !(/(auto|scroll)/.test(getComputedStyle(sc).overflowY) && sc.scrollHeight > sc.clientHeight)) sc = sc.parentElement;
-      const page = !sc || sc === document.body;
-      const box = page ? { top: $(".bar").getBoundingClientRect().bottom, bottom: innerHeight } : sc.getBoundingClientRect();
-      const r = d.getBoundingClientRect();
-      let dy = Math.max(0, r.bottom - (box.bottom - 8));
-      if (r.top - dy < box.top + 8) dy = r.top - (box.top + 8);
-      if (Math.abs(dy) > 1) (page ? window : sc).scrollBy({ top: dy, behavior: reduced() ? "auto" : "smooth" });
-    }
-  }));
-
-  // ---------- music: Spotify's embed player (no login; full songs when you're signed in to Spotify in this browser) ----------
-  // The player's inside is Spotify's own, either dark or tinted from the cover; each skin dresses the card around it
-  // and picks which with --sp-embed (dark | art). The iframe loads the first time the box opens.
-  const SP = "rlp-spotify";
+  // ---------- music: Spotify or Lofi Girl ----------
+  // Spotify plays through its embed (no login needed; full songs when signed in to Spotify in this browser), or,
+  // once connected to Brian's account, shows what he's playing anywhere. Lofi Girl is the 24/7 YouTube stream.
+  // Each skin dresses the card; --sp-embed (dark | art) picks the embed's own look.
+  const SP = "rlp-spotify", SRC = "rlp-music-src", SPA = "rlp-sp-auth";
   const SP_DEFAULT = { type: "playlist", id: "37i9dQZF1DWWQRwui0ExPn", title: "lofi beats", art: "" };
+  // "lofi hip hop radio 📚 beats to relax/study to", live since Aug 19 2026 (checked Nov 3; the 2022 stream ended in May).
+  // Lofi Girl runs several streams at once and the channel's live link currently points at the Christmas one, so
+  // the stream is pinned by id; if it restarts again, put the new id here (youtube.com/@LofiGirl/streams).
+  const LOFI = { id: "rFZHOHl-L8A", title: "lofi hip hop radio", sub: "Lofi Girl · live" };
   const spParse = (s) => {
     const m = /(?:open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?|spotify:)(playlist|album|track|episode|show|artist)[/:]([A-Za-z0-9]{22})/.exec(s || "");
     return m && { type: m[1], id: m[2] };
   };
-  let sp = (() => {
-    try { const v = JSON.parse(localStorage.getItem(SP)); if (v && spParse(`spotify:${v.type}:${v.id}`)) return { ...SP_DEFAULT, ...v }; } catch {}
-    return { ...SP_DEFAULT };
-  })();
-  const spSave = () => { try { localStorage.setItem(SP, JSON.stringify(sp)); } catch {} };
+  const jget = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+  const jset = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+  let sp = (() => { const v = jget(SP, null); return v && spParse(`spotify:${v.type}:${v.id}`) ? { ...SP_DEFAULT, ...v } : { ...SP_DEFAULT }; })();
+  let musicSrc = jget(SRC, "spotify") === "lofi" ? "lofi" : "spotify";
+  let spA = jget(SPA, {}); // { client, access, refresh, exp, noControl } — this browser only, never in the repo
+  let np = null, npAt = 0, spMsg = "", spSetup = false;
+  const spSave = () => jset(SP, sp);
+  // ?npdemo previews the now-playing card with a made-up track, no account needed
+  const NP_DEMO = new URLSearchParams(location.search).has("npdemo");
+  const spConnected = () => NP_DEMO || !!(spA.access && spA.refresh);
+  const playing = () => musicSrc === "spotify" && spConnected() && np?.item && np.is_playing;
+  const mmss = (ms) => { const t = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(t / 60)}:${pad(t % 60)}`; };
+
   function spRender(load) {
     const f = $("#sp-frame");
     if (!f) return;
     const de = document.documentElement, v = getComputedStyle(de).getPropertyValue("--sp-embed").trim();
     const src = `https://open.spotify.com/embed/${sp.type}/${sp.id}?utm_source=generator${(v ? v === "dark" : de.dataset.mode === "dark") ? "&theme=0" : ""}`;
-    $("#sp-title").textContent = sp.title || "Spotify";
-    $("#t-music").textContent = sp.title || "";
-    $("#sp-art").src = sp.art || "";
-    $("#sp").classList.toggle("tall", !!sp.tall);
+    const lofi = musicSrc === "lofi", live = playing();
+    document.querySelectorAll("[data-src]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.src === musicSrc)));
+    $("#sp").classList.toggle("tall", !!sp.tall && !lofi && !live);
+    $("#sp").classList.toggle("np", live);
+    $("#sp").classList.toggle("lofi", lofi);
+    $("#sp-title").textContent = lofi ? LOFI.title : sp.title || "Spotify";
+    $("#sp-art").src = lofi ? `https://i.ytimg.com/vi/${LOFI.id}/hqdefault.jpg` : sp.art || "";
+    $("#sp-size").hidden = lofi || live;
     $("#sp-size").setAttribute("aria-pressed", String(!!sp.tall));
     $("#sp-size").textContent = sp.tall ? "Shorter" : "Taller";
-    $("#sp-reset").hidden = sp.id === SP_DEFAULT.id;
-    if ((load || f.src) && f.src !== src) f.src = src;
+    $("#sp-form").hidden = lofi || live;
+    $("#sp-err").hidden = $("#sp-err").hidden || lofi;
+    $("#sp-np").hidden = !live;
+    $("#sp-embed").hidden = lofi || live;
+    $("#sp-yt").hidden = !lofi;
+    // only one player makes sound: the hidden one is unloaded
+    const yt = $("#yt-frame"), ytSrc = `https://www.youtube-nocookie.com/embed/${LOFI.id}?rel=0&playsinline=1&modestbranding=1`;
+    if (lofi) { if (load && yt.src !== ytSrc) yt.src = ytSrc; if (f.src) f.removeAttribute("src"); }
+    else { if (yt.src) yt.removeAttribute("src"); if ((load || f.src) && f.src !== src) f.src = src; }
+    spRenderAcct();
+    spRenderNP();
   }
   // title and cover from Spotify's oEmbed, which allows requests from other sites
   async function spMeta() {
@@ -683,7 +693,6 @@
       spRender();
     } catch {}
   }
-  $(".p-music").addEventListener("toggle", (e) => { if (e.target.open) spRender(true); });
   $("#sp-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const got = spParse($("#sp-url").value.trim());
@@ -695,10 +704,160 @@
     spRender(true);
     spMeta();
   });
-  $("#sp-reset").onclick = () => { sp = { ...SP_DEFAULT, tall: sp.tall }; spSave(); spRender(true); spMeta(); };
   $("#sp-size").onclick = () => { sp.tall = !sp.tall; spSave(); spRender(); };
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-src]");
+    if (!b || b.dataset.src === musicSrc) return;
+    musicSrc = b.dataset.src;
+    jset(SRC, musicSrc);
+    spRender(true);
+    if (musicSrc === "spotify") spPoll();
+    if (st.open) setTimeout(stPlaceMusic, 50);
+  });
+
+  // ---------- Spotify account: Authorization Code with PKCE (no client secret, so it works from GitHub Pages) ----------
+  // Brian makes the Spotify app and pastes its Client ID; tokens stay in this browser's localStorage.
+  const SP_SCOPES = "user-read-currently-playing user-read-playback-state user-modify-playback-state";
+  const spRedirect = () => location.origin + location.pathname;
+  const b64url = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const spSaveAuth = () => jset(SPA, spA);
+  async function spConnect(client) {
+    const verifier = b64url(crypto.getRandomValues(new Uint8Array(48)));
+    const challenge = b64url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)));
+    const nonce = b64url(crypto.getRandomValues(new Uint8Array(12)));
+    sessionStorage.setItem("rlp-sp-pkce", JSON.stringify({ verifier, state: nonce, client, back: location.search }));
+    spA = { ...spA, client };
+    spSaveAuth();
+    location.href = `https://accounts.spotify.com/authorize?${new URLSearchParams({ response_type: "code", client_id: client, scope: SP_SCOPES, redirect_uri: spRedirect(), code_challenge_method: "S256", code_challenge: challenge, state: nonce })}`;
+  }
+  async function spTokenCall(body) {
+    const r = await fetch("https://accounts.spotify.com/api/token", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(body) });
+    return r.ok ? r.json() : Promise.reject(new Error(String(r.status)));
+  }
+  // back from Spotify's consent page with ?code=…: trade it for tokens, then put the address back the way it was
+  async function spCallback() {
+    const q = new URLSearchParams(location.search), code = q.get("code"), err = q.get("error");
+    if (!code && !err) return;
+    let p = null;
+    try { p = JSON.parse(sessionStorage.getItem("rlp-sp-pkce")); } catch {}
+    sessionStorage.removeItem("rlp-sp-pkce");
+    history.replaceState(null, "", location.pathname + (p?.back || ""));
+    if (err || !p || p.state !== q.get("state")) { spMsg = err === "access_denied" ? "Spotify connection cancelled." : "Spotify connection didn't finish. Try Connect again."; return; }
+    try {
+      const d = await spTokenCall({ grant_type: "authorization_code", code, redirect_uri: spRedirect(), client_id: p.client, code_verifier: p.verifier });
+      spA = { client: p.client, access: d.access_token, refresh: d.refresh_token, exp: Date.now() + (d.expires_in - 60) * 1000 };
+      spSaveAuth();
+      spMsg = "";
+    } catch (e) { spMsg = `Spotify wouldn't finish connecting (${e.message}). Check that the redirect URI matches exactly.`; }
+  }
+  async function spToken() {
+    if (!spConnected()) return null;
+    if (Date.now() < spA.exp) return spA.access;
+    try {
+      const d = await spTokenCall({ grant_type: "refresh_token", refresh_token: spA.refresh, client_id: spA.client });
+      spA = { ...spA, access: d.access_token, refresh: d.refresh_token || spA.refresh, exp: Date.now() + (d.expires_in - 60) * 1000 };
+      spSaveAuth();
+      return spA.access;
+    } catch (e) {
+      if (e.message === "400" || e.message === "401") spDisconnect("Spotify signed you out. Connect again.");
+      return null;
+    }
+  }
+  async function spApi(path, opts = {}) {
+    let tok = await spToken();
+    if (!tok) return null;
+    let r = await fetch(`https://api.spotify.com/v1${path}`, { ...opts, headers: { Authorization: `Bearer ${tok}` } });
+    if (r.status === 401) { spA.exp = 0; tok = await spToken(); if (tok) r = await fetch(`https://api.spotify.com/v1${path}`, { ...opts, headers: { Authorization: `Bearer ${tok}` } }); }
+    return r;
+  }
+  function spDisconnect(msg = "") {
+    spA = { client: spA.client };
+    spSaveAuth();
+    np = null;
+    spMsg = msg;
+    spRender();
+  }
+  let npTimer;
+  async function spPoll() {
+    clearTimeout(npTimer);
+    if (!spConnected() || musicSrc !== "spotify" || document.hidden) return;
+    if (NP_DEMO) { np = np || { is_playing: true, progress_ms: 61000, device: { name: "Brian's iPhone" }, item: { name: "Snowman", duration_ms: 165000, artists: [{ name: "WYS" }], album: { images: [{ url: "https://i.scdn.co/image/ab67706f00000002266beb50b0032b0f140a749e" }] } } }; npAt = npAt || Date.now(); spRender(); return; }
+    try {
+      const r = await spApi("/me/player?additional_types=episode");
+      if (r?.status === 200) { np = await r.json(); npAt = Date.now(); spMsg = ""; }
+      else if (r?.status === 204) np = null;
+      else if (r?.status === 403) { np = null; spMsg = "Spotify said no. In your Spotify app's settings, add your account under User Management."; }
+    } catch {}
+    spRender();
+    npTimer = setTimeout(spPoll, 5000);
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) spPoll(); });
+  // the bar moves every second between polls
+  setInterval(() => { if (playing()) spRenderNP(); }, 1000);
+
+  function spRenderNP() {
+    if (!playing()) return;
+    const it = np.item, dur = it.duration_ms || 1, at = Math.min(dur, (np.progress_ms || 0) + (np.is_playing ? Date.now() - npAt : 0));
+    const art = it.album?.images?.[0]?.url || it.images?.[0]?.url || it.show?.images?.[0]?.url || "";
+    if ($("#np-art").getAttribute("src") !== art) $("#np-art").src = art;
+    $("#np-track").textContent = it.name;
+    $("#np-artist").textContent = (it.artists || []).map((a) => a.name).join(", ") || it.show?.name || "";
+    $("#np-dev").textContent = np.device ? `on ${np.device.name}` : "";
+    $("#np-t0").textContent = mmss(at);
+    $("#np-t1").textContent = mmss(dur);
+    $("#np-bar").style.width = `${(at / dur) * 100}%`;
+    $("#np-ctl").hidden = !!spA.noControl;
+    $("#np-icon").innerHTML = np.is_playing ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M7 4v16l13-8z"/>';
+  }
+  async function spControl(what) {
+    const paths = { prev: ["POST", "/me/player/previous"], next: ["POST", "/me/player/next"], toggle: np?.is_playing ? ["PUT", "/me/player/pause"] : ["PUT", "/me/player/play"] };
+    const [method, path] = paths[what];
+    const r = await spApi(path, { method });
+    if (r?.status === 403) { spA.noControl = true; spSaveAuth(); spRender(); toast("Play controls need Spotify Premium"); return; }
+    setTimeout(spPoll, 400);
+  }
+  document.addEventListener("click", (e) => { const b = e.target.closest("[data-np]"); if (b) spControl(b.dataset.np); });
+
+  function spRenderAcct() {
+    const el = $("#sp-acct"), note = $("#sp-note"), lofi = musicSrc === "lofi";
+    note.textContent = lofi ? "Lofi Girl's 24/7 stream on YouTube. Press play in the video." : playing() ? "" : "The player plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise.";
+    if (lofi) { el.innerHTML = ""; return; }
+    const paused = spConnected() && np?.item && !np.is_playing;
+    const reset = sp.id !== SP_DEFAULT.id ? `<button class="link" type="button" data-sp="reset">Back to lofi beats</button>` : "";
+    if (spConnected()) {
+      el.innerHTML = `${paused ? `<div class="sp-paused">Paused on Spotify: <b>${esc(np.item.name)}</b>${spA.noControl ? "" : ` <button class="link" type="button" data-np="toggle">Resume</button>`}</div>` : ""}
+        <div class="sp-row"><span class="sp-ok">Spotify account connected${playing() ? "" : " · nothing playing"}</span>${reset}<button class="link" type="button" data-sp="disconnect">Disconnect</button></div>${spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : ""}`;
+      return;
+    }
+    el.innerHTML = `<div class="sp-row"><button class="link" type="button" data-sp="setup" aria-expanded="${spSetup}">${spSetup ? "Hide setup" : "Connect your Spotify account"}</button>${reset}</div>${spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : ""}
+      ${spSetup ? `<div class="sp-setup">
+        <p>Shows what you're playing on any device. You make a free Spotify app once (it takes about two minutes):</p>
+        <ol><li>Go to <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a>, log in, and press <b>Create app</b>.</li>
+          <li>Any name and description. Under <b>Redirect URIs</b> add exactly <code>${esc(spRedirect())}</code> <button class="link" type="button" data-sp="copy">Copy</button>. Tick <b>Web API</b>, agree, and save.</li>
+          <li>In the app's <b>Settings → User Management</b>, add your name and your Spotify account's email.</li>
+          <li>Copy the app's <b>Client ID</b> into the box and press Connect. Spotify asks you to agree, then sends you back here.</li></ol>
+        <form class="sp-form" data-sp-form><input id="sp-client" value="${esc(spA.client || "")}" placeholder="Client ID" aria-label="Spotify Client ID" spellcheck="false" autocomplete="off"><button class="btn primary" type="submit">Connect</button></form>
+        <p class="sp-note">Play, pause and skip need Spotify Premium; without it you still see what's playing. The Client ID and sign-in stay in this browser.</p></div>` : ""}`;
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sp]");
+    if (!b) return;
+    if (b.dataset.sp === "setup") { spSetup = !spSetup; spRenderAcct(); }
+    if (b.dataset.sp === "disconnect") spDisconnect();
+    if (b.dataset.sp === "reset") { sp = { ...SP_DEFAULT, tall: sp.tall }; spSave(); spRender(true); spMeta(); }
+    if (b.dataset.sp === "copy") navigator.clipboard?.writeText(spRedirect()).then(() => toast("Redirect URI copied"));
+  });
+  document.addEventListener("submit", (e) => {
+    if (!e.target.matches("[data-sp-form]")) return;
+    e.preventDefault();
+    const id = $("#sp-client").value.trim();
+    if (!/^[0-9a-f]{32}$/i.test(id)) { spMsg = "That doesn't look like a Client ID (32 letters and numbers)."; spRenderAcct(); return; }
+    spConnect(id);
+  });
   spRender();
   if (!sp.art) spMeta();
+  // the embed loads once the card is on screen, not on every page load
+  new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { spRender(true); io.disconnect(); } }).observe($("#sp"));
 
   // ---------- expanded view: a side box opens big; its contents move into the dialog and back ----------
   const xdlg = $("#xdlg");
@@ -706,9 +865,9 @@
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-expand]");
     if (!b) return;
-    xHome = b.closest("details.extra");
-    $("#x-dlg-h").textContent = xHome.querySelector(".x-name").textContent;
-    xdlg.dataset.x = xHome.dataset.x;
+    xHome = b.closest("[data-xhome]");
+    $("#x-dlg-h").textContent = xHome.dataset.xname;
+    xdlg.dataset.x = xHome.dataset.xname.toLowerCase().replace(/\s+/g, "");
     $("#x-dlg-body").append(xHome.querySelector(".x-body"));
     xdlg.showModal();
     wake($("#x-dlg-body"));
@@ -736,7 +895,7 @@
   }
   const myAbbrs = () => new Set((schedule.teams || []).map((t) => t.id.toUpperCase()));
   function renderBoard() {
-    document.querySelectorAll(".p-scores .seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.league === sbLeague)));
+    document.querySelectorAll("[data-league]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.league === sbLeague)));
     const b = boards[sbLeague];
     if (!b) { $("#scoreboard").innerHTML = `<li class="empty-state">Scores unavailable right now.</li>`; return; }
     const mine = myAbbrs();
@@ -760,7 +919,7 @@
       return `<li class="${st.state === "in" ? "live" : ""}${isMine ? " mine" : ""}" data-game="${esc(e.id)}" data-lg="${sbLeague}" tabindex="0" role="button" aria-label="${esc(e.name)}"><div class="tm2">${rows}</div><div class="st2">${status}${tv ? `<br>${esc(tv)}` : ""}</div></li>`;
     }).join("") : `<li class="empty-state">No games today.</li>`;
   }
-  document.querySelector(".p-scores .seg").addEventListener("click", (e) => {
+  document.querySelector(".seg:has([data-league])").addEventListener("click", (e) => {
     const b = e.target.closest("[data-league]");
     if (b) { sbLeague = b.dataset.league; renderBoard(); }
   });
@@ -1009,7 +1168,7 @@
       <span class="txt"><span class="hl">${esc(x.title)}</span>${x.summary ? `<span class="sum">${esc(x.summary)}</span>` : ""}<span class="meta"><span class="chip-src">${esc(x.chip)}</span>${x.when ? `<span class="ago">${ago(x.when)} ago</span>` : ""}</span></span>
     </a></li>`;
   // a lazy picture inside a box that starts closed doesn't always load once it opens (Safari), so load them when it's open
-  const wake = (el) => { if (el.closest("details[open], dialog[open]")) el.querySelectorAll('img[loading="lazy"]').forEach((im) => { im.loading = "eager"; }); };
+  const wake = (el) => { if (el && !el.closest("[hidden]") && (!el.closest("dialog") || el.closest("dialog[open]"))) el.querySelectorAll('img[loading="lazy"]').forEach((im) => { im.loading = "eager"; }); };
   // ESPN photos come full-size (up to 2 MB); its resizer serves a small copy
   const espnImg = (u, w) => { const m = /^https:\/\/a\.espncdn\.com(\/photo\/[^?#]+)$/.exec(u || ""); return m ? `https://a.espncdn.com/combiner/i?img=${m[1]}&w=${w}` : u; };
   function renderNews() {
@@ -1133,10 +1292,31 @@
     renderRotation();
   });
 
-  document.querySelectorAll("details.extra").forEach((d) => {
-    if (state.open?.[d.dataset.x]) d.open = true;
-    d.addEventListener("toggle", () => { (state.open ||= {})[d.dataset.x] = d.open; save(); });
+  // ---------- tabs: one strip for the secondary panes; on phones a bottom bar picks the section ----------
+  const PANES = ["week", "sports", "news", "fantasy", "count"], TABS = ["today", "homework", "music", "more"];
+  function showPane(name) {
+    if (!PANES.includes(name)) name = "week";
+    document.querySelectorAll("[data-tab-pane]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tabPane === name)));
+    document.querySelectorAll(".pane").forEach((p) => { p.hidden = p.dataset.pane !== name; });
+    wake($(`.pane[data-pane="${name}"]`));
+    if (state.pane !== name) { state.pane = name; save(); }
+  }
+  function showTab(name) {
+    if (!TABS.includes(name)) name = "today";
+    document.documentElement.dataset.tab = name;
+    document.querySelectorAll("#tabbar [data-tab]").forEach((b) => b.toggleAttribute("aria-current", b.dataset.tab === name));
+    if (name === "music") spRender(true);
+    if (name === "more") wake($(".pane:not([hidden])"));
+    if (state.tab !== name) { state.tab = name; save(); }
+  }
+  document.addEventListener("click", (e) => {
+    const p = e.target.closest("[data-tab-pane]");
+    if (p) showPane(p.dataset.tabPane);
+    const t = e.target.closest("#tabbar [data-tab]");
+    if (t) { showTab(t.dataset.tab); window.scrollTo({ top: 0, behavior: "auto" }); }
   });
+  showPane(state.pane);
+  showTab(state.tab);
 
   // add / edit dialog
   const dlg = $("#dlg"), form = $("#form");
@@ -1308,7 +1488,7 @@
   // (moving an iframe restarts it); it's pinned over a slot in the layout, or docked at the bottom on phones.
   const study = $("#study");
   const ST_PRESETS = { "25/5": [25, 5], "50/10": [50, 10] };
-  const st = { open: false, t0: 0, done: 0, pick: null, key: "", lock: null, nudged: 0, musicWasOpen: false,
+  const st = { open: false, t0: 0, done: 0, pick: null, key: "", lock: null, nudged: 0,
     focus: { preset: (() => { try { return localStorage.getItem("rlp-focus") || "25/5"; } catch { return "25/5"; } })(), phase: "focus", endsAt: 0, left: 25 * 60e3, round: 1 } };
 
   // tonight's list: what's due on the next school day (today's, during school), tests and projects first, then
@@ -1535,9 +1715,7 @@
     stSceneName = null;
     study.hidden = false;
     document.documentElement.classList.add("studying");
-    const music = $(".p-music");
-    st.musicWasOpen = music.open;
-    music.open = true;
+    spRender(true);
     document.documentElement.requestFullscreen?.().catch(() => {});
     stRenderWork();
     stTick();
@@ -1552,7 +1730,6 @@
     clearTimeout(stTimer);
     study.hidden = true;
     document.documentElement.classList.remove("studying");
-    $(".p-music").open = st.musicWasOpen;
     stPlaceMusic();
     $("#st-nudge").hidden = true;
     st.lock?.release().catch(() => {});
@@ -1613,41 +1790,7 @@
       ${tonight.length ? `<span class="ss-pts" title="Points: homework 2, quiz 4, test 6, essay or project 8"><b>${scored}</b> / ${proj} proj · ${esc(relDay(by))}<span class="ss-bar"><i style="width:${proj ? Math.round((scored / proj) * 100) : 0}%"></i></span></span>` : ""}`;
   }
 
-  // ---------- voyage to Ithaca: every W moves the ship one stop; a new marking period starts the voyage over ----------
-  // a loop west from Troy past the monsters and back east to Ithaca, roughly where the stories put each stop
-  const STOPS = [["Troy", 296, 40], ["Ismarus", 262, 20], ["Lotus-Eaters", 218, 126], ["Cyclops", 170, 104], ["Aeolus", 140, 64], ["Laestrygonians", 104, 34],
-    ["Circe", 70, 52], ["Underworld", 34, 28], ["Sirens", 38, 82], ["Scylla & Charybdis", 76, 104], ["Thrinacia", 112, 124], ["Calypso", 46, 138], ["Phaeacians", 158, 140], ["Ithaca", 204, 84]];
-  function renderVoyage() {
-    const s = season(), at = Math.min(s.w, STOPS.length - 1), [name, x, y] = STOPS[at];
-    const route = STOPS.map(([, sx, sy], i) => `${i ? "L" : "M"}${sx} ${sy}`).join(" ");
-    $("#voyage").innerHTML = `<svg viewBox="0 0 320 150" role="img" aria-label="Odysseus's ship at ${esc(name)}, stop ${at} of ${STOPS.length - 1}">
-      <rect width="320" height="150" rx="8" class="vy-sea"/>${Array.from({ length: 9 }, (_, i) => `<path class="vy-wave" d="M${(i * 37) % 300 + 6} ${(i * 53) % 130 + 10}q4-3 8 0t8 0"/>`).join("")}
-      <path d="${route}" class="vy-route"/><path d="${STOPS.slice(0, at + 1).map(([, sx, sy], i) => `${i ? "L" : "M"}${sx} ${sy}`).join(" ")}" class="vy-done"/>
-      ${STOPS.map(([n, sx, sy], i) => `<circle cx="${sx}" cy="${sy}" r="${i === STOPS.length - 1 ? 5 : 3.2}" class="vy-stop${i <= at ? " on" : ""}${i === STOPS.length - 1 ? " home" : ""}"><title>${esc(n)}</title></circle>`).join("")}
-      <g class="vy-ship" transform="translate(${x} ${y - 9})"><path d="M-9 6h18l-4 5h-10z"/><path d="M0-8v14M0-7l7 9H0z" class="vy-sail"/></g>
-      ${at < STOPS.length - 1 ? `<text x="${STOPS.at(-1)[1]}" y="${STOPS.at(-1)[2] + 17}" text-anchor="middle" class="vy-name vy-home">Ithaca</text>` : ""}
-      <text x="${Math.min(Math.max(x, 40), 280)}" y="${y > 120 ? y - 16 : y + 20}" text-anchor="middle" class="vy-name">${esc(name)}</text></svg>
-      <p class="vy-note">${at === STOPS.length - 1 ? "Home to Ithaca. The voyage starts over next marking period." : `${s.w} win${s.w === 1 ? "" : "s"} so far in ${esc(s.name)}. Every day you finish everything sails one stop closer to Ithaca.`}</p>`;
-    tease("t-voyage", `${at === STOPS.length - 1 ? "Home" : `Stop ${at}/${STOPS.length - 1}`} · ${esc(name)}`);
-  }
-
-  // ---------- player card: Brian's stats from this browser, the frame upgrades with them ----------
-  function renderCard() {
-    const s = season(), t = today(), items = allItems();
-    const done = Object.keys(state.done).length;
-    const tests = items.filter((i) => MAJOR.has(i.type) && (i.due < t || (i.due === t && now().getHours() >= 15))).length;
-    const score = done + tests * 3 + s.best * 4;
-    const [tier, name] = score >= 90 ? ["legend", "Legendary"] : score >= 40 ? ["epic", "Epic"] : score >= 15 ? ["rare", "Rare"] : ["common", "Common"];
-    const owner = schedule.owner || "Player";
-    $("#pcard").innerHTML = `<div class="pcard ${tier}">
-      <div class="pc-top"><b>${esc(owner)}</b><span>${esc((schedule.term || "").replace(/ · .*/, ""))}</span></div>
-      <div class="pc-art"><span class="pc-mono">${esc(owner[0])}</span><span class="pc-pos">Freshman</span></div>
-      <dl class="pc-stats"><div><dt>Record</dt><dd>${s.w}-${s.l}</dd></div><div><dt>Best streak</dt><dd>${s.best}</dd></div><div><dt>Items done</dt><dd>${done}</dd></div><div><dt>Tests survived</dt><dd>${tests}</dd></div></dl>
-      <div class="pc-foot"><span>${name}</span><span>${score} pts</span></div></div>
-      <p class="vy-note">Frames: Common, Rare at 15 points, Epic at 40, Legendary at 90. Points: items done + 3 per test or quiz behind you + 4 per day of your best streak.</p>`;
-    tease("t-card", `${name} · ${score} pts`);
-  }
-  function renderSeasonal() { renderSeason(); renderVoyage(); renderCard(); }
+  function renderSeasonal() { renderSeason(); }
 
   // ---------- snow day odds: Open-Meteo (no key) for West Roxbury; the box shows itself only when snow is forecast ----------
   async function loadSnow() {
@@ -1742,12 +1885,12 @@
     if (!/^p\. /.test(title)) title = title[0].toUpperCase() + title.slice(1);
     return { class: klass, title, due, type, details: "" };
   }
+  const go = (tab, pane) => () => { if (pane) showPane(pane); showTab(tab); return pane ? $(".p-more") : { today: $(".p-sched"), homework: $(".p-hw"), music: $(".p-music") }[tab]; };
   const JUMPS = [
-    ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", () => $(".p-hw")], ["Today's schedule", "schedule today bell", () => $(".p-sched")],
-    ["Tests & quizzes", "tests quizzes", () => $(".p-big")], ["Rotation", "rotation week letters", () => $(".p-week")], ["Music", "music spotify", () => $(".p-music")],
-    ["Voyage to Ithaca", "voyage odyssey ithaca", () => $('[data-x="voyage"]')], ["Player card", "player card stats", () => $('[data-x="card"]')], ["Countdowns", "countdowns", () => $('[data-x="count"]')],
-    ["Warriors & 49ers", "warriors 49ers teams", () => $('[data-x="teams"]')], ["Scores", "scores nba nfl", () => $('[data-x="scores"]')], ["News", "news", () => $('[data-x="news"]')],
-    ["Fantasy", "fantasy lineup", () => $('[data-x="fantasy"]')], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
+    ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", go("homework")], ["Today's schedule", "schedule today bell", go("today")],
+    ["Tests & quizzes", "tests quizzes", () => { showTab("today"); return $(".p-big"); }], ["Music", "music spotify lofi", go("music")], ["Rotation", "rotation week letters", go("more", "week")],
+    ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")],
+    ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
     ...Object.entries(SKINS).map(([k, v]) => [`Theme: ${v}`, `theme ${k} ${v.toLowerCase()}`, () => { setSkin(k); document.querySelectorAll(".skin-select").forEach((o) => { o.value = k; }); }]),
   ];
   let cmdSel = 0, cmdItems = [];
@@ -1759,7 +1902,7 @@
       save(); renderHomework(); renderBig(); toast(`Added: ${add.title}`);
     } });
     if (lw) JUMPS.filter(([label, keys]) => keys.split(" ").some((k) => k.startsWith(lw.split(" ")[0])) || label.toLowerCase().includes(lw)).slice(0, 6)
-      .forEach(([label, , go]) => cmdItems.push({ html: `<b>Go</b> ${esc(label)}`, run: () => { const el = go(); if (el instanceof Element) { if (el.matches("details")) el.open = true; el.scrollIntoView({ block: "start", behavior: reduced() ? "auto" : "smooth" }); } } }));
+      .forEach(([label, , jump]) => cmdItems.push({ html: `<b>Go</b> ${esc(label)}`, run: () => { const el = jump(); if (el instanceof Element) el.scrollIntoView({ block: "start", behavior: reduced() ? "auto" : "smooth" }); } }));
     cmdSel = Math.min(cmdSel, Math.max(0, cmdItems.length - 1));
     $("#cmd-list").innerHTML = cmdItems.map((c, i) => `<li role="option" aria-selected="${i === cmdSel}" data-i="${i}">${c.html}</li>`).join("") || (v ? `<li class="cmd-none">Start with a class (latin, eng, msi, fr, fgc, art…) to add homework, or a section name to jump.</li>` : "");
   }
@@ -1799,6 +1942,7 @@
       setInterval(loadSportsNews, 15 * 60_000);
       loadSnow();
       setInterval(loadSnow, 3 * 3600_000);
+      spCallback().then(() => { spRender(matchMedia("(min-width:760px)").matches); spPoll(); }); // on laptops the card is always in view
       setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
       // tick just after each second turns over; a plain 1s interval drifts and skips a second now and then
       const tickLoop = () => { tickNow(); setTimeout(tickLoop, 1000 - (now().getTime() % 1000) + 15); };

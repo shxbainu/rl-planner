@@ -139,7 +139,7 @@ html[data-skin="hardwood"]{
   .sp-form input{background:#171a21;border-color:#2a2d33;color:#fff}
   .sp-form input::placeholder{color:#8b93a3}
   .sp-note{color:#a7afbd}
-  .sp-note .link{color:var(--gold)}
+  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--gold)}
   .sp-err{color:#ff8a7a}
 }
 @keyframes hw-swish{from{transform:rotate(-6deg) scale(0)}to{transform:rotate(-6deg) scale(1)}}
@@ -166,4 +166,11 @@ html[data-skin="hardwood"]{
 /* a studied test or quiz */
 html[data-skin="hardwood"]{
   .studied-mk{border-radius:3px;background:var(--gold);color:#13213b;box-shadow:none;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+}
+
+/* the tab strip (and phone tab bar) in this theme */
+html[data-skin="hardwood"]{
+  .tabs button{font-family:var(--head);font-weight:400;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+  .tabs button[aria-selected="true"]{border-bottom:3px solid var(--gold)}
+  .tabbar{border-top:4px solid var(--gold)}
 }

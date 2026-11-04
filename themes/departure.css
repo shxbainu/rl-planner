@@ -173,7 +173,7 @@ html[data-skin="departure"]{
   .sp-frame{border-radius:3px}
   .sp-form input{background:var(--tile-2);border-color:#333;color:var(--tile-fg)}
   .sp-note{color:#b5ad9c}
-  .sp-note .link{color:var(--amber)}
+  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--amber)}
   .sp-err{color:#f08a78}
 }
 
@@ -191,4 +191,10 @@ html[data-skin="departure"]{
   .sbc-t{color:var(--amber)}
   .sbc-bar i{box-shadow:inset -1.5px 0 0 var(--tile)}
   .sbc-mk{background:var(--amber);box-shadow:0 0 0 2px var(--tile)}
+}
+
+/* the tab strip (and phone tab bar) in this theme */
+html[data-skin="departure"]{
+  .tabs button{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.08em}
+  .tabs button[aria-selected="true"]{color:var(--amber-ink);border-bottom-color:var(--amber)}
 }

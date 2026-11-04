@@ -143,8 +143,8 @@ html[data-skin="arcade"]{
   .sp-frame{border-radius:0}
   .sp-form input{background:var(--surface);color:var(--fg);border-color:var(--line)}
   .sp-note{color:color-mix(in srgb,var(--screen-fg) 75%,var(--screen))}
-  .sp-note .link{color:var(--coin)}
-  &[data-mode="light"] .sp-note .link{color:var(--screen-fg)}
+  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--coin)}
+  &[data-mode="light"] :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--screen-fg)}
   .sp-err{color:#ff8a8a}
 
   @media (max-width:759px){
@@ -177,4 +177,12 @@ html[data-skin="arcade"]{
 /* a studied test or quiz */
 html[data-skin="arcade"]{
   .studied-mk{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:7.5px;padding:3px 5px 2px;line-height:1}
+}
+
+/* the tab strip (and phone tab bar) in this theme */
+html[data-skin="arcade"]{
+  .tabs button{font-family:var(--pixel);font-weight:400;font-size:8.5px;letter-spacing:0;text-transform:uppercase;padding:9px 9px 10px}
+  .tabs button[aria-selected="true"]{color:var(--neon);border-bottom-color:var(--coin)}
+  .tabbar button{font-family:var(--pixel);font-weight:400;font-size:7px;gap:5px}
+  .tabbar{border-top:3px solid var(--edge)}
 }

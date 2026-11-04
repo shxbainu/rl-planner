@@ -154,3 +154,8 @@ html[data-skin="herbarium"]{
   .st-card{border-radius:4px}
   .st-k{font-family:var(--mono);font-weight:500;text-transform:none;letter-spacing:.02em;font-size:12px;color:var(--accent-ink)}
 }
+
+/* the tab strip (and phone tab bar) in this theme */
+html[data-skin="herbarium"]{
+  .tabs button{font-family:var(--head);font-weight:500;font-size:14px}
+}

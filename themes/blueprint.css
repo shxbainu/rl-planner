@@ -167,3 +167,8 @@ html[data-skin="blueprint"]{
 html[data-skin="blueprint"]{
   .studied-mk{border-radius:0;background:transparent;font-family:var(--mono);box-shadow:inset 0 0 0 1px var(--sheet-line)}
 }
+
+/* the tab strip (and phone tab bar) in this theme */
+html[data-skin="blueprint"]{
+  .tabs button{font-family:var(--head);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+}

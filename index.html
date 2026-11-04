@@ -63,6 +63,10 @@
       <ol class="tl" id="timeline"></ol>
       <p class="after" id="after"></p>
     </section>
+    <section class="panel p-snow" id="snow-box" aria-labelledby="snow-h" hidden>
+      <div class="panel-h"><h2 id="snow-h">Snow day odds</h2><span class="panel-meta" id="t-snow"></span></div>
+      <div class="snow" id="snow"></div>
+    </section>
     <section class="panel p-big" aria-labelledby="big-h">
       <div class="panel-h"><h2 id="big-h">Tests &amp; quizzes</h2><span class="panel-meta" id="big-meta"></span></div>
       <ul class="big" id="big"></ul>
@@ -100,111 +104,110 @@
   </section>
 
   <div class="col col-c">
-    <section class="panel p-week" aria-labelledby="week-h">
-      <div class="panel-h"><h2 id="week-h">Rotation</h2>
-        <div class="seg" role="group" aria-label="Rotation view">
-          <button type="button" data-view="week" aria-pressed="true">This week</button>
-          <button type="button" data-view="letters" aria-pressed="false">All letters</button>
+    <section class="panel p-music" aria-labelledby="music-h">
+      <div class="panel-h"><h2 id="music-h">Music</h2>
+        <div class="seg" role="group" aria-label="Music source">
+          <button type="button" data-src="spotify" aria-pressed="true">Spotify</button>
+          <button type="button" data-src="lofi" aria-pressed="false">Lofi Girl</button>
         </div>
       </div>
-      <div class="rot-scroll"><table class="rot" id="rot"></table></div>
-      <p class="panel-foot" id="rot-note"></p>
+      <div class="sp" id="sp">
+        <div class="sp-head">
+          <span class="sp-disc" aria-hidden="true"><img id="sp-art" alt=""></span>
+          <span class="sp-now"><span class="sp-k"></span><b id="sp-title"></b></span>
+          <button class="sp-size" id="sp-size" type="button" aria-pressed="false">Taller</button>
+        </div>
+        <div class="sp-np" id="sp-np" hidden>
+          <img class="np-art" id="np-art" alt="">
+          <div class="np-info"><span class="sp-k"></span><b id="np-track"></b><span id="np-artist"></span><span class="np-dev" id="np-dev"></span></div>
+          <div class="np-prog"><span id="np-t0">0:00</span><div class="np-bar"><i id="np-bar"></i></div><span id="np-t1">0:00</span></div>
+          <div class="np-ctl" id="np-ctl">
+            <button type="button" data-np="prev" aria-label="Previous track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+            <button type="button" data-np="toggle" class="np-main" aria-label="Play or pause"><svg viewBox="0 0 24 24" aria-hidden="true" id="np-icon"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
+            <button type="button" data-np="next" aria-label="Next track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+          </div>
+        </div>
+        <div class="sp-frame" id="sp-embed"><iframe id="sp-frame" title="Spotify player" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe></div>
+        <div class="sp-frame sp-yt" id="sp-yt" hidden><iframe id="yt-frame" title="Lofi Girl: lofi hip hop radio, live" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><span class="yt-cap">Lofi Girl · live</span></div>
+        <form class="sp-form" id="sp-form" autocomplete="off">
+          <input id="sp-url" inputmode="url" placeholder="Paste a Spotify playlist, album or song link" aria-label="Spotify link">
+          <button class="btn" type="submit">Play</button>
+        </form>
+        <p class="sp-err" id="sp-err" hidden>That isn't a Spotify link. In Spotify, tap Share, then Copy link.</p>
+        <div class="sp-acct" id="sp-acct"></div>
+        <p class="sp-note" id="sp-note"></p>
+      </div>
     </section>
 
-    <div class="extras" id="extras">
-      <details class="extra p-music" data-x="music">
-        <summary><span class="x-name">Music</span><span class="x-tease" id="t-music"></span></summary>
-        <div class="x-body">
-          <div class="sp" id="sp">
-            <div class="sp-head">
-              <span class="sp-disc" aria-hidden="true"><img id="sp-art" alt=""></span>
-              <span class="sp-now"><span class="sp-k"></span><b id="sp-title"></b></span>
-              <button class="sp-size" id="sp-size" type="button" aria-pressed="false">Taller</button>
-            </div>
-            <div class="sp-frame"><iframe id="sp-frame" title="Spotify player" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe></div>
-            <form class="sp-form" id="sp-form" autocomplete="off">
-              <input id="sp-url" inputmode="url" placeholder="Paste a Spotify playlist, album or song link" aria-label="Spotify link">
-              <button class="btn" type="submit">Play</button>
-            </form>
-            <p class="sp-err" id="sp-err" hidden>That isn't a Spotify link. In Spotify, tap Share, then Copy link.</p>
-            <p class="sp-note">Plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise. <button class="link" id="sp-reset" type="button" hidden>Back to lofi beats</button></p>
+    <section class="panel p-more" aria-label="More">
+      <div class="tabs" role="tablist" aria-label="More">
+        <button type="button" role="tab" data-tab-pane="week" aria-selected="true">Week</button>
+        <button type="button" role="tab" data-tab-pane="sports" aria-selected="false">Sports</button>
+        <button type="button" role="tab" data-tab-pane="news" aria-selected="false">News</button>
+        <button type="button" role="tab" data-tab-pane="fantasy" aria-selected="false">Fantasy</button>
+        <button type="button" role="tab" data-tab-pane="count" aria-selected="false">Countdowns</button>
+      </div>
+
+      <div class="pane p-week" data-pane="week" role="tabpanel">
+        <div class="x-tools">
+          <span class="panel-meta">Rotation</span>
+          <div class="seg" role="group" aria-label="Rotation view">
+            <button type="button" data-view="week" aria-pressed="true">This week</button>
+            <button type="button" data-view="letters" aria-pressed="false">All letters</button>
           </div>
         </div>
-      </details>
+        <div class="rot-scroll"><table class="rot" id="rot"></table></div>
+        <p class="panel-foot" id="rot-note"></p>
+      </div>
 
-      <details class="extra p-snow" data-x="snow" id="snow-box" hidden>
-        <summary><span class="x-name">Snow day odds</span><span class="x-tease" id="t-snow"></span></summary>
-        <div class="x-body"><div class="snow" id="snow"></div></div>
-      </details>
-
-      <details class="extra" data-x="voyage">
-        <summary><span class="x-name">Voyage to Ithaca</span><span class="x-tease" id="t-voyage"></span></summary>
-        <div class="x-body"><div class="voyage" id="voyage"></div></div>
-      </details>
-
-      <details class="extra" data-x="card">
-        <summary><span class="x-name">Player card</span><span class="x-tease" id="t-card"></span></summary>
-        <div class="x-body"><div class="pcard-wrap" id="pcard"></div></div>
-      </details>
-
-      <details class="extra" data-x="count">
-        <summary><span class="x-name">Countdowns</span><span class="x-tease" id="t-count"></span></summary>
-        <div class="x-body">
-          <ul class="counts" id="counts"></ul>
-          <form class="count-form" id="count-form" autocomplete="off">
-            <input id="c-title" maxlength="60" placeholder="What's coming up?" aria-label="Countdown name" required>
-            <input id="c-date" type="date" aria-label="Date" required>
-            <button class="btn" type="submit">Add</button>
-          </form>
-        </div>
-      </details>
-
-      <details class="extra" data-x="teams">
-        <summary><span class="x-name">Warriors &amp; 49ers</span><span class="x-tease" id="t-teams"></span></summary>
-        <div class="x-body"><div class="teams" id="teams"></div></div>
-      </details>
-
-      <details class="extra p-scores" data-x="scores">
-        <summary><span class="x-name">Scores</span><span class="x-tease" id="t-scores"></span></summary>
-        <div class="x-body">
-          <div class="x-tools">
-            <span class="panel-meta" id="sb-meta"></span>
-            <div class="seg" role="group" aria-label="League">
-              <button type="button" data-league="nba" aria-pressed="true">NBA</button>
-              <button type="button" data-league="nfl" aria-pressed="false">NFL</button>
-            </div>
+      <div class="pane" data-pane="sports" role="tabpanel" hidden>
+        <div class="sub-h">Warriors &amp; 49ers</div>
+        <div class="teams" id="teams"></div>
+        <div class="x-tools sub-tools">
+          <span class="sub-h">Scores <span class="panel-meta" id="sb-meta"></span></span>
+          <div class="seg" role="group" aria-label="League">
+            <button type="button" data-league="nba" aria-pressed="true">NBA</button>
+            <button type="button" data-league="nfl" aria-pressed="false">NFL</button>
           </div>
-          <ul class="sb" id="scoreboard"></ul>
         </div>
-      </details>
+        <ul class="sb" id="scoreboard"></ul>
+        <div data-xhome data-xname="Sports news">
+          <div class="x-tools sub-tools"><span class="sub-h">Sports news <span class="panel-meta">Warriors and 49ers first</span></span><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
+          <div class="x-body"><ul class="news" id="snews"></ul></div>
+        </div>
+      </div>
 
-      <details class="extra" data-x="news">
-        <summary><span class="x-name">News</span><span class="x-tease" id="t-news"></span></summary>
+      <div class="pane" data-pane="news" role="tabpanel" data-xhome data-xname="News" hidden>
+        <div class="x-tools"><div role="group" aria-label="News section" id="news-tabs"></div><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
         <div class="x-body">
-          <div class="x-tools"><div role="group" aria-label="News section" id="news-tabs"></div><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
           <ul class="news" id="news"></ul>
           <p class="panel-foot" id="news-foot"></p>
         </div>
-      </details>
+      </div>
 
-      <details class="extra" data-x="snews">
-        <summary><span class="x-name">Sports news</span><span class="x-tease" id="t-snews"></span></summary>
-        <div class="x-body">
-          <div class="x-tools"><span class="panel-meta">NBA and NFL, Warriors and 49ers first</span><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
-          <ul class="news" id="snews"></ul>
-        </div>
-      </details>
+      <div class="pane" data-pane="fantasy" role="tabpanel" data-xhome data-xname="Fantasy" hidden>
+        <div class="x-tools"><span class="panel-meta" id="ff-meta"></span><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
+        <div class="x-body"><div id="ff"></div></div>
+      </div>
 
-      <details class="extra" data-x="ff">
-        <summary><span class="x-name">Fantasy</span><span class="x-tease" id="t-ff"></span></summary>
-        <div class="x-body">
-          <div class="x-tools"><span class="panel-meta" id="ff-meta"></span><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
-          <div id="ff"></div>
-        </div>
-      </details>
-    </div>
+      <div class="pane" data-pane="count" role="tabpanel" hidden>
+        <ul class="counts" id="counts"></ul>
+        <form class="count-form" id="count-form" autocomplete="off">
+          <input id="c-title" maxlength="60" placeholder="What's coming up?" aria-label="Countdown name" required>
+          <input id="c-date" type="date" aria-label="Date" required>
+          <button class="btn" type="submit">Add</button>
+        </form>
+      </div>
+    </section>
   </div>
 </main>
+
+<nav class="tabbar" id="tabbar" aria-label="Sections">
+  <button type="button" data-tab="today" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>Today</button>
+  <button type="button" data-tab="homework"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 2 2 4-4M8 15h8"/></svg>Homework</button>
+  <button type="button" data-tab="music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>Music</button>
+  <button type="button" data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>More</button>
+</nav>
 
 <dialog id="dlg" aria-labelledby="dlg-h">
   <form id="form" method="dialog">

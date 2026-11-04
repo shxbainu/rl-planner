@@ -145,3 +145,10 @@ html[data-skin="chess"]{
 html[data-skin="chess"]{
   .studied-mk{border-radius:2px;background:var(--ebony);color:var(--ivory);box-shadow:none;font-family:var(--mono);font-weight:500}
 }
+
+/* the tab strip (and phone tab bar) in this theme */
+html[data-skin="chess"]{
+  .p-music .panel-h h2::before{content:"\2657\FE0E"}
+  .tabs button{font-family:var(--head);font-weight:700;font-size:14px}
+  .tabs button[aria-selected="true"]{border-bottom-color:var(--flag)}
+}
