@@ -518,7 +518,7 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 .dlg-actions{display:flex;gap:8px;align-items:center;margin-top:4px}
 .grow{flex:1}
 
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.2s;max-width:calc(100% - 32px);display:flex;gap:12px;align-items:center;z-index:10}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.2s;max-width:calc(100% - 32px);display:flex;gap:12px;align-items:center;z-index:80}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast button{border:0;background:transparent;color:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
 
@@ -550,6 +550,96 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
   html[data-skin] .bar .bar-date{font-size:16px;letter-spacing:0}
   html[data-skin] .bar-status span.pill{font-size:11px;letter-spacing:-.01em}
   html[data-skin] .bar-status .skin-clock{display:none}
+}
+
+/* study mode: full screen, the theme's colors over a scene drawn for the subject */
+.study-btn{width:auto;padding:0 11px;gap:6px;font-weight:600;font-size:13px;display:inline-flex;align-items:center}
+.study-btn svg{width:16px;height:16px}
+.study{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);grid-template-rows:auto minmax(0,1fr);
+  grid-template-areas:"top top" "left right";gap:16px;padding:14px 20px 20px;padding-top:calc(14px + env(safe-area-inset-top,0px));background:var(--bg);color:var(--fg);overflow:hidden}
+.study[hidden]{display:none}
+.st-scene{position:absolute;inset:0;pointer-events:none}
+.st-scene svg{display:block;width:100%;height:100%}
+.study.has-scene{background:#0d111a}
+.study > :not(.st-scene,.st-nudge){position:relative}
+html.studying body{overflow:hidden}
+.st-top{grid-area:top;display:flex;align-items:center;gap:12px;min-height:38px}
+.st-where{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.st-stats{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.study.has-scene .st-top,.study.has-scene .st-stats{color:#ece8de}
+.st-x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:15px;cursor:pointer;flex:none}
+.st-left{grid-area:left;display:flex;flex-direction:column;gap:16px;min-height:0}
+.st-right{grid-area:right;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto;scrollbar-width:thin}
+.st-card{background:color-mix(in srgb,var(--surface) 90%,transparent);color:var(--fg);border:1px solid var(--line);border-radius:16px;padding:16px 18px;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 10px 30px rgb(0 0 0 / .18)}
+.st-k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+/* the clock card wears the theme's countdown look (it is also a .now-card); the ids keep its size */
+#st-clock{flex:1;display:flex;flex-direction:column;justify-content:safe center;gap:10px;padding:24px 28px;min-height:0;overflow:auto}
+#st-clock .lbl{font-size:clamp(20px,2.3vw,30px);font-weight:700;line-height:1.15}
+#st-clock .lbl small{display:block;font-size:14px;font-weight:500;color:inherit;opacity:.75;margin-top:3px}
+#st-clock .num{font-family:var(--digits,var(--mono));font-size:clamp(76px,12.5vw,190px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#st-clock .prog{height:10px;max-width:none}
+#st-clock .sub{font-size:15px}
+.st-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+/* the clock card can be light or dark depending on the theme, so its controls take the card's own text color */
+#st-clock .btn,#st-clock .seg{background:transparent;color:inherit;border:1.5px solid color-mix(in srgb,currentColor 35%,transparent)}
+#st-clock .btn.primary{border-color:currentColor;font-weight:700}
+#st-clock .seg button{color:inherit;background:transparent;box-shadow:none}
+#st-clock .seg button[aria-pressed="true"]{background:color-mix(in srgb,currentColor 18%,transparent);color:inherit}
+.st-music{flex:none;min-height:80px}
+/* the Music card pinned over its slot */
+html.studying .p-music{position:fixed;z-index:61;margin:0}
+html.studying .p-music > summary{display:none}
+html.studying .p-music .x-body{max-height:none;overflow:visible;padding:12px 0}
+html.studying .sp-note{display:none}
+/* now working on: one task, one big box */
+.st-now{display:flex;gap:14px;align-items:flex-start;font-size:clamp(19px,1.7vw,24px);font-weight:700;line-height:1.25;cursor:pointer;margin-top:8px}
+.st-check{appearance:none;-webkit-appearance:none;width:34px;height:34px;flex:none;margin:-2px 0 0;border:2.5px solid var(--cc);border-radius:9px;background:var(--surface);display:grid;place-items:center;cursor:pointer}
+.st-check::after{content:"";width:9px;height:17px;border:solid var(--accent-fg);border-width:0 3.5px 3.5px 0;transform:rotate(45deg) translate(-2px,-2px);opacity:0}
+.st-check:checked{background:var(--cc)}
+.st-check:checked::after{opacity:1}
+.st-now.done .st-title{text-decoration:line-through;color:var(--done)}
+.st-work .meta{margin-top:10px}
+.st-det{margin:8px 0 0;font-size:14px;color:var(--muted)}
+.st-empty{margin:6px 0 0;color:var(--muted)}
+/* subject helper */
+.st-fact{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-size:14px;line-height:1.4}
+.st-fact small{display:block;margin-top:3px;font-size:12.5px;color:var(--muted)}
+.st-f{display:inline-block;margin:6px 12px 0 0;font-family:var(--mono);font-size:17px;font-weight:600}
+.st-bits{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.st-bits i{font-style:normal;font-family:var(--mono);font-size:13px;padding:2px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--line)}
+/* up next */
+.st-queue ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}
+.st-queue button{width:100%;display:grid;grid-template-columns:10px minmax(0,1fr);gap:1px 10px;align-items:center;text-align:left;border:0;border-radius:9px;padding:7px 10px;background:var(--surface-2);color:var(--fg);cursor:pointer;font:inherit}
+.st-dot{grid-row:span 2;width:9px;height:9px;border-radius:50%;background:var(--cc)}
+.st-qt{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-queue small{font-size:12px;color:var(--muted)}
+.st-nudge{position:fixed;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:62;margin:0;display:flex;gap:14px;align-items:center;
+  padding:10px 16px;border-radius:999px;background:var(--fg);color:var(--bg);font-size:14px;font-weight:600;width:max-content;max-width:calc(100% - 32px)}
+.st-nudge .link{color:inherit}
+/* phones, and phones held sideways: one scrolling column (or two short ones), Spotify's slim player docked at the bottom */
+html.st-dock .p-music{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));top:auto;width:auto}
+html.st-dock .p-music .x-body{padding:8px 0}
+html.st-dock .sp-head,html.st-dock .sp-form{display:none}
+html.st-dock .sp .sp-frame iframe{height:80px}
+html.st-dock .study{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+html.st-dock .st-music{display:none}
+@media (max-width:759px){
+  .study-btn{width:38px;padding:0;justify-content:center}
+  .study-btn span{display:none}
+  .study{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"top" "left" "right";overflow:auto;gap:12px;padding-left:12px;padding-right:12px}
+  .st-right{overflow:visible}
+  #st-clock{padding:18px 20px}
+  #st-clock .num{font-size:clamp(68px,23vw,120px)}
+}
+@media (max-height:520px) and (min-width:760px){
+  .study{overflow:auto;gap:10px;padding-top:8px}
+  .st-right{overflow:visible}
+  #st-clock{padding:14px 18px;gap:6px}
+  #st-clock .num{font-size:clamp(48px,15vh,84px)}
+  #st-clock .lbl{font-size:20px}
+  #st-clock .lbl small{display:none}
+  html.st-dock .p-music{right:auto;width:calc(53.5% - 24px)}
 }
 
 /* plain section markers */

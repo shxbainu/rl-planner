@@ -133,3 +133,9 @@ html[data-skin="catalog"]{
   }
 }
 @keyframes cc-thump{from{opacity:0;transform:rotate(calc(var(--rnd,0) * 2deg)) scale(1.7)}to{opacity:.85;transform:rotate(calc(var(--rnd,0) * 2deg)) scale(1)}}
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="catalog"]{
+  .st-card{border-radius:3px;border:0;box-shadow:0 2px 0 -1px var(--surface-2),0 3px 10px rgb(0 0 0 / .25)}
+  .st-k{font-family:var(--mono);letter-spacing:.12em}
+}

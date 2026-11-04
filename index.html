@@ -42,6 +42,7 @@
   </div>
   <div class="bar-status" id="updated" role="status"></div>
   <div class="bar-actions">
+    <button class="icon-btn study-btn" id="study-btn" type="button" aria-label="Study mode" title="Study mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><path d="M4 15a2 2 0 0 1 2-2h1v7H6a2 2 0 0 1-2-2zM20 15a2 2 0 0 0-2-2h-1v7h1a2 2 0 0 0 2-2z"/></svg><span>Study</span></button>
     <button class="btn primary" id="add-btn" type="button">+ Add</button>
     <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch light or dark mode" title="Light / dark"></button>
   </div>
@@ -236,6 +237,25 @@
   </div>
   <div class="x-dlg-body" id="x-dlg-body"></div>
 </dialog>
+
+<div class="study" id="study" role="dialog" aria-modal="true" aria-label="Study mode" hidden>
+  <div class="st-scene" id="st-scene" aria-hidden="true"></div>
+  <header class="st-top">
+    <span class="st-where" id="st-where">Study mode</span>
+    <span class="st-stats" id="st-stats"></span>
+    <button class="st-x" id="st-close" type="button" aria-label="Close study mode (Esc)">✕</button>
+  </header>
+  <div class="st-left">
+    <section class="st-card st-clock now-card" id="st-clock" aria-live="off"></section>
+    <div class="st-music" id="st-music"></div>
+  </div>
+  <div class="st-right">
+    <section class="st-card st-work" id="st-work"></section>
+    <section class="st-card st-help" id="st-help" hidden></section>
+    <section class="st-card st-queue" id="st-queue"></section>
+  </div>
+  <p class="st-nudge" id="st-nudge" role="status" hidden></p>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

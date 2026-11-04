@@ -155,3 +155,10 @@ html[data-skin="blueprint"]{
   .sp-frame{border-radius:0;outline:1px dashed var(--sheet-line);outline-offset:3px;margin:4px}
   .sp-size,.sp-form input{border-radius:0}
 }
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="blueprint"]{
+  .st-card{border-radius:0;border:1px solid var(--sheet-line)}
+  .st-check{border-radius:0}
+  .st-k{font-family:var(--mono);letter-spacing:.12em}
+}

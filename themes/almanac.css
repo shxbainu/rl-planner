@@ -166,3 +166,10 @@ html[data-skin="almanac"]{
   }
 }
 @keyframes al-sprout{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="almanac"]{
+  .st-card{border-radius:8px}
+  .st-k{font-variant:small-caps;text-transform:lowercase;font-size:13px;letter-spacing:.06em;color:var(--leaf-ink)}
+  .st-check{border-radius:50%}
+}

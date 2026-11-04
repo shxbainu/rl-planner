@@ -155,3 +155,10 @@ html[data-skin="arcade"]{
   }
 }
 @keyframes ar-coin{from{transform:translateY(0);opacity:1}to{transform:translateY(-22px);opacity:0}}
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="arcade"]{
+  .st-card{border-radius:0;clip-path:var(--notch);border:3px solid var(--edge)}
+  .st-check{border-radius:0}
+  .st-k{font-family:var(--pixel);font-weight:400;font-size:8px;letter-spacing:0;color:var(--neon)}
+}

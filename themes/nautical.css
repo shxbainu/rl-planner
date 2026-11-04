@@ -148,3 +148,10 @@ html[data-skin="nautical"]{
   }
 }
 @keyframes nc-fill{from{transform:scale(.6)}to{transform:scale(1)}}
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="nautical"]{
+  .st-card{border-radius:3px;border:1.5px solid var(--coast)}
+  .st-k{font-family:var(--mono);letter-spacing:.2em}
+  .st-check{border-radius:50%}
+}

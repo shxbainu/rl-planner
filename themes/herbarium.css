@@ -148,3 +148,9 @@ html[data-skin="herbarium"]{
   .sp-disc::after{display:none}
   .sp-frame{border-radius:4px}
 }
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="herbarium"]{
+  .st-card{border-radius:4px}
+  .st-k{font-family:var(--mono);font-weight:500;text-transform:none;letter-spacing:.02em;font-size:12px;color:var(--accent-ink)}
+}

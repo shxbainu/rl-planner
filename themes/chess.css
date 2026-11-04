@@ -134,3 +134,9 @@ html[data-skin="chess"]{
   }
 }
 @keyframes ch-take{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="chess"]{
+  .st-card{border-radius:4px}
+  .st-check{border-radius:3px}
+}

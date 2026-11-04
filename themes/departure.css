@@ -176,3 +176,9 @@ html[data-skin="departure"]{
   .sp-note .link{color:var(--amber)}
   .sp-err{color:#f08a78}
 }
+
+/* study mode: its cards take this theme's panel shape */
+html[data-skin="departure"]{
+  .st-card{border-radius:4px}
+  .st-k{font-family:var(--sign);font-weight:600;letter-spacing:.14em}
+}

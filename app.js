@@ -279,6 +279,29 @@
     return "";
   }
 
+  // Where today stands, for study mode and the scoreboard clock: in a block, passing between blocks,
+  // before the first bell, or outside school hours. `day` is the day's blocks from first to last; `i` indexes it.
+  function periodNow() {
+    const t = today();
+    if (!isSchoolDay(t)) return { mode: "off" };
+    if (special(t)) return { mode: "special", note: special(t) };
+    const segs = dayRows(letterFor(t).letter, t).flatMap((r) => r.segs);
+    if (!segs.some((s) => s.name)) return { mode: "off" };
+    const firstI = segs.findIndex((s) => s.name || s.edge), lastI = segs.length - 1 - [...segs].reverse().findIndex((s) => s.name);
+    const day = segs.slice(firstI, lastI + 1);
+    const n = now(), m = n.getHours() * 60 + n.getMinutes() + (n.getSeconds() + n.getMilliseconds() / 1000) / 60;
+    const start = minutes(day[0].start), end = minutes(day.at(-1).end);
+    const base = { day, m, start, end };
+    if (m >= end) return { ...base, mode: "after" };
+    if (m < start) return { ...base, mode: m < start - 60 ? "off" : "before", left: start - m, next: day[0], i: -1 };
+    for (let i = 0; i < day.length; i++) {
+      const s = day[i], a = minutes(s.start), b = minutes(s.end), nx = day[i + 1];
+      if (m >= a && m < b) return { ...base, mode: "class", seg: s, i, left: b - m, pct: (m - a) / (b - a), next: day.slice(i + 1).find((x) => x.name || x.ev), gap: nx ? minutes(nx.start) - b : 0 };
+      if (nx && m >= b && m < minutes(nx.start)) return { ...base, mode: "passing", seg: s, i, left: minutes(nx.start) - m, next: nx };
+    }
+    return { ...base, mode: "off" };
+  }
+
   // once a second: update the number and bar in place; redraw the card when the block changes
   function tickNow() {
     const day = schoolDay(), { letter } = letterFor(day);
@@ -1260,6 +1283,264 @@
     document.head.append(l);
     document.documentElement.style.setProperty("--sans", `"${tryFont}",system-ui,sans-serif`);
   }
+
+  // ---------- study mode: full screen, one thing at a time ----------
+  // The clock follows the bell during school and becomes a focus timer outside it. The Music card isn't moved
+  // (moving an iframe restarts it); it's pinned over a slot in the layout, or docked at the bottom on phones.
+  const study = $("#study");
+  const ST_PRESETS = { "25/5": [25, 5], "50/10": [50, 10] };
+  const st = { open: false, t0: 0, done: 0, pick: null, key: "", lock: null, nudged: 0, musicWasOpen: false,
+    focus: { preset: (() => { try { return localStorage.getItem("rlp-focus") || "25/5"; } catch { return "25/5"; } })(), phase: "focus", endsAt: 0, left: 25 * 60e3, round: 1 } };
+
+  // tonight's list: what's due on the next school day (today's, during school), tests and projects first,
+  // then anything left over from before; if that's all done, the next few coming up
+  function stQueue() {
+    const t = today(), by = isSchoolDay(t) && now().getHours() < 15 ? t : nextSchoolDay(t);
+    const open = allItems().filter((i) => !isDone(i));
+    const main = open.filter((i) => i.due === by).sort((a, b) => MAJOR.has(b.type) - MAJOR.has(a.type));
+    const late = open.filter((i) => i.due < by).sort((a, b) => b.due.localeCompare(a.due));
+    const q = [...main, ...late];
+    return q.length ? q : open.filter((i) => i.due > by).slice(0, 4);
+  }
+  const stCurrent = (q) => q.find((i) => i.id === st.pick) || q[0];
+
+  // what the subject helper can honestly show: the item's own details, plus a few fixed facts for topics on the list
+  const romanNum = (s) => [...s.toUpperCase()].reduce((n, c, i, a) => { const v = { I: 1, V: 5, X: 10, L: 50 }[c], w = { I: 1, V: 5, X: 10, L: 50 }[a[i + 1]] || 0; return n + (v < w ? -v : v); }, 0);
+  function stHelp(it) {
+    if (!it) return "";
+    const text = `${it.details || ""} ${it.title}`, out = []; // details first: they carry the line and page numbers
+    const od = /Odyssey\s+([IVXL]+)\b(?:[.,]\s*([\d\-–, ]+(?:end)?))?/i.exec(text);
+    if (od) {
+      const ranges = (od[2] || "").split(",").map((r) => r.trim()).filter(Boolean);
+      const count = ranges.every((r) => /^\d+[-–]\d+$/.test(r)) ? ranges.reduce((n, r) => { const [a, b] = r.split(/[-–]/).map(Number); return n + b - a + 1; }, 0) : 0;
+      out.push(`<div class="st-fact"><b>Odyssey, Book ${esc(od[1].toUpperCase())}</b> (book ${romanNum(od[1])} of 24)${ranges.length ? `<br>Lines ${esc(ranges.join(", "))}${count ? ` · about ${count} lines` : ""}` : ""}</div>`);
+    }
+    if (/ohm/i.test(text)) out.push(`<div class="st-fact"><b>Ohm's law</b><span class="st-f">V = I × R</span><span class="st-f">I = V ÷ R</span><span class="st-f">R = V ÷ I</span><small>V volts · I amps · R ohms (Ω) · power P = V × I watts</small></div>`);
+    if (/binary|bitRead/i.test(text)) out.push(`<div class="st-fact"><b>Binary place values</b><span class="st-bits">${[128, 64, 32, 16, 8, 4, 2, 1].map((v) => `<i>${v}</i>`).join("")}</span><small>bitRead(x, n) gives bit n of x, counting from 0 at the right</small></div>`);
+    if (/ut clause/i.test(text)) out.push(`<div class="st-fact"><b>Ut clauses</b><small><b>Purpose:</b> ut / nē + subjunctive, "so that, in order to"<br><b>Result:</b> ut / ut nōn + subjunctive, set up by tam, ita, sīc, tantus, tot: "so … that"</small></div>`);
+    if (/participle/i.test(text)) out.push(`<div class="st-fact"><b>Participles</b><small>Present active -ns, -ntis: "___ing"<br>Perfect passive -tus, -a, -um: "having been ___ed"<br>Future active -tūrus, -a, -um: "about to ___"</small></div>`);
+    if (/punic/i.test(text) || /fabius/i.test(text)) out.push(`<div class="st-fact"><b>Second Punic War</b><small>218–201 BC, Rome against Hannibal of Carthage. Cannae 216 BC; Fabius Maximus "Cunctator" wears Hannibal down by avoiding battle; Scipio wins at Zama, 202 BC.</small></div>`);
+    if (/heure/i.test(text)) out.push(`<div class="st-fact"><b>L'heure</b><small>Il est une heure, deux heures… · et quart :15 · et demie :30 · moins le quart :45 · midi, minuit</small></div>`);
+    const pg = /p(?:p|ages?)?\.?\s*(\d+)\s*[-–]\s*(\d+)/i.exec(it.details || it.pages || "");
+    if (pg && it.class === "Forces") out.push(`<div class="st-fact"><b>Pages ${pg[1]}–${pg[2]}</b><small>${+pg[2] - +pg[1] + 1} pages${it.pages && it.pages.includes(",") ? `, plus ${esc(it.pages.split(",").slice(1).join(", ").trim())}` : ""}</small></div>`);
+    return out.join("");
+  }
+
+  // the background follows the subject: drawn scenes, kept dim so the cards stay easy to read
+  function stScene(name) {
+    const W = 1600, H = 900, svg = (body) => `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+    const rnd = ((s) => () => (s = (s * 16807) % 2147483647) / 2147483647)(7);
+    const stars = (n, h) => Array.from({ length: n }, () => `<circle cx="${(rnd() * W) | 0}" cy="${(rnd() * h) | 0}" r="${(0.6 + rnd() * 1.2).toFixed(1)}" fill="#fff" opacity="${(0.25 + rnd() * 0.5).toFixed(2)}"/>`).join("");
+    if (name === "English") {
+      const waves = Array.from({ length: 16 }, (_, i) => { const y = 560 + i * 22 + i * i; let d = `M0 ${y}`; for (let x = 0; x < W; x += 80) d += ` q40 ${-4 - i * 0.5} 80 0`; return `<path d="${d}" stroke="#9fb1cf" stroke-opacity="${(0.05 + i * 0.008).toFixed(3)}" fill="none" stroke-width="1.4"/>`; }).join("");
+      return { label: "The wine-dark sea", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#101729"/><stop offset=".55" stop-color="#2a2c46"/><stop offset="1" stop-color="#5a3a47"/></linearGradient><linearGradient id="w" x2="0" y2="1"><stop offset="0" stop-color="#3a2a3c"/><stop offset=".25" stop-color="#1b2136"/><stop offset="1" stop-color="#0c111d"/></linearGradient><radialGradient id="g"><stop offset="0" stop-color="#efe6cf" stop-opacity=".18"/><stop offset="1" stop-color="#efe6cf" stop-opacity="0"/></radialGradient></defs>
+        <rect width="${W}" height="540" fill="url(#s)"/>${stars(70, 420)}<circle cx="1180" cy="230" r="150" fill="url(#g)"/><circle cx="1180" cy="230" r="42" fill="#ece3cc" opacity=".9"/>
+        <rect y="540" width="${W}" height="${H - 540}" fill="url(#w)"/><rect x="1150" y="545" width="60" height="300" fill="#ece3cc" opacity=".05"/>${waves}
+        <g fill="#0a0d16"><path d="M380 548h150l-22 16H404z"/><rect x="452" y="470" width="4" height="80"/><path d="M420 482h68l-6 48h-56z" opacity=".92"/></g>`) };
+    }
+    if (name === "Latin") {
+      const cols = [180, 260, 340, 420, 980, 1060, 1300].map((x, i) => { const h = [300, 300, 300, 300, 230, 160, 270][i]; return `<rect x="${x}" y="${720 - h}" width="38" height="${h}"/><rect x="${x - 7}" y="${720 - h - 14}" width="52" height="14"/><rect x="${x - 9}" y="704" width="56" height="16"/>`; }).join("");
+      return { label: "The Forum at dusk", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#1f2034"/><stop offset=".55" stop-color="#5a4152"/><stop offset=".85" stop-color="#b9805f"/><stop offset="1" stop-color="#cf9a6c"/></linearGradient></defs>
+        <rect width="${W}" height="${H}" fill="url(#s)"/>${stars(30, 260)}<circle cx="760" cy="640" r="70" fill="#f1c08a" opacity=".55"/>
+        <path d="M0 650 C200 600 380 640 560 610 S900 590 1100 620 1450 600 1600 630V900H0z" fill="#3a2b36"/>
+        <g fill="#1a1520">${cols}<rect x="166" y="392" width="300" height="26"/><path d="M1130 720V520a110 110 0 0 1 220 0v200h-46V530a64 64 0 0 0-128 0v190z"/><rect y="718" width="${W}" height="${H - 718}"/></g>`) };
+    }
+    if (name === "French") {
+      let roofs = "M0 900V640", win = "";
+      for (let x = 0; x < W; x += 0) { const w = 90 + ((rnd() * 90) | 0), top = 560 + ((rnd() * 90) | 0); roofs += ` L${x} ${top + 30} L${x + 14} ${top} L${x + w - 14} ${top} L${x + w} ${top + 30}`; if (rnd() > 0.5) roofs += ` L${x + w - 30} ${top + 30} L${x + w - 30} ${top - 22} L${x + w - 18} ${top - 22} L${x + w - 18} ${top + 30}`;
+        for (let r = 0; r < 4; r++) for (let c = 0; c < Math.floor(w / 28); c++) if (rnd() > 0.62) win += `<rect x="${x + 10 + c * 28}" y="${top + 48 + r * 54}" width="12" height="20" rx="1"/>`; x += w; }
+      roofs += ` L${W} 640 V900z`;
+      return { label: "Paris at night", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#0d1326"/><stop offset="1" stop-color="#232b47"/></linearGradient><radialGradient id="l"><stop offset="0" stop-color="#f3cd86" stop-opacity=".45"/><stop offset="1" stop-color="#f3cd86" stop-opacity="0"/></radialGradient></defs>
+        <rect width="${W}" height="${H}" fill="url(#s)"/>${stars(90, 520)}
+        <path d="M1150 150l7 70h-14zM1143 220h14l22 170h-58zM1121 390h58l40 140h-138zM1081 530h138l60 200h-60c-10-70-40-110-69-110s-59 40-69 110h-60z" fill="#0a0e1b"/><circle cx="1150" cy="148" r="4" fill="#f3cd86"/>
+        <path d="${roofs}" fill="#0b0f1c"/><g fill="#e9bb6e" opacity=".75">${win}</g>
+        <rect x="300" y="560" width="6" height="340" fill="#06080f"/><circle cx="303" cy="560" r="90" fill="url(#l)"/><circle cx="303" cy="556" r="9" fill="#f6d79c"/>`) };
+    }
+    if (name === "MSI") {
+      let traces = "", nodes = "";
+      for (let i = 0; i < 26; i++) { let x = ((rnd() * 16) | 0) * 100, y = ((rnd() * 9) | 0) * 100, d = `M${x} ${y}`; for (let k = 0; k < 5; k++) { if (rnd() > 0.5) x += (rnd() > 0.5 ? 1 : -1) * 100; else y += (rnd() > 0.5 ? 1 : -1) * 100; d += ` L${x} ${y}`; } traces += `<path d="${d}"/>`; nodes += `<circle cx="${x}" cy="${y}" r="5"/>`; }
+      return { label: "Circuit board", svg: svg(`<defs><radialGradient id="b" cx=".7" cy=".4" r=".9"><stop offset="0" stop-color="#14302a"/><stop offset="1" stop-color="#0a1311"/></radialGradient><filter id="f"><feGaussianBlur stdDeviation="6"/></filter></defs>
+        <rect width="${W}" height="${H}" fill="url(#b)"/><g fill="none" stroke="#5fc4a4" stroke-width="2" opacity=".18" filter="url(#f)">${traces}</g><g fill="none" stroke="#5fc4a4" stroke-width="1.6" opacity=".28">${traces}</g><g fill="#7fdcbf" opacity=".45">${nodes}</g>
+        <g fill="#0d1b18" stroke="#5fc4a4" stroke-opacity=".35"><rect x="1080" y="300" width="240" height="240" rx="10"/></g><g stroke="#5fc4a4" stroke-opacity=".3" stroke-width="3">${Array.from({ length: 8 }, (_, i) => `<path d="M${1100 + i * 28} 300v-30M${1100 + i * 28} 540v30M1080 ${320 + i * 28}h-30M1320 ${320 + i * 28}h30"/>`).join("")}</g>`) };
+    }
+    if (name === "Forces") {
+      const merid = Array.from({ length: 7 }, (_, i) => `<ellipse cx="1150" cy="450" rx="${50 + i * 48}" ry="340"/>`).join(""), par = Array.from({ length: 7 }, (_, i) => { const y = 450 + (i - 3) * 96, w = Math.sqrt(Math.max(0, 340 ** 2 - (y - 450) ** 2)); return `<path d="M${1150 - w} ${y}H${1150 + w}"/>`; }).join("");
+      return { label: "The world at night", svg: svg(`<defs><radialGradient id="b" cx=".7" cy=".5" r=".8"><stop offset="0" stop-color="#18263b"/><stop offset="1" stop-color="#0c121d"/></radialGradient></defs>
+        <rect width="${W}" height="${H}" fill="url(#b)"/>${stars(60, H)}<circle cx="1150" cy="450" r="340" fill="#122036" stroke="#6f8fb8" stroke-opacity=".35"/><g fill="none" stroke="#6f8fb8" stroke-opacity=".22">${merid}${par}</g>`) };
+    }
+    return { label: "", svg: "" };
+  }
+
+  // the Music card sits over its slot (laptop) or docks along the bottom (phone, or a phone held sideways)
+  const stDockMQ = matchMedia("(max-width:759px), (max-height:520px)");
+  function stPlaceMusic() {
+    const card = $(".p-music");
+    if (!st.open) { card.removeAttribute("style"); document.documentElement.classList.remove("st-dock"); return; }
+    const dock = stDockMQ.matches;
+    document.documentElement.classList.toggle("st-dock", dock);
+    if (dock) { card.removeAttribute("style"); return; }
+    const slot = $("#st-music");
+    slot.style.height = card.offsetHeight + "px";
+    const r = slot.getBoundingClientRect();
+    Object.assign(card.style, { top: `${r.top}px`, left: `${r.left}px`, width: `${r.width}px` });
+  }
+
+  function stClockState() {
+    const p = periodNow();
+    if (p.mode === "class" || p.mode === "passing" || p.mode === "before") return p;
+    return { mode: "focus", note: p.mode === "special" ? p.note : "" };
+  }
+  function stFocusLeft() { const f = st.focus; return f.endsAt ? Math.max(0, f.endsAt - Date.now()) : f.left; }
+  function stRenderClock() {
+    const s = stClockState(), f = st.focus;
+    if (s.mode === "focus" && f.endsAt && stFocusLeft() <= 0) { // a round ended: switch focus and break
+      const [fo, br] = ST_PRESETS[f.preset];
+      f.phase = f.phase === "focus" ? "break" : "focus";
+      if (f.phase === "focus") f.round++;
+      f.left = (f.phase === "focus" ? fo : br) * 60e3;
+      f.endsAt = Date.now() + f.left;
+      stNudge(f.phase === "break" ? `Round ${f.round} done. Take ${br} minutes: stand up, water, look away from the screen.` : "Break's over. Back to it.");
+    }
+    const label = s.mode === "class" ? (s.seg.name ? cls(s.seg.name).name : s.seg.label) : s.mode === "passing" ? `Passing · next ${s.next.name ? cls(s.next.name).name : s.next.label}` : s.mode === "before" ? "Until school" : f.phase;
+    const key = `${s.mode}|${label}|${f.preset}`;
+    const el = $("#st-clock");
+    if (key !== st.key) {
+      st.key = key;
+      const room = (seg) => seg?.name ? where(seg.name) : "";
+      el.style.cssText = s.mode === "class" && s.seg.name ? cc(s.seg.name) : s.mode === "passing" && s.next.name ? cc(s.next.name) : "";
+      if (s.mode === "focus") {
+        el.innerHTML = `<div class="st-k">${s.note ? `Special schedule today · ${esc(s.note)}` : f.phase === "focus" ? `Focus · round ${f.round}` : "Break"}</div>
+          <div class="num st-num" id="st-num"></div><div class="prog"><i id="st-bar"></i></div>
+          <div class="st-ctrl"><button class="btn primary" type="button" data-st="go"></button><button class="btn" type="button" data-st="reset">Reset</button>
+          <div class="seg" role="group" aria-label="Focus length">${Object.keys(ST_PRESETS).map((k) => `<button type="button" data-preset="${k}" aria-pressed="${k === f.preset}">${k}</button>`).join("")}</div></div>`;
+      } else {
+        const n = s.next;
+        el.innerHTML = `<div class="st-k">${s.mode === "class" ? "Left in" : s.mode === "passing" ? "Passing time" : "Until school"}</div>
+          <div class="lbl">${esc(s.mode === "class" ? (s.seg.name ? cls(s.seg.name).name : s.seg.label) : s.mode === "passing" ? `Next: ${n.name ? cls(n.name).name : n.label}` : `First: ${n.name ? cls(n.name).name : n.label}`)}${s.mode === "class" && room(s.seg) ? `<small>${esc(room(s.seg))}</small>` : ""}</div>
+          <div class="num st-num" id="st-num"></div><div class="prog"><i id="st-bar"></i></div>
+          <div class="sub">${s.mode === "class" ? `Ends ${s.seg.end}${s.gap > 0 && s.gap <= passing() ? ` · ${s.gap} min passing` : ""}${n ? ` · then ${esc(n.name ? cls(n.name).name : n.label)} at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : " · last one today"}` : `${esc(n.name ? cls(n.name).name : n.label)} at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}`}</div>`;
+      }
+    }
+    const left = s.mode === "focus" ? stFocusLeft() / 60e3 : s.left;
+    const pct = s.mode === "focus" ? 1 - stFocusLeft() / (ST_PRESETS[f.preset][f.phase === "focus" ? 0 : 1] * 60e3) : s.mode === "class" ? s.pct : 0;
+    const num = $("#st-num"), txt = clock(left);
+    if (num.textContent !== txt) num.textContent = txt;
+    $("#st-bar").style.width = `${Math.round(Math.min(1, Math.max(0, pct)) * 100)}%`;
+    const go = el.querySelector('[data-st="go"]');
+    if (go) go.textContent = f.endsAt ? "Pause" : f.left < ST_PRESETS[f.preset][f.phase === "focus" ? 0 : 1] * 60e3 ? "Resume" : "Start";
+  }
+  $("#st-clock").addEventListener("click", (e) => {
+    const f = st.focus, b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.preset) {
+      f.preset = b.dataset.preset;
+      try { localStorage.setItem("rlp-focus", f.preset); } catch {}
+      Object.assign(f, { phase: "focus", endsAt: 0, left: ST_PRESETS[f.preset][0] * 60e3, round: 1 });
+    } else if (b.dataset.st === "go") {
+      if (f.endsAt) { f.left = stFocusLeft(); f.endsAt = 0; } else f.endsAt = Date.now() + f.left;
+    } else if (b.dataset.st === "reset") Object.assign(f, { phase: "focus", endsAt: 0, left: ST_PRESETS[f.preset][0] * 60e3 });
+    st.key = "";
+    stRenderClock();
+  });
+
+  function stNudge(msg) {
+    const el = $("#st-nudge");
+    el.innerHTML = `<span>${esc(msg)}</span><button type="button" class="link">OK</button>`;
+    el.hidden = false;
+    el.querySelector("button").onclick = () => { el.hidden = true; };
+  }
+
+  let stSceneName = null;
+  function stRenderWork() {
+    const q = stQueue(), it = stCurrent(q);
+    const scene = it?.class || periodNow().seg?.name || "";
+    if (scene !== stSceneName) {
+      stSceneName = scene;
+      const sc = stScene(scene);
+      $("#st-scene").innerHTML = sc.svg;
+      study.classList.toggle("has-scene", !!sc.svg);
+      $("#st-where").textContent = sc.label || "Study mode";
+    }
+    $("#st-work").innerHTML = it ? `<div class="st-k">Now working on</div>
+      <label class="st-now" style="${cc(it.class)}"><input type="checkbox" class="st-check" data-id="${esc(it.id)}"><span class="st-title">${esc(it.title)}</span></label>
+      <div class="meta"><span class="chip" style="${cc(it.class)}">${esc(it.class)}</span>${MAJOR.has(it.type) ? `<span class="tag" style="${cc(it.class)}">${esc(it.type)}</span>` : ""}${it.unconfirmed ? `<span class="tag unsure">Unconfirmed</span>` : ""}<span>due ${esc(relDay(it.due).toLowerCase())}</span></div>
+      ${it.details ? `<p class="st-det">${esc(it.details)}</p>` : ""}`
+      : `<div class="st-k">Now working on</div><p class="st-empty">Nothing left for tonight. Pick a test from the dashboard to get ahead on, or call it a night.</p>`;
+    const help = stHelp(it);
+    $("#st-help").hidden = !help;
+    $("#st-help").innerHTML = help ? `<div class="st-k">${esc(it.class)} helper</div>${help}` : "";
+    const rest = q.filter((i) => i !== it);
+    $("#st-queue").innerHTML = `<div class="st-k">Up next${rest.length ? ` · ${rest.length}` : ""}</div>${rest.length ? `<ul>${rest.slice(0, 6).map((i) => `<li style="${cc(i.class)}"><button type="button" data-pick="${esc(i.id)}"><span class="st-dot"></span><span class="st-qt">${esc(i.title)}</span><small>${esc(i.class)} · ${esc(relDay(i.due))}</small></button></li>`).join("")}</ul>` : `<p class="st-empty">That's the last one.</p>`}`;
+  }
+  study.addEventListener("change", (e) => {
+    if (!e.target.matches(".st-check")) return;
+    const id = e.target.dataset.id;
+    setDone(id, true);
+    st.done++;
+    st.pick = null;
+    e.target.closest(".st-now").classList.add("done");
+    setTimeout(() => { stRenderWork(); stRenderStats(); renderHomework(); renderBig(); }, 450);
+    toast("Done. Next one up.", () => { setDone(id, false); st.done--; stRenderWork(); stRenderStats(); renderHomework(); renderBig(); });
+  });
+  study.addEventListener("click", (e) => {
+    const p = e.target.closest("[data-pick]");
+    if (p) { st.pick = p.dataset.pick; stRenderWork(); }
+  });
+
+  function stRenderStats() {
+    const mins = Math.floor((Date.now() - st.t0) / 60e3);
+    $("#st-stats").textContent = `Session ${clock(mins)} · ${st.done} done`;
+    // a nudge every 50 minutes of school-clock studying (the focus timer brings its own breaks)
+    if (mins >= 50 && Math.floor(mins / 50) > st.nudged && stClockState().mode !== "focus") { st.nudged = Math.floor(mins / 50); stNudge(`${mins} minutes in. Take five: stand up, water, look away from the screen.`); }
+  }
+
+  async function stWake() {
+    try { if (st.open && "wakeLock" in navigator && !st.lock) { st.lock = await navigator.wakeLock.request("screen"); st.lock.addEventListener("release", () => { st.lock = null; }); } } catch {}
+  }
+  let stTimer;
+  function stTick() {
+    clearTimeout(stTimer);
+    if (!st.open) return;
+    stRenderClock();
+    stRenderStats();
+    stTimer = setTimeout(stTick, 1000 - (now().getTime() % 1000) + 15);
+  }
+  function openStudy() {
+    if (st.open) return;
+    Object.assign(st, { open: true, t0: Date.now(), done: 0, key: "", nudged: 0, pick: null });
+    stSceneName = null;
+    study.hidden = false;
+    document.documentElement.classList.add("studying");
+    const music = $(".p-music");
+    st.musicWasOpen = music.open;
+    music.open = true;
+    document.documentElement.requestFullscreen?.().catch(() => {});
+    stRenderWork();
+    stTick();
+    requestAnimationFrame(stPlaceMusic);
+    setTimeout(stPlaceMusic, 400); // once the player has its height
+    stWake();
+    $("#st-close").focus();
+  }
+  function closeStudy() {
+    if (!st.open) return;
+    st.open = false;
+    clearTimeout(stTimer);
+    study.hidden = true;
+    document.documentElement.classList.remove("studying");
+    $(".p-music").open = st.musicWasOpen;
+    stPlaceMusic();
+    $("#st-nudge").hidden = true;
+    st.lock?.release().catch(() => {});
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    $("#study-btn").focus();
+  }
+  $("#study-btn").onclick = openStudy;
+  $("#st-close").onclick = closeStudy;
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.open) closeStudy(); });
+  addEventListener("resize", () => { if (st.open) stPlaceMusic(); });
+  stDockMQ.addEventListener("change", stPlaceMusic);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && st.open) { stWake(); stTick(); } });
 
   // ---------- boot ----------
   async function getJSON(path) {
