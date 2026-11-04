@@ -104,17 +104,27 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .nu-k{flex:none;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-right:2px}
 .nu{flex:none;padding:2px 8px;border-radius:999px;font-size:12px;white-space:nowrap;color:var(--fg);background:color-mix(in srgb,var(--cc) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--cc) 40%,var(--line))}
 .nu b{font-weight:700}
-/* lunch: SAGE's menu, station labels on the left, dishes inline */
+/* lunch: SAGE's menu. The main dishes one per line, soup and specials a short line each, the rest folded away */
 .lunch-nav{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
 .lunch-nav span{min-width:86px;text-align:center}
 .lunch-nav .icon-btn:disabled{opacity:.35;cursor:default}
-.lunch{margin:0;display:grid;gap:7px}
-.lunch-row{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:baseline}
-.lunch dd{margin:0;display:flex;flex-wrap:wrap;row-gap:2px;font-size:13.5px;line-height:1.4}
-.lunch-row.main dd{font-weight:600}
-.dish:not(:last-of-type)::after{content:"·";margin:0 7px;color:var(--muted);font-weight:400}
-.diet{font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.02em;margin-left:4px;padding:0 4px;border-radius:4px;vertical-align:1px;color:var(--c-msi);box-shadow:inset 0 0 0 1px currentColor}
-.lunch-more{border:0;background:none;padding:0 0 0 7px;font:inherit;font-size:12.5px;font-weight:600;color:var(--accent);cursor:pointer}
+.lunch{display:grid;gap:8px}
+.lunch-mains{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.lunch-mains li{position:relative;padding-left:14px;font-size:15px;font-weight:600;line-height:1.3}
+.lunch-mains li::before{content:"";position:absolute;left:2px;top:.55em;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.lunch-line{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:baseline}
+.lunch-v{display:flex;flex-wrap:wrap;row-gap:2px;font-size:13.5px;line-height:1.4}
+.lunch-v .dish:not(:last-child)::after{content:"·";margin:0 7px;color:var(--muted);font-weight:400}
+.diet{font-style:normal;font-size:9px;font-weight:700;letter-spacing:.02em;margin-left:5px;padding:0 3px;border-radius:3px;vertical-align:1.5px;color:var(--c-msi);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 55%,transparent)}
+.lunch-more{justify-self:start;margin:-4px 0 0 14px;border:0;background:none;padding:0;font:inherit;font-size:12.5px;font-weight:600;color:var(--accent);cursor:pointer}
+.lunch-rest{border-top:1px solid var(--line);padding-top:8px;display:grid;gap:7px}
+.lunch-rest[open]{gap:7px}
+.lunch-rest summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.lunch-rest summary::-webkit-details-marker{display:none}
+.lunch-rest summary::before{content:"";width:6px;height:6px;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(-45deg);transition:transform .15s;margin-right:2px}
+.lunch-rest[open] summary::before{transform:rotate(45deg)}
+.lunch-rest summary:hover{color:var(--fg)}
+.lunch-rest[open] summary{margin-bottom:2px}
 .lunch-src{align-self:flex-start;font-size:12px;color:var(--muted);text-decoration:none}
 .lunch-src:hover{color:var(--fg);text-decoration:underline}
 /* the morning briefing: an AI summary of the day's headlines, at the top of News */
@@ -361,6 +371,20 @@ details .list{margin-top:6px}
 .sp-bar-acts button:hover,.sp-x:hover{opacity:1;background:color-mix(in srgb,currentColor 9%,transparent)}
 .sp-bar.pasting .sp-form{flex:1}
 .sp-bar.pasting .sp-form input,.sp-bar.pasting .sp-form .btn{min-height:32px;padding-block:4px}
+/* Lofi radio: plain audio streams for networks that block YouTube. One big play button, the station, a switch */
+.sp-radio{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 14px;align-content:center;align-items:center;padding:4px 6px}
+.rd-play{width:64px;height:64px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;background:var(--sp-hi);color:var(--sp-hi-fg);box-shadow:0 4px 14px color-mix(in srgb,var(--sp-hi) 35%,transparent)}
+.rd-play svg{width:26px;height:26px;fill:currentColor}
+.sp-radio.on .rd-play{animation:rd-pulse 2.4s ease-in-out infinite}
+@keyframes rd-pulse{50%{box-shadow:0 4px 22px color-mix(in srgb,var(--sp-hi) 60%,transparent)}}
+@media (prefers-reduced-motion:reduce){ .sp-radio.on .rd-play{animation:none} }
+.rd-main{min-width:0;display:flex;flex-direction:column;gap:2px}
+.rd-name{font-size:17px;font-weight:700;line-height:1.2}
+.rd-sub{font-size:13px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rd-st{grid-column:1 / -1;display:flex;gap:6px}
+.rd-st button{flex:1;min-height:32px;padding:4px 10px;border-radius:8px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;color:inherit;background:transparent;border:1.5px solid color-mix(in srgb,currentColor 25%,transparent)}
+.rd-st button[aria-pressed="true"]{border-color:var(--sp-hi);background:color-mix(in srgb,var(--sp-hi) 14%,transparent)}
+.rd-err{grid-column:1 / -1}
 /* now playing on Brian's Spotify account: cover, title, quiet controls, a slim bar */
 .sp-np{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 14px;align-content:center;align-items:center;padding:0 2px}
 .np-art{width:clamp(84px,30cqw,124px);aspect-ratio:1;height:auto;border-radius:10px;object-fit:cover;background:color-mix(in srgb,currentColor 8%,transparent);box-shadow:0 6px 18px rgb(0 0 0 / .2);transition:filter .3s}
@@ -413,7 +437,7 @@ details .list{margin-top:6px}
 .moves .why{font-size:12px;color:var(--muted)}
 .sub-h{margin:6px 0 2px}
 /* small section labels share one style */
-.sub-h,.hw-notes b,.lunch dt,.brief-k,.st-k{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.sub-h,.hw-notes b,.lunch-k,.brief-k,.st-k{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .brief-k{color:var(--accent)}
 /* fantasy: color-coded positions, team logos, a score bar and colored move cards */
 .pos{display:inline-block;min-width:36px;text-align:center;background:var(--cc);color:var(--ct);font:700 10.5px/1.5 var(--mono);border-radius:4px;padding:1px 4px}
@@ -812,6 +836,9 @@ html.st-dock .np-prog,html.st-dock .np-ctl button:not(.np-play){display:none}
 html.st-dock .sp-yt{display:flex;align-items:center;gap:12px;background:none}
 html.st-dock .sp-yt iframe{flex:none;width:142px;border-radius:8px}
 html.st-dock .yt-cap{display:block;font-weight:600}
+html.st-dock .sp-radio{padding:0 4px;gap:0 12px}
+html.st-dock .rd-play{width:46px;height:46px}
+html.st-dock .rd-st,html.st-dock .rd-main .sp-k{display:none}
 html.st-dock .study{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 html.st-dock .st-music{display:none}
 @media (max-width:759px){

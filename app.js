@@ -672,6 +672,18 @@
   // Lofi Girl runs several streams at once and the channel's live link currently points at the Christmas one, so
   // the stream is pinned by id; if it restarts again, put the new id here (youtube.com/@LofiGirl/streams).
   const LOFI = { id: "rFZHOHl-L8A", title: "lofi hip hop radio", sub: "Lofi Girl · live" };
+  // School networks often block YouTube, so the Lofi tab can also play plain audio streams (no YouTube involved).
+  // "auto" plays the video unless a YouTube image fails to load on this network; the bar switches by hand.
+  const RADIO = [
+    { id: "chillhop", name: "Chillhop Radio", sub: "Chillhop Music on FluxFM", url: "https://streams.fluxfm.de/Chillhop/mp3-128/audio/" },
+    { id: "laut", name: "Lofi Radio", sub: "laut.fm", url: "https://stream.laut.fm/lofi", now: "https://api.laut.fm/station/lofi/current_song" },
+  ];
+  const LOFI_MODE = "rlp-lofi-mode", RADIO_ST = "rlp-radio";
+  // ?ytblocked previews the Lofi tab as it looks on a network that blocks YouTube
+  let lofiMode = ["video", "radio"].includes(jgetRaw(LOFI_MODE)) ? jgetRaw(LOFI_MODE) : "auto", ytBlocked = new URLSearchParams(location.search).has("ytblocked") || null;
+  let radioSt = RADIO.find((r) => r.id === jgetRaw(RADIO_ST)) || RADIO[0], radioOn = false, radioMsg = "", radioNow = "";
+  function jgetRaw(k) { try { return localStorage.getItem(k); } catch { return null; } }
+  const lofiRadio = () => lofiMode === "radio" || (lofiMode === "auto" && ytBlocked === true);
   const spParse = (s) => {
     const m = /(?:open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?|spotify:)(playlist|album|track|episode|show|artist)[/:]([A-Za-z0-9]{22})/.exec(s || "");
     return m && { type: m[1], id: m[2] };
@@ -703,12 +715,17 @@
     card.classList.toggle("setup", empty && spSetup);
     $("#sp-np").hidden = !live;
     $("#sp-embed").hidden = !embed;
-    $("#sp-yt").hidden = !lofi;
+    const radio = lofi && lofiRadio();
+    card.classList.toggle("radio", radio);
+    $("#sp-yt").hidden = !lofi || radio;
+    $("#sp-radio").hidden = !radio;
+    if (lofi && ytBlocked === null && lofiMode === "auto") ytProbe();
+    if (!radio && radioOn) radioStop();
     $("#sp-empty").hidden = !empty;
     // only one player makes sound: the hidden one is unloaded (the Spotify one stays loaded under now playing,
     // since what it plays may be what now playing shows)
     const yt = $("#yt-frame"), ytSrc = `https://www.youtube-nocookie.com/embed/${LOFI.id}?rel=0&playsinline=1&modestbranding=1`;
-    if (lofi) { if (load && yt.src !== ytSrc) yt.src = ytSrc; if (f.src) f.removeAttribute("src"); }
+    if (lofi) { if (radio) { if (yt.src) yt.removeAttribute("src"); } else if (load && yt.src !== ytSrc) yt.src = ytSrc; if (f.src) f.removeAttribute("src"); }
     else {
       if (yt.src) yt.removeAttribute("src");
       const src = sp && `https://open.spotify.com/embed/${sp.type}/${sp.id}?utm_source=generator${(v ? v === "dark" : de.dataset.mode === "dark") ? "&theme=0" : ""}`;
@@ -717,6 +734,7 @@
     }
     spRenderEmpty(empty);
     spRenderBar(lofi, live, embed);
+    radioRender();
     spRenderNP();
   }
   const spForm = () => `<form class="sp-form" data-sp-paste><input id="sp-url" inputmode="url" placeholder="Paste a Spotify link" aria-label="Spotify playlist, album or song link" spellcheck="false" autocomplete="off"><button class="btn primary" type="submit">Play</button></form>`;
@@ -746,11 +764,78 @@
     const el = $("#sp-bar"), dis = spConnected() ? `<button type="button" data-sp="disconnect">Disconnect</button>` : "";
     el.classList.toggle("pasting", embed && spPasting);
     if (embed && spPasting) { el.innerHTML = `${spForm()}<button class="sp-x" type="button" data-sp="cancel" aria-label="Cancel">✕</button>`; return; }
-    const k = lofi ? `<span class="sp-k own">${LOFI.sub}</span>` : live ? `<span class="sp-k own" id="np-k"></span>`
+    if (lofi) {
+      const radio = lofiRadio(), why = radio && lofiMode === "auto" ? "YouTube's blocked here · " : "";
+      el.innerHTML = `<span class="sp-k own">${radio ? `${why}radio` : LOFI.sub}</span><span class="sp-bar-acts"><button type="button" data-lofi="${radio ? "video" : "radio"}">${radio ? "Try video" : "Radio"}</button></span>`;
+      return;
+    }
+    const k = live ? `<span class="sp-k own" id="np-k"></span>`
       : spMsg ? `<span class="sp-k own sp-err" title="${esc(spMsg)}">${esc(spMsg)}</span>` : `<span class="sp-k"></span>`;
     const acts = lofi ? "" : live ? dis : `<button type="button" data-sp="paste">Change</button><button type="button" data-sp="clear">Clear</button>${dis}`;
     el.innerHTML = `${k}<span class="sp-bar-acts">${acts}</span>`;
   }
+  // ---------- Lofi radio ----------
+  // One <img> load from YouTube tells whether this network blocks it (a filter's block page isn't an image).
+  function ytProbe() {
+    ytBlocked = false; // probing; the video shows meanwhile
+    const img = new Image(), done = (blocked) => { clearTimeout(t); img.onload = img.onerror = null; if (blocked) { ytBlocked = true; if (musicSrc === "lofi") spRender(); } };
+    const t = setTimeout(() => done(true), 8000);
+    img.onload = () => done(false);
+    img.onerror = () => done(true);
+    img.src = `https://www.youtube-nocookie.com/favicon.ico?${Date.now()}`;
+  }
+  function radioRender() {
+    const el = $("#sp-radio");
+    if (el.hidden) return;
+    el.innerHTML = `<button type="button" class="rd-play" data-radio="toggle" aria-label="${radioOn ? "Pause" : "Play"} ${esc(radioSt.name)}"><svg viewBox="0 0 24 24" aria-hidden="true">${radioOn ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M8 4.5v15l12-7.5z"/>'}</svg></button>
+      <div class="rd-main"><span class="sp-k own">${radioOn ? "On air" : "Radio"}</span><b class="rd-name">${esc(radioSt.name)}</b><span class="rd-sub">${esc(radioOn && radioNow ? radioNow : radioSt.sub)}</span></div>
+      <div class="rd-st" role="group" aria-label="Station">${RADIO.map((r) => `<button type="button" data-radio="${r.id}" aria-pressed="${r === radioSt}">${esc(r.name)}</button>`).join("")}</div>
+      ${radioMsg ? `<p class="sp-err rd-err">${esc(radioMsg)}</p>` : ""}`;
+    el.classList.toggle("on", radioOn);
+  }
+  let radioNowTimer;
+  async function radioPollNow() {
+    clearTimeout(radioNowTimer);
+    radioNow = "";
+    if (!radioOn || !radioSt.now) return;
+    try { const d = await (await fetch(radioSt.now)).json(); radioNow = [d.title, d.artist?.name].filter(Boolean).join(" · "); } catch {}
+    radioRender();
+    radioNowTimer = setTimeout(radioPollNow, 30_000);
+  }
+  function radioPlay() {
+    const a = $("#radio");
+    radioMsg = "";
+    a.src = radioSt.url;
+    a.play().then(() => { radioOn = true; radioRender(); radioPollNow(); }).catch(() => { radioOn = false; radioMsg = "That station didn't start. Press play again, or try the other station."; radioRender(); });
+    radioOn = true;
+    radioRender();
+  }
+  function radioStop() {
+    const a = $("#radio");
+    radioOn = false;
+    clearTimeout(radioNowTimer);
+    a.pause();
+    a.removeAttribute("src"); // stops the download too
+    a.load();
+    radioRender();
+  }
+  $("#radio").addEventListener("error", () => { if (!radioOn) return; radioOn = false; radioMsg = `Couldn't reach ${radioSt.name} on this network. Try the other station.`; radioRender(); });
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-radio], [data-lofi]");
+    if (!b) return;
+    // radio sticks; "try video" lasts this visit and then it's back to auto, so school still falls back to radio
+    if (b.dataset.lofi) { lofiMode = b.dataset.lofi; try { lofiMode === "radio" ? localStorage.setItem(LOFI_MODE, "radio") : localStorage.removeItem(LOFI_MODE); } catch {} spRender(true); return; }
+    const v = b.dataset.radio;
+    if (v === "toggle") return radioOn ? radioStop() : radioPlay();
+    const st = RADIO.find((r) => r.id === v);
+    if (!st || st === radioSt) return;
+    const was = radioOn;
+    if (was) radioStop();
+    radioSt = st;
+    try { localStorage.setItem(RADIO_ST, st.id); } catch {}
+    if (was) radioPlay(); else { radioMsg = ""; radioRender(); }
+  });
+
   document.addEventListener("submit", (e) => {
     if (!e.target.matches("[data-sp-paste]")) return;
     e.preventDefault();
@@ -1901,7 +1986,12 @@
     const from = isSchoolDay(t) && !over ? t : nextSchoolDay(t);
     return days.find((d) => d >= from) || days.at(-1);
   }
-  const LUNCH_SHOW = 3; // longer stations (salads, sides, dessert) show this many, then "+N"
+  // The card leads with the main dishes, one per line; soup and specials get a short line each; the deli, salads,
+  // sides and dessert fold under one line that opens on tap.
+  const LUNCH_MAIN = ["Featured", "Entrées"], LUNCH_LINE = ["Specials", "Soup"], LUNCH_MAIN_SHOW = 4;
+  const DIET = { V: "Vegetarian", VG: "Vegan", GF: "Gluten-free" };
+  const lunchDish = (it) => `<span class="dish"${it.allergens?.length ? ` title="Contains ${esc(it.allergens.join(", "))}"` : ""}>${esc(it.name)}${(it.diet || []).map((d) => `<i class="diet" title="${DIET[d] || d}">${d}</i>`).join("")}</span>`;
+  let lunchOpen = false;
   function renderLunch() {
     const days = lunchDays(), el = $("#lunch");
     if (!days.length) {
@@ -1913,12 +2003,15 @@
     $("#lunch-day").textContent = `${relDay(day)}${daysBetween(today(), day) > 1 ? ` ${fmt(day, { month: "short", day: "numeric" })}` : ""}`;
     document.querySelector('[data-lunch="-1"]').disabled = i <= 0;
     document.querySelector('[data-lunch="1"]').disabled = i >= days.length - 1;
-    const dish = (it) => `<span class="dish"${it.allergens?.length ? ` title="Contains ${esc(it.allergens.join(", "))}"` : ""}>${esc(it.name)}${(it.diet || []).map((d) => `<i class="diet" title="${{ V: "Vegetarian", VG: "Vegan", GF: "Gluten-free" }[d] || d}">${d}</i>`).join("")}</span>`;
-    el.innerHTML = menu.days[day].stations.map((st) => {
-      const short = st.items.length > LUNCH_SHOW + 1 && !["Entrées", "Featured", "Specials", "Soup"].includes(st.name);
-      const shown = short ? st.items.slice(0, LUNCH_SHOW) : st.items;
-      return `<div class="lunch-row${st.name === "Entrées" ? " main" : ""}"><dt>${esc(st.name)}</dt><dd>${shown.map(dish).join("")}${short ? `<button class="lunch-more" type="button" data-more="${esc(st.name)}">+${st.items.length - LUNCH_SHOW}</button>` : ""}</dd></div>`;
-    }).join("");
+    const stations = menu.days[day].stations, by = (names) => stations.filter((st) => names.includes(st.name));
+    const mains = by(LUNCH_MAIN).flatMap((st) => st.items), lines = by(LUNCH_LINE), rest = stations.filter((st) => ![...LUNCH_MAIN, ...LUNCH_LINE].includes(st.name));
+    const extra = mains.length - LUNCH_MAIN_SHOW > 1 ? mains.length - LUNCH_MAIN_SHOW : 0;
+    const row = (st) => `<div class="lunch-line"><span class="lunch-k">${esc(st.name)}</span><span class="lunch-v">${st.items.map(lunchDish).join("")}</span></div>`;
+    const restName = rest.map((st) => st.name.toLowerCase()).join(", ").replace(/, ([^,]*)$/, " & $1");
+    el.innerHTML = `${mains.length ? `<ul class="lunch-mains">${mains.slice(0, extra ? LUNCH_MAIN_SHOW : mains.length).map((it) => `<li>${lunchDish(it)}</li>`).join("")}</ul>
+        ${extra ? `<button class="lunch-more" type="button" data-more="mains">+${extra} more</button>` : ""}` : ""}
+      ${lines.map(row).join("")}
+      ${rest.length ? `<details class="lunch-rest"${lunchOpen ? " open" : ""}><summary>${esc(restName[0].toUpperCase() + restName.slice(1))}</summary>${rest.map(row).join("")}</details>` : ""}`;
   }
   document.addEventListener("click", (e) => {
     const nav = e.target.closest("[data-lunch]");
@@ -1927,13 +2020,16 @@
       lunchPick = days[Math.min(days.length - 1, Math.max(0, days.indexOf(cur) + +nav.dataset.lunch))];
       renderLunch();
     }
-    const more = e.target.closest("[data-more]");
+    const more = e.target.closest('[data-more="mains"]');
     if (more) {
       const days = lunchDays(), day = days.includes(lunchPick) ? lunchPick : lunchDefault(days);
-      const st = menu.days[day].stations.find((x) => x.name === more.dataset.more);
-      more.closest("dd").innerHTML = st.items.map((it) => `<span class="dish"${it.allergens?.length ? ` title="Contains ${esc(it.allergens.join(", "))}"` : ""}>${esc(it.name)}${(it.diet || []).map((d) => `<i class="diet">${d}</i>`).join("")}</span>`).join("");
+      const mains = menu.days[day].stations.filter((st) => LUNCH_MAIN.includes(st.name)).flatMap((st) => st.items);
+      $(".lunch-mains").innerHTML = mains.map((it) => `<li>${lunchDish(it)}</li>`).join("");
+      more.remove();
     }
   });
+  // the folded stations stay open (or shut) as the day changes and the card redraws
+  $("#lunch").addEventListener("toggle", (e) => { if (e.target.matches(".lunch-rest")) lunchOpen = e.target.open; }, true);
 
   // ---------- the morning briefing: an AI summary of today's headlines, written by tools/summarize_news.py ----------
   let brief = null;
