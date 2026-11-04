@@ -185,12 +185,12 @@ html[data-skin="departure"]{
 
 /* the scoreboard clock on a board tile */
 html[data-skin="departure"]{
-  .sbc{background:var(--tile);color:var(--tile-fg);border-color:var(--split)}
+  .sbc{color:var(--fg)}
   .sbc-q{background:var(--amber);color:#141414}
   .sbc-n{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
   .sbc-t{color:var(--amber)}
-  .sbc-bar i{box-shadow:inset -1.5px 0 0 var(--tile)}
-  .sbc-mk{background:var(--amber);box-shadow:0 0 0 2px var(--tile)}
+  .sbc-bar i{box-shadow:inset -1.5px 0 0 var(--surface)}
+  .sbc-mk{background:var(--amber);box-shadow:0 0 0 2px var(--surface)}
 }
 
 /* the tab strip (and phone tab bar) in this theme */

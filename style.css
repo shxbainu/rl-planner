@@ -90,6 +90,19 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
   .p-week .rot-scroll{flex:1;display:flex}
   .p-week .rot{height:100%}
 }
+/* lunch: SAGE's menu, station labels on the left, dishes inline */
+.lunch-nav{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.lunch-nav span{min-width:86px;text-align:center}
+.lunch-nav .icon-btn:disabled{opacity:.35;cursor:default}
+.lunch{margin:0;display:grid;gap:7px}
+.lunch-row{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:baseline}
+.lunch dd{margin:0;display:flex;flex-wrap:wrap;row-gap:2px;font-size:13.5px;line-height:1.4}
+.lunch-row.main dd{font-weight:600}
+.dish:not(:last-of-type)::after{content:"·";margin:0 7px;color:var(--muted);font-weight:400}
+.diet{font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.02em;margin-left:4px;padding:0 4px;border-radius:4px;vertical-align:1px;color:var(--c-msi);box-shadow:inset 0 0 0 1px currentColor}
+.lunch-more{border:0;background:none;padding:0 0 0 7px;font:inherit;font-size:12.5px;font-weight:600;color:var(--accent);cursor:pointer}
+.lunch-src{align-self:flex-start;font-size:12px;color:var(--muted);text-decoration:none}
+.lunch-src:hover{color:var(--fg);text-decoration:underline}
 /* the morning briefing: an AI summary of the day's headlines, at the top of News */
 .brief{display:grid;gap:10px;padding:12px 14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
 .brief-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -241,6 +254,9 @@ html.studying .p-music{display:flex!important}
 .item.done{opacity:.75}
 .item.leaving{opacity:0;transition:opacity .2s}
 .hw-note{margin:0 0 6px;font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:6px 10px}
+/* Muse's notes under the list: quiet, one line each */
+.hw-notes{margin-top:8px;padding:8px 10px;border-radius:8px;border:1px dashed var(--line);font-size:12px;line-height:1.45;color:var(--muted)}
+.hw-notes ul{margin:2px 0 0;padding-left:16px;display:grid;gap:2px}
 .empty-state{color:var(--muted);font-size:13px;background:var(--surface-2);border-radius:8px;padding:10px 12px;margin:0 0 10px}
 
 details{border-top:1px solid var(--line);margin-top:auto}
@@ -383,7 +399,10 @@ details .list{margin-top:6px}
 .moves .by{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .moves .by i{font-style:normal;color:var(--accent)}
 .moves .why{font-size:12px;color:var(--muted)}
-.sub-h{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:6px 0 2px}
+.sub-h{margin:6px 0 2px}
+/* small section labels share one style */
+.sub-h,.hw-notes b,.lunch dt,.brief-k,.st-k{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.brief-k{color:var(--accent)}
 /* fantasy: color-coded positions, team logos, a score bar and colored move cards */
 .pos{display:inline-block;min-width:36px;text-align:center;background:var(--cc);color:var(--ct);font:700 10.5px/1.5 var(--mono);border-radius:4px;padding:1px 4px}
 .ff-table td.slot{width:46px;vertical-align:middle}
@@ -588,7 +607,7 @@ details .list{margin-top:6px}
 .agenda{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}
 .agenda-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .agenda-h b{font-size:14px}
-#hw-notes .hw-note{margin-top:4px}
+
 
 /* dialog */
 dialog{border:0;border-radius:14px;padding:0;width:min(420px,calc(100% - 24px));background:var(--surface);color:var(--fg);box-shadow:0 20px 60px rgb(0 0 0 / .3)}
@@ -638,15 +657,16 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 }
 
 /* scoreboard clock: the school day as a game */
-.sbc{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:5px 10px;padding:8px 10px 9px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line)}
+.sbc{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;padding:0 2px}
 .sbc-q{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.06em;padding:2px 7px;border-radius:5px;background:var(--fg);color:var(--surface)}
 .sbc-n{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sbc-t{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
-.sbc-bar{grid-column:1 / -1;position:relative;height:8px}
-.sbc-bar i{position:absolute;top:0;bottom:0;background:var(--cc);border-radius:2px;box-shadow:inset -1.5px 0 0 var(--surface-2)}
+.sbc-n,.sbc-t{display:none}
+.sbc-bar{position:relative;height:8px}
+.sbc-bar i{position:absolute;top:0;bottom:0;background:var(--cc);border-radius:2px;box-shadow:inset -1.5px 0 0 var(--surface)}
 .sbc-bar i.ev{background:color-mix(in srgb,var(--muted) 28%,transparent)}
 .sbc-bar i.gone{opacity:.35}
-.sbc-mk{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--fg);box-shadow:0 0 0 2px var(--surface-2)}
+.sbc-mk{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--fg);box-shadow:0 0 0 2px var(--surface)}
 /* the season: W/L record, recent form, tonight's points */
 .season{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:12.5px;color:var(--muted)}
 .ss-rec b{font-family:var(--mono);font-size:14px;color:var(--fg)}
@@ -654,7 +674,7 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 .ss-form i{font-style:normal;font:700 9.5px/16px var(--mono);width:16px;text-align:center;border-radius:3px;color:var(--fg)}
 .ss-form .W{background:color-mix(in srgb,var(--c-msi) 30%,var(--surface))}
 .ss-form .L{background:var(--surface-2);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
-.ss-pts{margin-left:auto;display:inline-flex;align-items:center;gap:6px}
+.ss-pts{margin-left:auto;display:inline-flex;align-items:center;gap:5px}
 .ss-pts b{font-family:var(--mono);font-size:14px;color:var(--fg)}
 .ss-bar{width:56px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
 .ss-bar i{display:block;height:100%;background:var(--accent)}

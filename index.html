@@ -63,6 +63,17 @@
       <ol class="tl" id="timeline"></ol>
       <p class="after" id="after"></p>
     </section>
+    <section class="panel p-lunch" aria-labelledby="lunch-h">
+      <div class="panel-h"><h2 id="lunch-h">Lunch</h2>
+        <div class="lunch-nav">
+          <button class="icon-btn sm" type="button" data-lunch="-1" aria-label="Earlier day">‹</button>
+          <span id="lunch-day"></span>
+          <button class="icon-btn sm" type="button" data-lunch="1" aria-label="Later day">›</button>
+        </div>
+      </div>
+      <dl class="lunch" id="lunch"></dl>
+      <a class="lunch-src" href="https://www.sagedining.com/sites/roxburylatin/menu" target="_blank" rel="noopener">Full menu on SAGE ↗</a>
+    </section>
     <button class="brief-peek" id="brief-peek" type="button" hidden></button>
     <section class="panel p-snow" id="snow-box" aria-labelledby="snow-h" hidden>
       <div class="panel-h"><h2 id="snow-h">Snow day odds</h2><span class="panel-meta" id="t-snow"></span></div>
@@ -155,7 +166,6 @@
 
       <div class="pane p-week" data-pane="week" role="tabpanel">
         <div class="x-tools">
-          <span class="panel-meta">Rotation</span>
           <div class="seg" role="group" aria-label="Rotation view">
             <button type="button" data-view="week" aria-pressed="true">This week</button>
             <button type="button" data-view="letters" aria-pressed="false">All letters</button>

@@ -205,7 +205,7 @@
     const when = at.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
     const stale = hrs > STALE_HOURS;
     el.className = "bar-status" + (stale ? " stale" : "");
-    el.innerHTML = `<span class="pill" title="Homework last updated ${esc(when)}"><span class="dot"></span>${stale ? `Homework is ${ago} old, check Blackbaud` : `Homework updated ${esc(when)} · ${ago}`}</span>`;
+    el.innerHTML = `<span class="pill" title="Homework last updated ${esc(when)}"><span class="dot"></span>${stale ? `Homework is ${ago} old · check Blackbaud` : `Homework updated ${ago}`}</span>`;
     skinBar();
   }
 
@@ -336,7 +336,7 @@
     const rows = dayRows(letter, day);
     const classes = rows.filter((r) => r.kind === "class").length;
     $("#sched-h").textContent = isToday ? "Today" : relDay(day);
-    $("#sched-meta").textContent = letter ? `${letter} day · ${special(day) ? "special schedule" : `${classes} classes`}` : "";
+    $("#sched-meta").textContent = letter ? (special(day) ? "Special schedule" : `${classes} classes`) : "";
     $("#now-card").innerHTML = nowCard(rows, isToday, day, letter);
     if (special(day)) {
       $("#timeline").innerHTML = `<li class="empty">Times for this special schedule aren't posted yet.</li>`;
@@ -410,8 +410,8 @@
     $("#rot").innerHTML = head + `<tbody>${rows}</tbody>`;
     const sps = view === "week" ? cols.filter((c) => c.sp) : [];
     $("#rot-note").textContent = view === "week"
-      ? "? = day letter is a guess. Tap the letter in the top bar to fix today's." + sps.map((c) => ` * ${c.top}: ${c.sp}.`).join("")
-      : "? = B, E and G times aren't confirmed yet.";
+      ? "? = guessed day letter" + sps.map((c) => ` · * ${c.top}: ${c.sp}`).join("")
+      : "? = B, E and G times aren't confirmed";
   }
 
   function groupBy(items) {
@@ -463,7 +463,8 @@
     $("#agenda").innerHTML = list.length
       ? list.map((i) => itemHTML(i, { overdue: showOverdue, showDue: showOverdue })).join("")
       : `<li class="empty-state">Nothing due${offName(selDay) ? ` (${esc(offName(selDay))})` : ""}.</li>`;
-    $("#hw-notes").innerHTML = (homework?.notes || []).map((n) => `<p class="hw-note">${esc(n)}</p>`).join("");
+    const notes = homework?.notes || [];
+    $("#hw-notes").innerHTML = notes.length ? `<div class="hw-notes"><b>Notes</b><ul>${notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></div>` : "";
 
     const done = items.filter(finished).sort((a, b) => b.due.localeCompare(a.due));
     $("#done-count").textContent = done.length;
@@ -825,7 +826,7 @@
 
   function spRenderAcct() {
     const el = $("#sp-acct"), note = $("#sp-note"), lofi = musicSrc === "lofi";
-    note.textContent = lofi ? "Lofi Girl's 24/7 stream on YouTube. Press play in the video." : npShown() ? "" : "The player plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise.";
+    note.textContent = "";
     if (lofi) { el.innerHTML = ""; return; }
     const reset = sp.id !== SP_DEFAULT.id ? `<button class="link" type="button" data-sp="reset">Back to lofi beats</button>` : "";
     if (spConnected()) {
@@ -840,7 +841,7 @@
           <li>In the app's <b>Settings → User Management</b>, add your name and your Spotify account's email.</li>
           <li>Copy the app's <b>Client ID</b> into the box and press Connect. Spotify asks you to agree, then sends you back here.</li></ol>
         <form class="sp-form" data-sp-form><input id="sp-client" value="${esc(spA.client || "")}" placeholder="Client ID" aria-label="Spotify Client ID" spellcheck="false" autocomplete="off"><button class="btn primary" type="submit">Connect</button></form>
-        <p class="sp-note">Play, pause and skip need Spotify Premium; without it you still see what's playing. The Client ID and sign-in stay in this browser.</p></div>` : ""}`;
+        <p class="sp-note">Play, pause and skip need Spotify Premium; without it you still see what's playing. The Client ID and sign-in stay in this browser. (Without connecting, the player plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise.)</p></div>` : ""}`;
   }
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-sp]");
@@ -1788,9 +1789,8 @@
     const s = season(), t = today(), by = isSchoolDay(t) && now().getHours() < 15 ? t : nextSchoolDay(t);
     const tonight = allItems().filter((i) => i.due === by);
     const proj = tonight.reduce((n, i) => n + (PTS[i.type] || 2), 0), scored = tonight.filter(isDone).reduce((n, i) => n + (PTS[i.type] || 2), 0);
-    $("#season").innerHTML = `<span class="ss-rec" title="${esc(s.name)}: days with everything done are wins"><b>${s.w}-${s.l}</b> ${esc(s.name)}${s.streak ? ` · Streak ${s.streak}` : ""}</span>
-      <span class="ss-form" aria-hidden="true">${s.res.slice(-8).map((r) => `<i class="${r}">${r}</i>`).join("")}</span>
-      ${tonight.length ? `<span class="ss-pts" title="Points: homework 2, quiz 4, test 6, essay or project 8"><b>${scored}</b> / ${proj} proj · ${esc(relDay(by))}<span class="ss-bar"><i style="width:${proj ? Math.round((scored / proj) * 100) : 0}%"></i></span></span>` : ""}`;
+    $("#season").innerHTML = `<span class="ss-rec" title="${esc(s.name)} so far: a day counts as a win when everything due that day got done"><b>${s.w}–${s.l}</b> record${s.streak ? ` · ${s.streak[0] === "W" ? "win" : "loss"} streak ${s.streak.slice(1)}` : ""}</span>
+      ${tonight.length ? `<span class="ss-pts" title="Points: homework 2, quiz 4, test 6, essay or project 8"><span>${esc(relDay(by))}</span> <b>${scored}</b>/${proj} pts<span class="ss-bar"><i style="width:${proj ? Math.round((scored / proj) * 100) : 0}%"></i></span></span>` : ""}`;
   }
 
   function renderSeasonal() { renderSeason(); }
@@ -1847,6 +1847,50 @@
     tick();
     gnTimer = setInterval(tick, 1000);
   }
+
+  // ---------- lunch: SAGE Dining's menu (menu.json, fetched on every deploy by tools/fetch_menu.py) ----------
+  // Shows today's lunch until lunch is over, then the next school day's; the arrows step through the posted days.
+  let menu = null, lunchPick = null;
+  const lunchDays = () => Object.keys(menu?.days || {}).filter(isSchoolDay).sort();
+  function lunchDefault(days) {
+    const t = today(), bell = schedule.bells.find((b) => b.lunch), n = now();
+    const over = bell && n.getHours() * 60 + n.getMinutes() >= minutes(bell.end);
+    const from = isSchoolDay(t) && !over ? t : nextSchoolDay(t);
+    return days.find((d) => d >= from) || days.at(-1);
+  }
+  const LUNCH_SHOW = 3; // longer stations (salads, sides, dessert) show this many, then "+N"
+  function renderLunch() {
+    const days = lunchDays(), el = $("#lunch");
+    if (!days.length) {
+      $("#lunch-day").textContent = "";
+      el.innerHTML = `<p class="empty-state">SAGE hasn't posted the next menus yet.</p>`;
+      return;
+    }
+    const day = days.includes(lunchPick) ? lunchPick : lunchDefault(days), i = days.indexOf(day);
+    $("#lunch-day").textContent = `${relDay(day)}${daysBetween(today(), day) > 1 ? ` ${fmt(day, { month: "short", day: "numeric" })}` : ""}`;
+    document.querySelector('[data-lunch="-1"]').disabled = i <= 0;
+    document.querySelector('[data-lunch="1"]').disabled = i >= days.length - 1;
+    const dish = (it) => `<span class="dish"${it.allergens?.length ? ` title="Contains ${esc(it.allergens.join(", "))}"` : ""}>${esc(it.name)}${(it.diet || []).map((d) => `<i class="diet" title="${{ V: "Vegetarian", VG: "Vegan", GF: "Gluten-free" }[d] || d}">${d}</i>`).join("")}</span>`;
+    el.innerHTML = menu.days[day].stations.map((st) => {
+      const short = st.items.length > LUNCH_SHOW + 1 && !["Entrées", "Featured", "Specials", "Soup"].includes(st.name);
+      const shown = short ? st.items.slice(0, LUNCH_SHOW) : st.items;
+      return `<div class="lunch-row${st.name === "Entrées" ? " main" : ""}"><dt>${esc(st.name)}</dt><dd>${shown.map(dish).join("")}${short ? `<button class="lunch-more" type="button" data-more="${esc(st.name)}">+${st.items.length - LUNCH_SHOW}</button>` : ""}</dd></div>`;
+    }).join("");
+  }
+  document.addEventListener("click", (e) => {
+    const nav = e.target.closest("[data-lunch]");
+    if (nav) {
+      const days = lunchDays(), cur = days.includes(lunchPick) ? lunchPick : lunchDefault(days);
+      lunchPick = days[Math.min(days.length - 1, Math.max(0, days.indexOf(cur) + +nav.dataset.lunch))];
+      renderLunch();
+    }
+    const more = e.target.closest("[data-more]");
+    if (more) {
+      const days = lunchDays(), day = days.includes(lunchPick) ? lunchPick : lunchDefault(days);
+      const st = menu.days[day].stations.find((x) => x.name === more.dataset.more);
+      more.closest("dd").innerHTML = st.items.map((it) => `<span class="dish"${it.allergens?.length ? ` title="Contains ${esc(it.allergens.join(", "))}"` : ""}>${esc(it.name)}${(it.diet || []).map((d) => `<i class="diet">${d}</i>`).join("")}</span>`).join("");
+    }
+  });
 
   // ---------- the morning briefing: an AI summary of today's headlines, written by tools/summarize_news.py ----------
   let brief = null;
@@ -1920,7 +1964,7 @@
   const JUMPS = [
     ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", go("homework")], ["Today's schedule", "schedule today bell", go("today")],
     ["Tests & quizzes", "tests quizzes", () => { showTab("today"); return $(".p-big"); }], ["Music", "music spotify lofi", go("music")], ["Rotation", "rotation week letters", go("more", "week")],
-    ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")], ["Today's briefing", "briefing summary ai news today", () => { $("#brief-peek").click(); }],
+    ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")], ["Lunch menu", "lunch menu food sage", () => { showTab("today"); return $(".p-lunch"); }], ["Today's briefing", "briefing summary ai news today", () => { $("#brief-peek").click(); }],
     ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
     ...Object.entries(SKINS).map(([k, v]) => [`Theme: ${v}`, `theme ${k} ${v.toLowerCase()}`, () => { setSkin(k); document.querySelectorAll(".skin-select").forEach((o) => { o.value = k; }); }]),
   ];
@@ -1959,16 +2003,18 @@
     if (!r.ok) throw new Error(`${path}: ${r.status}`);
     return r.json();
   }
-  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null), getJSON("news_summary.json").catch(() => null)])
-    .then(([s, h, f, n, b]) => {
+  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null), getJSON("news_summary.json").catch(() => null), getJSON("menu.json").catch(() => null)])
+    .then(([s, h, f, n, b, mn]) => {
       news = n;
       brief = b;
+      menu = mn;
       schedule = s;
       homework = h;
       fantasy = f;
       document.title = s.owner ? `${s.owner}'s RL Planner` : "RL Planner";
       render();
       renderBrief();
+      renderLunch();
       loadTeams();
       loadBoards();
       loadSportsNews();
@@ -1976,7 +2022,7 @@
       loadSnow();
       setInterval(loadSnow, 3 * 3600_000);
       spCallback().then(() => { spRender(matchMedia("(min-width:760px)").matches); spPoll(); }); // on laptops the card is always in view
-      setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
+      setInterval(() => { renderBar(); renderSchedule(); if (!lunchPick) renderLunch(); }, 15_000);
       // tick just after each second turns over; a plain 1s interval drifts and skips a second now and then
       const tickLoop = () => { tickNow(); setTimeout(tickLoop, 1000 - (now().getTime() % 1000) + 15); };
       tickLoop();

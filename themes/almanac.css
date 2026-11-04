@@ -188,3 +188,8 @@ html[data-skin="almanac"]{
   .np-k{color:var(--leaf-ink)}
   .np-bar i{background:var(--leaf)}
 }
+
+/* lunch: a packet printed in tomato, with a little pea pod */
+html[data-skin="almanac"]{
+  .p-lunch{--band:var(--tomato);--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 6.5c4.6 0 7.5 2.6 7.5 6s-3.2 6-7.5 6-7.5-2.6-7.5-6 2.9-6 7.5-6z' fill='%23d8432b'/%3E%3Cpath d='M10 7.5 7 4.5l2.2.6L10 2.5l.8 2.6L13 4.5z' fill='%235e8c4a'/%3E%3C/svg%3E")}
+}

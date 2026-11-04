@@ -160,3 +160,8 @@ html[data-skin="chess"]{
   .np-ctl .np-play{background:var(--ebony);color:var(--ivory)}
   .np-bar i{background:var(--flag)}
 }
+
+/* lunch: a pawn by the name */
+html[data-skin="chess"]{
+  .p-lunch .panel-h h2::before{content:"\2659\FE0E"}
+}

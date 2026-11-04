@@ -153,7 +153,7 @@ html[data-skin="arcade"]{
 
 /* the scoreboard clock and dock as pixel boxes */
 html[data-skin="arcade"]{
-  .sbc,.dock a{border-radius:0;clip-path:var(--notch)}
+  .dock a{border-radius:0;clip-path:var(--notch)}
   .sbc-q{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:9px;padding:4px 6px 3px;background:var(--coin);color:var(--bg)}
   .sbc-t{font-family:var(--digits);font-size:20px;line-height:.8;color:var(--coin)}
   .sbc-bar i{border-radius:0}
