@@ -1,6 +1,6 @@
 {
   "updated_at": "2026-11-03T17:43:00-05:00",
-  "source": "Muse, Crosswalk post zsysbb (Tue Nov 3, 5:44pm); kickoffs checked against ESPN's Week 9 schedule, Claude's moves added Tue Nov 3",
+  "source": "Muse, Crosswalk post zsysbb (Tue Nov 3, 5:44pm); kickoffs and statuses checked against ESPN Wed Nov 4, Claude's moves updated Wed Nov 4",
   "league": "FFantasy Football",
   "team": "#1 Substation Hater",
   "week": 9,
@@ -191,13 +191,19 @@
       "by": "Claude",
       "kind": "start/sit",
       "text": "Keep Evans in at WR until the 49ers' inactives (about 2:55pm ET Sunday); if he's out, swap in DJ Moore.",
-      "why": "Corrects the earlier Evans/Moore note: per ESPN's schedule Evans (Achilles, Q, expected back after the bye) plays Sunday 4:25pm and Moore (knee, Q, says he's okay) plays Monday 8:15pm at MIN, so Moore is still open when Evans' status is known. Watch Moore's Thursday-Friday practice reports too."
+      "why": "ESPN still lists Evans Q (Achilles, expected back after SF's Week 8 bye) and Moore Q (knee, says he's okay after leaving late vs BAL). Evans plays Sun 4:25pm vs LV; Moore plays Mon 8:15pm at MIN, so Moore is still swappable once Evans' status is known. Watch Wed-Fri practice reports for both; if Evans logs full practices, this is moot."
     },
     {
       "by": "Claude",
       "kind": "waiver",
-      "text": "Look for a better D/ST on waivers than the Vikings.",
-      "why": "Vikings D/ST projects only 4.1 against a Bills offense that just scored 36 on the Ravens, on Monday night. Any defense facing a weak offense on Sunday is likely an upgrade."
+      "text": "Check waivers for a Sunday D/ST facing a weak offense, e.g. Eagles (vs NYG) or Chiefs (vs NYJ), to replace the Vikings.",
+      "why": "Vikings D/ST projects just 4.1 vs a Bills offense that scored 36 on the Ravens, and it plays Monday night. Either suggested defense plays Sun 1pm at home; take whichever is actually available, only if it projects clearly higher."
+    },
+    {
+      "by": "Claude",
+      "kind": "start/sit",
+      "text": "Leave Jordyn Tyson in the IR slot for Week 9; plan on him as WR depth soon.",
+      "why": "Per ESPN (Nov 4), Tyson (hamstring) is set to resume practicing with the Saints Wednesday, which opens his return window; he's unlikely to be activated for Sunday vs CLE. Once he's activated, he's a better bench WR than Omar Cooper Jr. (no targets last week)."
     },
     {
       "by": "Muse",
