@@ -1,140 +1,135 @@
-/* CARD CATALOG: an old school library. Oak drawer fronts with brass label holders; everything you read is on an index card.
-   The wood stays quiet and never sits behind small text; cards clearly lift off it. */
-@import url("https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
+/* CARD CATALOG: an old school library in the afternoon. Soft walnut drawers, grey-white index cards, brass label holders.
+   Built to be easy on the eyes: no bright white, no dark bands over the cards, a highly legible text face,
+   and the typewriter only for short labels. */
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Courier+Prime:wght@400;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
 
 html[data-skin="catalog"]:root{
-  --wood:#5b3e2b; --wood-2:#4d3423; --wood-fg:#f3e9da; --wood-muted:#dccbb3; --brass:#b08d57; --brass-2:#8a6b3c;
-  --bg:#5b3e2b; --surface:#fbf8f1; --surface-2:#f4efe4; --fg:#2b2622; --muted:#5f574e; --line:#e2dacb;
-  --red:#c0392b; --rule:#bfd3e6; --stamp:#5b4e6d; --manila:#f3e7c9;
-  --accent:#a8322a; --accent-fg:#fffaf2; --accent-soft:#f6e4dc; --done:#8f877c;
-  --warn:#7a5413; --warn-soft:#f4e8cc; --bad:#a8322a; --bad-soft:#f6e1dc;
-  --c-glee:#3e8c88; --c-latin:#b8862b; --c-eng:#2f5a8a; --c-msi:#4f7f45; --c-fr:#75528f; --c-fgc:#a8432f; --c-arts:#b5677a; --c-health:#7c7a3a; --c-other:#857c70;
-  --sans:"Courier Prime","Courier New",monospace; --mono:"Courier Prime","Courier New",monospace; --head:"Newsreader",Georgia,serif;
+  --wood:#6b5646; --wood-2:#5f4b3c; --wood-fg:#f0eae1; --wood-muted:#d9cec1; --brass:#b39a68; --brass-2:#8d7647;
+  --bg:#6b5646; --surface:#edece7; --surface-2:#e4e2db; --fg:#34312c; --muted:#5f5a52; --line:#d0ccc2;
+  --red:#b66a5d; --rule:#cfd9e2; --stamp:#5d5475; --manila:#e7e1cf;
+  --accent:#96493c; --accent-fg:#fbf8f3; --accent-soft:#e9dcd6; --done:#8b867d;
+  --warn:#72551d; --warn-soft:#e9e1cb; --bad:#9c3f2f; --bad-soft:#ecdcd6;
+  --c-glee:#3b827e; --c-latin:#a87d2c; --c-eng:#3a5f8a; --c-msi:#4d7a45; --c-fr:#6f5288; --c-fgc:#a0503b; --c-arts:#a8657a; --c-health:#737236; --c-other:#7d776d;
+  --sans:"Atkinson Hyperlegible",system-ui,sans-serif; --mono:"Courier Prime","Courier New",monospace; --head:"Newsreader",Georgia,serif;
+  --sp-k:"Call no. 780.9 · Music";
   --leave-ms:800;
   color-scheme:light;
 }
 html[data-skin="catalog"][data-mode="dark"]:root{
-  --wood:#2a1e16; --wood-2:#22180f; --wood-fg:#eae3d6; --wood-muted:#c4b6a2; --brass:#bd9b64; --brass-2:#8a6d3e;
-  --bg:#2a1e16; --surface:#2e2a26; --surface-2:#35302b; --fg:#eae3d6; --muted:#b9ae9f; --line:#47403a;
-  --red:#c0392b; --rule:#3e4a57; --stamp:#a99bc2; --manila:#3a3227;
-  --accent:#e0705f; --accent-fg:#1f1813; --accent-soft:#40302a; --done:#857c71;
-  --warn:#e0b766; --warn-soft:#3b3122; --bad:#e8806e; --bad-soft:#40291f;
-  --c-glee:#5aa9a4; --c-latin:#cf9f45; --c-eng:#6d93c2; --c-msi:#73a467; --c-fr:#a07fbd; --c-fgc:#cf6a52; --c-arts:#cf8798; --c-health:#a3a05a;
+  --wood:#251e19; --wood-2:#2c241e; --wood-fg:#ddd6cb; --wood-muted:#b3a796; --brass:#a88f5f; --brass-2:#7d6a44;
+  --bg:#251e19; --surface:#2c2a27; --surface-2:#32302c; --fg:#dcd6cb; --muted:#aaa194; --line:#423e38;
+  --red:#b36e60; --rule:#38404a; --stamp:#aa9dc2; --manila:#36322b;
+  --accent:#d58b7a; --accent-fg:#221b16; --accent-soft:#3d302b; --done:#857e74;
+  --warn:#d8b06a; --warn-soft:#39311f; --bad:#e08c79; --bad-soft:#3d2a23;
+  --c-glee:#5ba5a0; --c-latin:#c99d4f; --c-eng:#7196c2; --c-msi:#78a46c; --c-fr:#9f83ba; --c-fgc:#c97a63; --c-arts:#c98e9e; --c-health:#a3a061; --c-other:#9a9286;
   color-scheme:dark;
 }
 
 html[data-skin="catalog"]{
-  /* oak, with a very quiet grain */
-  body{background-color:var(--wood);font-size:13.5px;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='240'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.22' numOctaves='3' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.06 0 0 0 0 0.03 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='400' height='240' filter='url(%23w)'/%3E%3C/svg%3E")}
+  /* walnut, grain kept very faint */
+  body{background-color:var(--wood);font-size:14.5px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='240'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.22' numOctaves='3' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.06 0 0 0 0 0.03 0 0 0 0.11 0'/%3E%3C/filter%3E%3Crect width='400' height='240' filter='url(%23w)'/%3E%3C/svg%3E")}
 
   /* header: a drawer front */
-  .bar{background:var(--wood-2);color:var(--wood-fg);border-bottom:1px solid rgb(0 0 0 / .35);box-shadow:0 1px 0 rgb(255 255 255 / .06)}
-  .bar-date{font-family:var(--head);font-weight:600;font-size:20px}
+  .bar{background:var(--wood-2);color:var(--wood-fg);border-bottom:1px solid rgb(0 0 0 / .25)}
+  .bar-date{font-family:var(--head);font-weight:600;font-size:19px}
   .bar-sub{color:var(--wood-muted)}
-  .bar-sub b{color:#f0c97a}
-  .letter-pick select{border-radius:3px;background:var(--brass);color:#2b2622;font-family:var(--mono);font-weight:700;box-shadow:inset 0 0 0 1px var(--brass-2),0 1px 0 rgb(0 0 0 / .3)}
-  .bar-status span.pill{border-radius:2px;background:var(--surface);border:0;color:var(--fg)}
-  .bar .btn,.bar .icon-btn,.bar .skin-pick{border-radius:3px;background:var(--surface);border-color:transparent;color:var(--fg)}
-  .bar .btn.primary{background:var(--brass);color:#2b2622;box-shadow:inset 0 0 0 1px var(--brass-2)}
-  .btn,.icon-btn{border-radius:3px}
+  .bar-sub b{color:#ecc988}
+  .letter-pick select{border-radius:4px;background:var(--brass);color:#2e2a24;font-family:var(--head);font-weight:600;box-shadow:inset 0 0 0 1px var(--brass-2)}
+  .bar-status span.pill{border-radius:3px;background:var(--surface);border:0;color:var(--fg)}
+  .bar .btn,.bar .icon-btn,.bar .skin-pick{border-radius:4px;background:var(--surface);border-color:transparent;color:var(--fg)}
+  .bar .btn.primary{background:var(--brass);color:#2e2a24;box-shadow:inset 0 0 0 1px var(--brass-2)}
+  .btn,.icon-btn,.x-expand,.sp-size{border-radius:4px}
   .link{color:var(--accent)}
 
-  /* panels: a drawer front with a brass label holder, over a stack of index cards */
-  .panel,details.extra{border-radius:3px;border:0;background:var(--surface);
-    box-shadow:0 2px 0 -1px var(--surface-2),0 4px 0 -2px color-mix(in srgb,var(--surface-2) 80%,#000 6%),0 6px 14px rgb(0 0 0 / .35)}
-  .panel-h{background:var(--wood-2);margin:-12px -14px 4px;padding:8px 14px;border-radius:3px 3px 0 0;border-bottom:1px solid rgb(0 0 0 / .3)}
-  .panel-h .panel-meta{color:var(--wood-muted)}
-  .panel-h .link{color:var(--wood-fg)}
-  .panel-h .icon-btn{background:var(--surface);border-color:transparent}
-  .panel-h .seg{background:rgb(0 0 0 / .25);border-color:transparent}
-  .panel-h .seg button{color:var(--wood-muted)}
-  .panel-h .seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg)}
-  .panel-h h2,.x-name{display:inline-flex;align-items:center;gap:0;font-family:var(--head);font-weight:600;text-transform:none;letter-spacing:.02em;font-size:15px;color:#2b2622;
-    background:radial-gradient(circle at 6px 50%,var(--brass-2) 0 1.6px,transparent 2.1px),radial-gradient(circle at calc(100% - 6px) 50%,var(--brass-2) 0 1.6px,transparent 2.1px),var(--brass);
-    padding:1px 16px;border-radius:2px;box-shadow:inset 0 0 0 1px var(--brass-2),inset 0 1px 0 rgb(255 255 255 / .3)}
+  /* panels: index cards resting on the drawer, the name in a brass label holder */
+  .panel,details.extra{border-radius:4px;border:0;background:var(--surface);box-shadow:0 2px 0 -1px var(--surface-2),0 3px 8px rgb(0 0 0 / .2)}
+  .panel-h h2,.x-name{display:inline-flex;align-items:center;font-family:var(--head);font-weight:600;text-transform:none;letter-spacing:.01em;font-size:16px;color:var(--fg);
+    padding:0 12px;border-radius:3px;box-shadow:inset 0 0 0 1.5px var(--brass);
+    background:radial-gradient(circle at 5px 50%,var(--brass) 0 1.5px,transparent 2px),radial-gradient(circle at calc(100% - 5px) 50%,var(--brass) 0 1.5px,transparent 2px)}
   .panel-h h2::before{display:none}
-  details.extra{padding:0 12px}
-  details.extra > summary{background:var(--wood-2);margin:0 -12px;padding:9px 12px;border-radius:3px}
-  details.extra[open] > summary{border-radius:3px 3px 0 0;margin-bottom:8px}
-  details.extra > summary::after{border-color:var(--wood-muted)}
-  .x-name{font-size:13.5px}
-  .x-tease{color:var(--wood-muted)}
-  .panel-meta,.panel-foot{font-size:12px}
+  .x-name{font-size:14px}
+  .panel-meta,.panel-foot{font-size:12.5px}
 
-  /* countdown: a DATE DUE slip from the book pocket */
-  .now-card{border-radius:2px;background:var(--manila);border:1px solid color-mix(in srgb,var(--brass) 60%,transparent);padding:8px 14px 10px}
-  .now-card::before{content:"DATE DUE";font-family:var(--mono);font-weight:700;font-size:10.5px;letter-spacing:.2em;color:var(--accent);border-bottom:1.5px solid var(--red);padding-bottom:3px}
-  .now-card .num{font-family:var(--mono);font-weight:700;font-size:34px;color:var(--stamp);transform:rotate(-1.2deg);display:inline-block}
+  /* countdown: a DATE DUE slip */
+  .now-card{border-radius:3px;background:var(--manila);border:1px solid color-mix(in srgb,var(--brass) 45%,transparent);padding:8px 14px 10px}
+  .now-card::before{content:"DATE DUE";font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--accent);border-bottom:1px solid var(--red);padding-bottom:3px}
+  .now-card .num{font-family:var(--mono);font-weight:700;font-size:32px;color:var(--stamp)}
   .now-card .lbl{font-weight:700}
-  .prog{height:4px;border-radius:0;background:color-mix(in srgb,var(--stamp) 18%,transparent)}
+  .prog{height:4px;border-radius:0;background:color-mix(in srgb,var(--stamp) 16%,transparent)}
   .prog i{border-radius:0;background:var(--stamp)}
 
   /* schedule: card-tab letters */
-  .tl li{border-radius:2px}
-  .tl .blk{border-radius:6px 6px 0 0;background:color-mix(in srgb,var(--cc) 30%,var(--surface));color:var(--fg);border-top:3px solid var(--cc);font-family:var(--mono);font-weight:700}
+  .tl li{border-radius:3px}
+  .tl .blk{border-radius:6px 6px 0 0;background:color-mix(in srgb,var(--cc) 22%,var(--surface));color:var(--fg);border-top:3px solid var(--cc);font-weight:700}
   .tl .cn{font-weight:700}
-  .tl .split{color:var(--muted)}
+  .tl .tm{font-size:12px}
   .tl li.now{background:var(--accent-soft)}
   .tl li.now .tm{color:var(--accent)}
   .tl li.ev{background:var(--surface-2)}
 
-  /* homework: each day an index card with a red top rule and blue lines */
-  .cal .dow{font-family:var(--head);font-weight:600;font-size:12.5px;letter-spacing:.06em}
-  .cell{gap:0;border-radius:1px;border:1px solid var(--line);border-top:2px solid var(--red);line-height:17px;
-    background:repeating-linear-gradient(transparent 0 16px,var(--rule) 16px 17px) 0 5px/100% 17px,var(--surface);box-shadow:0 1px 2px rgb(0 0 0 / .08)}
+  /* homework: each day an index card, a thin red top rule, pale blue lines */
+  .cal .dow{font-family:var(--head);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:none}
+  .cell{gap:0;border-radius:2px;border:1px solid var(--line);border-top:2px solid var(--red);line-height:18px;
+    background:repeating-linear-gradient(transparent 0 17px,var(--rule) 17px 18px) 0 5px/100% 18px,var(--surface)}
   .cell .top b{font-weight:700}
-  .cell.today .top b{background:var(--red);color:#fffaf2;border-radius:2px}
+  .cell.today .top b{background:var(--accent);color:var(--accent-fg);border-radius:3px}
   .cell.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
   .cell.off{background:var(--surface-2);border-top:2px solid var(--line)}
-  .chip2{border:0;border-left:4px solid var(--cc);border-radius:0;background:transparent;padding:0 4px;font-size:11.5px;line-height:17px}
-  .chip2.major{font-weight:700;background:transparent;text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:2px}
+  .chip2{border:0;border-left:4px solid var(--cc);border-radius:0;background:transparent;padding:0 4px;font-size:12px;line-height:18px}
+  .chip2.major{font-weight:700;background:transparent}
 
-  /* checklist: each task an index card; DONE is a purple rubber stamp */
-  .item{position:relative;border-radius:1px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--cc);box-shadow:0 1px 0 rgb(0 0 0 / .06)}
+  /* checklist: index cards; DONE is a rubber stamp */
+  .item{position:relative;border-radius:2px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--cc)}
   .item.major{background:var(--surface)}
-  .check{border-radius:2px;border-width:1.5px;border-color:var(--fg)}
-  .check:checked{background:var(--fg)}
+  .check{border-radius:3px;border-width:1.5px;border-color:var(--muted)}
+  .check:checked{background:var(--fg);border-color:var(--fg)}
   .check::after{border-color:var(--surface)}
   .title{font-weight:700}
-  .chip{color:var(--fg);text-transform:uppercase;font-size:11px}
-  .tag{border-radius:2px;background:transparent;color:var(--accent);border:1.5px solid var(--red);font-family:var(--mono)}
+  .chip{color:var(--fg);font-size:12px}
+  .det{font-size:13px}
+  .tag{border-radius:2px;background:transparent;color:var(--accent);border:1px solid var(--red);font-family:var(--mono);font-size:11px}
   .item.leaving{opacity:1}
   .item.leaving.done{opacity:.65;transition:opacity .3s .45s}
   .item.leaving.done::after{content:"DONE";position:absolute;right:44px;top:50%;margin-top:-15px;padding:2px 10px;border:3px solid var(--stamp);border-radius:4px;
-    font-family:var(--mono);font-weight:700;font-size:18px;letter-spacing:.12em;line-height:20px;color:var(--stamp);opacity:.88;
-    text-shadow:0 0 1px var(--stamp);box-shadow:0 0 1px var(--stamp),inset 0 0 1px var(--stamp);
+    font-family:var(--mono);font-weight:700;font-size:18px;letter-spacing:.12em;line-height:20px;color:var(--stamp);opacity:.85;
     transform:rotate(calc(var(--rnd,0) * 2deg));animation:cc-thump .2s ease-in;pointer-events:none}
-  .hw-note,.empty-state,.overdue-strip{border-radius:1px}
-  .count{border-radius:2px;background:var(--stamp);color:var(--surface)}
-  .done-box{border-top-color:var(--line)}
+  .hw-note,.empty-state,.overdue-strip{border-radius:2px}
+  .count{border-radius:3px;background:var(--stamp);color:var(--surface)}
 
-  /* tests & quizzes: a rubber-stamped date-due box */
-  .big li{border-radius:1px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--cc)}
-  .big .d{color:var(--stamp);border:2px solid var(--stamp);border-radius:3px;padding:3px 4px;font-family:var(--mono);font-size:17px;transform:rotate(-2deg)}
+  /* tests & quizzes: a stamped date */
+  .big li{border-radius:2px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--cc)}
+  .big .d{color:var(--stamp);border:1.5px solid var(--stamp);border-radius:3px;padding:3px 4px;font-family:var(--mono);font-size:17px}
   .big .d small{color:var(--stamp)}
 
-  /* rotation: a borrower's card grid, today outlined in red */
-  .seg{border-radius:3px}
-  .seg button{border-radius:2px}
+  /* rotation: a borrower's card */
+  .seg{border-radius:4px}
+  .seg button{border-radius:3px}
   .rot{border-spacing:0}
-  .rot th{font-family:var(--head);font-weight:600;border-radius:0;border-bottom:1.5px solid var(--red)}
-  .rot th.cur{background:var(--red);color:#fffaf2}
+  .rot th{font-family:var(--head);font-weight:600;border-radius:0;border-bottom:1px solid var(--red)}
+  .rot th.cur{background:var(--accent);color:var(--accent-fg)}
   .rot td{border-radius:0;background:transparent;color:var(--fg);font-weight:700;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule);box-shadow:inset 3px 0 0 var(--cc)}
-  .rot td.x{box-shadow:none}
-  .rot td.tm{box-shadow:none;border-right:1.5px solid var(--red)}
-  .rot td.cur{outline:2px solid var(--red);outline-offset:-2px}
+  .rot td.x,.rot td.tm{box-shadow:none}
+  .rot td.tm{border-right:1px solid var(--red)}
+  .rot td.cur{outline:2px solid var(--accent);outline-offset:-2px}
   .rot td.ev{box-shadow:none;background:var(--surface-2)}
 
-  /* extras: typed catalog cards */
-  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:1px;background:var(--surface);border:1px solid var(--line);border-top:2px solid var(--red)}
+  /* extras: catalog cards */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:2px;background:var(--surface-2);border:1px solid var(--line)}
   .counts .n{color:var(--stamp)}
-  .count-form input{border-radius:2px}
-  dialog{border-radius:3px;border-top:3px solid var(--red)}
+  .count-form input,.sp-form input{border-radius:3px}
+  dialog{border-radius:4px;border-top:2px solid var(--red)}
+
+  /* music: a catalog card for the record, filed under 780 (Dewey for music) */
+  .sp{border-radius:2px;background:var(--surface);border:1px solid var(--line);border-top:2px solid var(--red)}
+  .sp-head{padding-bottom:7px;border-bottom:1px solid var(--rule)}
+  .sp-k{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:none;color:var(--accent)}
+  #sp-title{font-family:var(--head);font-weight:600;font-size:16px}
+  .sp-frame{border-radius:3px}
 
   @media (max-width:600px){
     .cell{background:var(--surface)}
-    .chip2{font-size:0;padding:0;height:5px;border:0;background:var(--cc);text-decoration:none}
+    .chip2{font-size:0;padding:0;height:5px;border:0;background:var(--cc)}
   }
 }
-@keyframes cc-thump{from{opacity:0;transform:rotate(calc(var(--rnd,0) * 2deg)) scale(1.7)}to{opacity:.88;transform:rotate(calc(var(--rnd,0) * 2deg)) scale(1)}}
+@keyframes cc-thump{from{opacity:0;transform:rotate(calc(var(--rnd,0) * 2deg)) scale(1.7)}to{opacity:.85;transform:rotate(calc(var(--rnd,0) * 2deg)) scale(1)}}

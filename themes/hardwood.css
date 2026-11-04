@@ -1,0 +1,145 @@
+/* HARDWOOD: game night at the arena. A maple floor with court lines, royal-blue banners with a gold stripe,
+   a red shot-clock countdown and varsity lettering. Dark mode is the arena with the house lights down. */
+@import url("https://fonts.googleapis.com/css2?family=Graduate&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap");
+
+html[data-skin="hardwood"]:root{
+  --bg:#d89f63; --plank:rgb(120 62 20 / .10); --court:rgb(255 255 255 / .6);
+  --surface:#fbfbfd; --surface-2:#f1f3f8; --fg:#13213b; --muted:#4d5a71; --line:#d6dbe6;
+  --royal:#1d428a; --gold:#f5b700; --gold-ink:#7a5600; --ball:#e0702a; --shot:#ff3b30; --led:#111317; --led-fg:#f2f4f8;
+  --bar-bg:#1d428a; --stripe:#1d428a;
+  --accent:#1d428a; --accent-fg:#ffffff; --accent-soft:#e3eaf7; --done:#8a93a6;
+  --warn:#7a5600; --warn-soft:#fff2c9; --bad:#c4281c; --bad-soft:#fde4e1;
+  --c-glee:#0c6b76; --c-latin:#8a5900; --c-eng:#1a53a8; --c-msi:#19733f; --c-fr:#5c3ca3; --c-fgc:#b23814; --c-arts:#9e2c69; --c-health:#4f6a0f; --c-other:#5c6578;
+  --sans:"Barlow",system-ui,sans-serif; --mono:"Barlow Condensed","Arial Narrow",sans-serif; --head:"Graduate",Georgia,serif;
+  --ballsvg:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='9' fill='%23e0702a'/%3E%3Cg fill='none' stroke='%232b1404' stroke-width='1.1'%3E%3Ccircle cx='10' cy='10' r='9'/%3E%3Cpath d='M1 10h18M10 1v18M3.6 3.6c3 2.6 3 10.2 0 12.8M16.4 3.6c-3 2.6-3 10.2 0 12.8'/%3E%3C/g%3E%3C/svg%3E");
+  --sp-embed:dark; --sp-k:"Now playing · arena";
+  --leave-ms:700;
+  color-scheme:light;
+}
+html[data-skin="hardwood"][data-mode="dark"]:root{
+  --bg:#0b1324; --plank:rgb(255 255 255 / .025); --court:rgb(255 199 44 / .16);
+  --surface:#121c33; --surface-2:#18233d; --fg:#eef2fa; --muted:#a3afc6; --line:#26324d;
+  --royal:#5a86e0; --gold:#ffc72c; --gold-ink:#ffc72c;
+  --bar-bg:#121c33; --stripe:#ffc72c;
+  --accent:#ffc72c; --accent-fg:#0b1324; --accent-soft:#2c2c22; --done:#78829a;
+  --warn:#ffc72c; --warn-soft:#332d17; --bad:#ff8a7a; --bad-soft:#3a1f22;
+  --c-glee:#3fc4cf; --c-latin:#f0b13a; --c-eng:#6f9df0; --c-msi:#55cf86; --c-fr:#a58af0; --c-fgc:#ff7f4f; --c-arts:#ef7fbc; --c-health:#b2d455; --c-other:#9aa4b8;
+  color-scheme:dark;
+}
+
+html[data-skin="hardwood"]{
+  /* the floor: maple boards, and the center circle under everything */
+  body{background-color:var(--bg);font-size:14px;
+    background-image:repeating-linear-gradient(90deg,transparent 0 45px,var(--plank) 45px 47px),
+      repeating-linear-gradient(90deg,rgb(255 255 255 / .06) 0 47px,transparent 47px 94px),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.6' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.18 0 0 0 0 0.05 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E")}
+  body::before{content:"";position:fixed;right:-160px;bottom:-160px;width:440px;height:440px;border-radius:50%;pointer-events:none;z-index:-1;
+    box-shadow:0 0 0 5px var(--court),inset 0 0 0 150px transparent,inset 0 0 0 155px var(--court)}
+
+  /* header: the team banner with a gold stripe */
+  .bar{background:var(--bar-bg);color:#fff;border-bottom:4px solid var(--gold)}
+  .bar-date{font-family:var(--head);font-weight:400;font-size:17px;letter-spacing:.02em}
+  .bar-sub{color:rgb(255 255 255 / .78)}
+  .bar-sub b{color:var(--gold)}
+  .letter-pick select{border-radius:8px 8px 12px 12px;background:var(--gold);color:#13213b;font-family:var(--head);font-weight:400}
+  .bar-status{color:rgb(255 255 255 / .8)}
+  .bar-status span.pill{background:rgb(255 255 255 / .12);border-color:transparent;color:#fff}
+  .bar .btn,.bar .icon-btn,.bar .skin-pick{background:rgb(255 255 255 / .12);border-color:transparent;color:#fff}
+  .bar .btn.primary{background:var(--gold);color:#13213b;font-weight:700}
+  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:6px}
+  .btn{font-weight:600}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+  .link{color:var(--royal)}
+  &[data-mode="dark"] .link{color:var(--gold)}
+
+  /* panels: white boards with a banner stripe and varsity names */
+  .panel,details.extra{border-radius:10px;border:0;box-shadow:0 2px 0 rgb(0 0 0 / .14),0 6px 18px rgb(0 0 0 / .12)}
+  .panel{border-top:5px solid var(--stripe)}
+  .panel-h h2,.x-name{font-family:var(--head);font-weight:400;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+  .x-name{font-size:12px}
+  .panel-h h2::before{width:17px;height:17px;border-radius:50%;background:var(--ballsvg) center/contain no-repeat}
+
+  /* countdown: the shot clock */
+  .now-card{border-radius:8px;background:var(--led);color:var(--led-fg);box-shadow:inset 0 0 0 2px #2a2d33;padding:8px 14px 10px}
+  .now-card::before{content:"GAME CLOCK";font-family:var(--mono);font-weight:700;font-size:11.5px;letter-spacing:.22em;color:var(--gold)}
+  .now-card .num{font-family:var(--mono);font-weight:700;font-size:46px;line-height:.9;color:var(--shot);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .now-card .lbl{font-weight:600;color:var(--led-fg)}
+  .now-card .sub{color:#b9c0cc}
+  .now-card .sub b{color:#fff}
+  .now-card .prog{height:5px;background:#2a2d33}
+  .now-card .prog i{background:var(--gold)}
+
+  /* schedule: jersey numbers */
+  .tl li{border-radius:6px}
+  .tl .blk{border-radius:4px 4px 9px 9px;font-family:var(--head);font-weight:400;font-size:12px}
+  .tl .tm{font-family:var(--mono);font-size:13px;font-weight:600}
+  .tl li.now{background:var(--warn-soft)}
+  .tl li.now .tm{color:var(--fg)}
+  .tl li.now .prog i{background:var(--gold)}
+  .tl li.ev{background:transparent}
+
+  /* homework */
+  .cal .dow{font-family:var(--head);font-weight:400;font-size:11px}
+  .cell{border-radius:6px;background:var(--surface-2);border:1px solid transparent}
+  .cell .top b{font-family:var(--mono);font-weight:700;font-size:16px}
+  .cell.today .top b{background:var(--gold);color:#13213b;border-radius:4px}
+  .cell.sel{border-color:var(--royal);box-shadow:inset 0 0 0 1px var(--royal)}
+  .chip2{border-radius:3px}
+  .chip2.major{font-weight:700;background:var(--warn-soft)}
+
+  /* checklist: the box is a ball; a finished one is nothing but net */
+  .item{position:relative;border-radius:8px;border-left:4px solid var(--cc)}
+  .item.major{background:color-mix(in srgb,var(--gold) 12%,var(--surface-2))}
+  .check{border-radius:50%}
+  .check:checked{background:var(--ball);border-color:var(--ball)}
+  .check::after{border-color:#fff}
+  .title{font-weight:600}
+  .chip{text-transform:uppercase;letter-spacing:.04em;font-size:11px}
+  .tag{border-radius:3px;font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.08em}
+  .item.leaving{opacity:1}
+  .item.leaving.done{opacity:.7;transition:opacity .3s .35s}
+  .item.leaving.done::after{content:"SWISH";position:absolute;right:46px;top:50%;margin-top:-10px;font-family:var(--head);font-size:15px;color:var(--gold-ink);
+    transform:rotate(-6deg);animation:hw-swish .3s cubic-bezier(.3,1.5,.6,1);pointer-events:none}
+  .count{background:var(--royal);color:#fff}
+  &[data-mode="dark"] .count{background:var(--gold);color:#0b1324}
+
+  /* tests & quizzes: scoreboard dates */
+  .big li{border-radius:8px;border-left:4px solid var(--cc)}
+  .big .d{background:var(--led);color:var(--gold);border-radius:5px;padding:4px 6px;font-family:var(--mono);font-size:21px}
+  .big .d small{color:#b9c0cc}
+
+  /* rotation */
+  .seg{border-radius:6px}
+  .seg button{border-radius:4px;font-family:var(--mono);font-size:13px;letter-spacing:.04em}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+  .rot th{font-family:var(--head);font-weight:400;font-size:11px;border-radius:4px}
+  .rot th small{font-family:var(--mono);font-size:15px}
+  .rot th.cur{background:var(--gold);color:#13213b}
+  .rot td{border-radius:4px;font-weight:700}
+  .rot td.tm{font-size:12.5px}
+  .rot td.cur{outline:2px solid var(--gold);outline-offset:-2px}
+
+  /* extras */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:8px;background:var(--surface-2)}
+  .team,.ff-match{border-left:4px solid var(--royal)}
+  .counts .n{font-family:var(--mono);font-size:24px;color:var(--royal)}
+  &[data-mode="dark"] .counts .n{color:var(--gold)}
+  dialog{border-radius:12px;border-top:5px solid var(--stripe)}
+
+  /* music: the jumbotron, a basketball for the record */
+  .sp{border-radius:10px;border:3px solid #2a2d33;color:var(--led-fg);
+    background:radial-gradient(circle,#1c2029 1px,transparent 1.6px) 0 0/5px 5px,#0c0e12}
+  .sp-k{color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.16em}
+  #sp-title{font-family:var(--head);font-weight:400;font-size:15px;color:#fff}
+  .sp-disc{background:var(--ballsvg) center/100% no-repeat;box-shadow:0 2px 6px rgb(0 0 0 / .5)}
+  .sp-disc img{inset:28%;width:44%;height:44%;box-shadow:0 0 0 2px #2b1404}
+  .sp-disc::after{display:none}
+  .sp-size{background:transparent;color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,transparent)}
+  .sp-frame{border-radius:8px}
+  .sp-form input{background:#171a21;border-color:#2a2d33;color:#fff}
+  .sp-form input::placeholder{color:#8b93a3}
+  .sp-note{color:#a7afbd}
+  .sp-note .link{color:var(--gold)}
+  .sp-err{color:#ff8a7a}
+}
+@keyframes hw-swish{from{transform:rotate(-6deg) scale(0)}to{transform:rotate(-6deg) scale(1)}}

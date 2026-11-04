@@ -142,3 +142,16 @@ html[data-skin="blueprint"]{
 }
 @keyframes bp-draw{from{clip-path:inset(0 100% 100% 0)}to{clip-path:inset(0 0 0 0)}}
 @keyframes bp-pop{from{opacity:0;transform:scale(.4)}}
+
+/* music: Detail A, the cover drawn as a circle with center lines and the player boxed in dimension lines */
+html[data-skin="blueprint"]{
+  --sp-k:"Detail A · Audio";
+  .sp{border-radius:0;background:var(--surface);border:1px solid var(--sheet-line)}
+  .sp-k{font-family:var(--mono);font-weight:500;letter-spacing:.06em}
+  #sp-title{font-family:var(--head);font-weight:600}
+  .sp-disc{background:linear-gradient(var(--fg),var(--fg)) center/1px 100% no-repeat,linear-gradient(var(--fg),var(--fg)) center/100% 1px no-repeat;border:1px solid var(--fg);box-shadow:none}
+  .sp-disc img{inset:22%;width:56%;height:56%;box-shadow:0 0 0 1px var(--fg)}
+  .sp-disc::after{display:none}
+  .sp-frame{border-radius:0;outline:1px dashed var(--sheet-line);outline-offset:3px;margin:4px}
+  .sp-size,.sp-form input{border-radius:0}
+}

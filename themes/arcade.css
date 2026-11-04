@@ -1,0 +1,157 @@
+/* ARCADE: a retro console. Notched pixel boxes, a HUD countdown with an HP bar, butter-yellow numbers, faint scanlines.
+   Light mode is a handheld's green LCD. Pixel lettering only for short labels; everything you read is a plain, sturdy face. */
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Chakra+Petch:wght@400;500;600;700&display=swap");
+
+html[data-skin="arcade"]:root{
+  /* light: green handheld screen */
+  --bg:#8bac0f; --surface:#c9d98f; --surface-2:#b8cc74; --fg:#0f380f; --muted:#22461f; --line:#7f9d2e; --edge:#306230;
+  --screen:#0f380f; --screen-fg:#c9d98f; --coin:#0f380f; --hp:#306230; --neon:#306230;
+  --accent:#306230; --accent-fg:#d6e4a4; --accent-soft:#adc366; --done:#4f6f3a;
+  --warn:#5c4a00; --warn-soft:#d8d98a; --bad:#8a1c10; --bad-soft:#d9c98a;
+  --c-glee:#0f524f; --c-latin:#5a4300; --c-eng:#193d70; --c-msi:#1c4d1c; --c-fr:#47307a; --c-fgc:#782b08; --c-arts:#702352; --c-health:#384a0a; --c-other:#3d4a30;
+  --sans:"Chakra Petch",system-ui,sans-serif; --mono:"Chakra Petch",system-ui,sans-serif; --pixel:"Press Start 2P",monospace; --digits:"VT323",monospace;
+  --notch:polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px));
+  --sp-embed:dark; --sp-k:"SOUND TEST";
+  --leave-ms:750;
+  color-scheme:light;
+}
+html[data-skin="arcade"][data-mode="dark"]:root{
+  /* dark: a console in a dim room. A neutral charcoal base and soft, desaturated retro pastels (no neon:
+     saturated colors vibrate against dark backgrounds), mint for labels, coral for the one accent, butter for numbers */
+  --bg:#17191c; --surface:#202327; --surface-2:#272b30; --fg:#e7e5de; --muted:#b2b6bc; --line:#353a41; --edge:#3a3f47;
+  --screen:#121416; --screen-fg:#e7e5de; --coin:#ead28c; --hp:#9fcf93; --neon:#92cbbb;
+  --accent:#e3a08a; --accent-fg:#1a1c1f; --accent-soft:#3a2f2b; --done:#7c8087;
+  --warn:#ead28c; --warn-soft:#35311f; --bad:#ec9a8f; --bad-soft:#3b2726;
+  --c-glee:#8ccacc; --c-latin:#e4c47e; --c-eng:#97b6df; --c-msi:#9fcf93; --c-fr:#b8abd6; --c-fgc:#e3a08a; --c-arts:#dba5bf; --c-health:#c6d08a; --c-other:#a4a8ae;
+  color-scheme:dark;
+}
+
+html[data-skin="arcade"]{
+  /* the floor: a faint pixel grid; scanlines over everything in the dark, LCD dots in the light */
+  body{background-color:var(--bg);font-size:14px;
+    background-image:linear-gradient(color-mix(in srgb,var(--edge) 22%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--edge) 22%,transparent) 1px,transparent 1px);background-size:24px 24px}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(rgb(0 0 0 / .05) 0 1px,transparent 1px 3px)}
+  &[data-mode="light"] body::after{background:repeating-linear-gradient(90deg,rgb(15 56 15 / .035) 0 1px,transparent 1px 3px),repeating-linear-gradient(rgb(15 56 15 / .035) 0 1px,transparent 1px 3px)}
+
+  /* header */
+  .bar{background:var(--surface);border-bottom:3px solid var(--edge)}
+  .bar-date{font-family:var(--pixel);font-size:12px;line-height:1.5;letter-spacing:0}
+  .bar-sub{font-size:12.5px}
+  .letter-pick select{border-radius:0;clip-path:var(--notch);background:var(--accent);color:var(--accent-fg);font-family:var(--pixel);font-size:17px}
+  .bar-status span.pill{border-radius:0;border:2px solid var(--line);background:var(--surface-2)}
+  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:0;clip-path:var(--notch);border:2px solid var(--line);background:var(--surface-2)}
+  .btn{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:13px}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+  .link{color:var(--accent)}
+  &[data-mode="dark"] .link{color:var(--neon)}
+
+  /* panels: notched pixel boxes */
+  .panel,details.extra{border-radius:0;clip-path:var(--notch);background:var(--surface);border:3px solid var(--edge)}
+  .panel-h h2,.x-name{font-family:var(--pixel);font-weight:400;font-size:10px;letter-spacing:.02em;text-transform:uppercase;color:var(--neon);line-height:1.6}
+  .x-name{font-size:9px}
+  .panel-h h2::before{width:10px;height:10px;border-radius:0;background:var(--coin);
+    clip-path:polygon(30% 0,70% 0,70% 15%,85% 15%,85% 30%,100% 30%,100% 70%,85% 70%,85% 85%,70% 85%,70% 100%,30% 100%,30% 85%,15% 85%,15% 70%,0 70%,0 30%,15% 30%,15% 15%,30% 15%)}
+  .panel-meta,.x-tease,.panel-foot{font-size:12px}
+
+  /* countdown: a HUD with an HP bar */
+  .now-card{border-radius:0;clip-path:var(--notch);background:var(--screen);color:var(--screen-fg);border:3px solid var(--neon);padding:8px 14px 10px}
+  .now-card::before{content:"PLAYER 1";font-family:var(--pixel);font-size:9px;color:var(--neon)}
+  &[data-mode="light"] .now-card::before{color:var(--screen-fg)}
+  .now-card .num{font-family:var(--digits);font-weight:400;font-size:50px;line-height:.8;color:var(--coin)}
+  &[data-mode="light"] .now-card .num{color:var(--screen-fg)}
+  .now-card .lbl{font-weight:700}
+  .now-card .sub{color:color-mix(in srgb,var(--screen-fg) 75%,var(--screen))}
+  .now-card .sub b{color:var(--screen-fg)}
+  .now-card .prog{height:10px;border-radius:0;background:color-mix(in srgb,var(--screen-fg) 14%,transparent)}
+  .now-card .prog i{border-radius:0;background:repeating-linear-gradient(90deg,var(--hp) 0 7px,transparent 7px 9px)}
+  &[data-mode="light"] .now-card .prog i{background:repeating-linear-gradient(90deg,var(--screen-fg) 0 7px,transparent 7px 9px)}
+
+  /* schedule: tiles, and a cursor on the block you're in */
+  .tl li{border-radius:0}
+  .tl .blk{border-radius:0;clip-path:var(--notch);color:var(--bg);font-family:var(--pixel);font-weight:400;font-size:9px}
+  &[data-mode="light"] .tl li:not(.free,.ev) .blk{color:#e2edb8}
+  .tl .tm{font-size:12px}
+  .tl li.now{background:var(--accent-soft)}
+  .tl li.now .cn::before{content:"▶ ";color:var(--coin)}
+  .tl li.now .tm{color:var(--fg);font-weight:600}
+  .tl li.ev{background:transparent}
+  .after{border-top:2px dashed var(--line)}
+
+  /* homework: level-select tiles; tests carry a star */
+  .cal .dow{font-family:var(--pixel);font-size:8px;letter-spacing:0}
+  .cell{border-radius:0;clip-path:var(--notch);background:var(--surface-2);border:2px solid transparent}
+  .cell .top b{font-family:var(--digits);font-weight:400;font-size:21px;line-height:.9}
+  .cell.today .top b{background:var(--coin);color:var(--bg);border-radius:0;padding:0 5px}
+  &[data-mode="light"] .cell.today .top b{background:var(--screen);color:var(--screen-fg)}
+  .cell.sel{border-color:var(--accent);box-shadow:none}
+  .cell.off{clip-path:none;border:2px dashed var(--line)}
+  .chip2{border-radius:0;background:var(--surface)}
+  .chip2.major{font-weight:700}
+  .chip2.major::before{content:"★ ";color:var(--coin)}
+
+  /* checklist: quests; finishing one drops a +100 */
+  .item{position:relative;border-radius:0;clip-path:var(--notch);background:var(--surface-2);border-left:5px solid var(--cc)}
+  .item.major{background:color-mix(in srgb,var(--cc) 14%,var(--surface-2))}
+  .check{border-radius:0;border-width:2px}
+  .title{font-weight:600}
+  .chip{text-transform:uppercase;letter-spacing:.04em;font-size:11px}
+  .tag{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:7.5px;letter-spacing:0;padding:3px 4px 2px;color:var(--bg)}
+  &[data-mode="light"] .tag{color:#e2edb8}
+  .tag.unsure{color:var(--muted)}
+  .item.leaving{opacity:1}
+  .item.leaving.done{clip-path:none;opacity:.7;transition:opacity .3s .4s}
+  .item.leaving.done::after{content:"+100";position:absolute;right:44px;top:50%;margin-top:-8px;font-family:var(--pixel);font-size:11px;color:var(--coin);
+    text-shadow:2px 2px 0 var(--bg);animation:ar-coin .7s steps(7) forwards;pointer-events:none}
+  .hw-note,.empty-state,.overdue-strip{border-radius:0}
+  .count{border-radius:0;background:var(--coin);color:var(--bg);font-family:var(--digits);font-size:15px;font-weight:400;line-height:1.1}
+  &[data-mode="light"] .count{background:var(--screen);color:var(--screen-fg)}
+
+  /* tests & quizzes: boss fights */
+  .big li{border-radius:0;clip-path:var(--notch);background:var(--surface-2);border-left:5px solid var(--cc)}
+  .big .d{font-family:var(--digits);font-weight:400;font-size:26px;line-height:.85}
+  .big .d small{font-family:var(--pixel);font-size:7px;margin-top:4px}
+
+  /* rotation */
+  .seg{border-radius:0;border:2px solid var(--line)}
+  .seg button{border-radius:0;font-weight:700;text-transform:uppercase;font-size:11px}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+  .rot th{font-family:var(--pixel);font-weight:400;font-size:8px;border-radius:0}
+  .rot th small{font-family:var(--digits);font-size:19px;font-weight:400;line-height:1}
+  .rot th.cur{background:var(--accent);color:var(--accent-fg)}
+  .rot td{border-radius:0;font-weight:700}
+  .rot td.tm{font-size:11.5px}
+  .rot td.cur{outline:2px solid var(--coin);outline-offset:-2px}
+  &[data-mode="light"] .rot td.cur{outline-color:var(--screen)}
+
+  /* extras */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:var(--surface-2);border:2px solid var(--line)}
+  .counts .n{font-family:var(--digits);font-weight:400;font-size:28px;color:var(--coin)}
+  &[data-mode="light"] .counts .n{color:var(--fg)}
+  .count-form input,.sp-form input{border-radius:0;border-width:2px}
+  dialog{border-radius:0;border:3px solid var(--neon)}
+
+  /* music: a sound-test screen, the cover as a cartridge label */
+  .sp{border-radius:0;clip-path:var(--notch);background:var(--screen);border:3px solid var(--accent);color:var(--screen-fg)}
+  .sp-k{font-family:var(--pixel);font-weight:400;font-size:8px;letter-spacing:0;color:var(--neon);margin-bottom:3px}
+  &[data-mode="light"] .sp-k{color:var(--screen-fg)}
+  #sp-title{font-family:var(--digits);font-weight:400;font-size:24px;line-height:1;color:var(--coin)}
+  &[data-mode="light"] #sp-title{color:var(--screen-fg)}
+  .sp-disc{border-radius:0;width:44px;height:48px;background:var(--edge);clip-path:polygon(0 0,75% 0,100% 18%,100% 100%,0 100%);box-shadow:none}
+  .sp-disc img{inset:6px 6px 10px;width:calc(100% - 12px);height:calc(100% - 16px);border-radius:0}
+  .sp-disc::after{display:none}
+  .sp-size{background:transparent;color:var(--screen-fg);border-color:color-mix(in srgb,var(--screen-fg) 40%,transparent);font-family:var(--pixel);font-size:8px;padding:6px 8px}
+  .sp-frame{border-radius:0}
+  .sp-form input{background:var(--surface);color:var(--fg);border-color:var(--line)}
+  .sp-note{color:color-mix(in srgb,var(--screen-fg) 75%,var(--screen))}
+  .sp-note .link{color:var(--coin)}
+  &[data-mode="light"] .sp-note .link{color:var(--screen-fg)}
+  .sp-err{color:#ff8a8a}
+
+  @media (max-width:759px){
+    .bar .bar-date{font-size:10px;letter-spacing:0}
+  }
+  @media (max-width:600px){
+    .chip2.major::before{content:none}
+  }
+}
+@keyframes ar-coin{from{transform:translateY(0);opacity:1}to{transform:translateY(-22px);opacity:0}}

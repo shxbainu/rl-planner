@@ -1,0 +1,136 @@
+/* CHESS CLUB: a tournament hall. Ivory and ebony squares, a chess clock for the countdown, one flag-orange accent.
+   Panels carry a checkered edge and a piece; tests get the "!!" a great move earns. Dark mode flips the pieces. */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Libre+Franklin:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap");
+
+html[data-skin="chess"]:root{
+  --bg:#e8eaed; --sq:#dde0e4; --surface:#ffffff; --surface-2:#f3f4f6; --fg:#16181b; --muted:#545b65; --line:#d4d8dd;
+  --ebony:#1c1e22; --ivory:#fafaf8; --flag:#b83d0a; --flag-soft:#fbe9e0; --flag-fg:#ffffff;
+  --accent:#1c1e22; --accent-fg:#fafaf8; --accent-soft:#eceef1; --done:#8b9098;
+  --warn:#8a4b00; --warn-soft:#fbeedd; --bad:#b42318; --bad-soft:#fde8e6;
+  --c-glee:#0f6e72; --c-latin:#855b00; --c-eng:#214f96; --c-msi:#1f6d3e; --c-fr:#55399a; --c-fgc:#ad3a0b; --c-arts:#972d63; --c-health:#556c10; --c-other:#5f6672;
+  --sans:"Libre Franklin",system-ui,sans-serif; --mono:"Roboto Mono",ui-monospace,monospace; --head:"Playfair Display",Georgia,serif;
+  --glyph:"Apple Symbols","Segoe UI Symbol","DejaVu Sans","Noto Sans Symbols 2",serif;
+  --sp-k:"Opening theme";
+  --leave-ms:650;
+  color-scheme:light;
+}
+html[data-skin="chess"][data-mode="dark"]:root{
+  --bg:#121315; --sq:#17181b; --surface:#1c1d21; --surface-2:#232429; --fg:#ecebe6; --muted:#a5a8af; --line:#30323a;
+  --ebony:#ecebe6; --ivory:#16171a; --flag:#ff7a3d; --flag-soft:#3a2418; --flag-fg:#16171a;
+  --accent:#ecebe6; --accent-fg:#16171a; --accent-soft:#2a2c32; --done:#7d8088;
+  --warn:#f2b45a; --warn-soft:#352a1a; --bad:#ff8a7a; --bad-soft:#3a1f1c;
+  --c-glee:#4fc4c9; --c-latin:#e8b040; --c-eng:#7aa7ef; --c-msi:#5fcf8a; --c-fr:#ab92f0; --c-fgc:#ff8a4c; --c-arts:#ee86bd; --c-health:#b6d35a; --c-other:#9aa1ad;
+  color-scheme:dark;
+}
+
+html[data-skin="chess"]{
+  /* the hall floor: a big, quiet board */
+  body{background:repeating-conic-gradient(var(--sq) 0 25%,var(--bg) 0 50%) 0 0/144px 144px;font-size:14px}
+
+  /* header, with a checkered edge */
+  .bar{background:var(--surface);border-bottom:0}
+  .bar::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:6px;background:repeating-conic-gradient(var(--ebony) 0 25%,var(--surface) 0 50%) 0 0/12px 12px}
+  .bar-date{font-family:var(--head);font-weight:700;font-size:19px}
+  .letter-pick select{border-radius:3px;background:var(--ebony);color:var(--ivory);font-family:var(--head)}
+  .bar-status span.pill{border-radius:3px}
+  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:3px}
+  .btn.primary{background:var(--ebony);border-color:var(--ebony);color:var(--ivory)}
+  .link{color:var(--fg)}
+  .dash{padding-top:18px}
+
+  /* panels: a checkered edge along the top, and a piece by the name */
+  .panel{position:relative;border-radius:4px;padding-top:20px}
+  .panel::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;border-radius:3px 3px 0 0;background:repeating-conic-gradient(var(--ebony) 0 25%,var(--surface) 0 50%) 0 0/16px 16px}
+  details.extra{border-radius:4px}
+  .panel-h h2{font-family:var(--head);font-weight:700;font-size:17px;letter-spacing:0;text-transform:none}
+  .panel-h h2::before{content:"\2654\FE0E";width:auto;height:auto;border-radius:0;background:none;font-family:var(--glyph);font-size:19px;line-height:1;font-weight:400}
+  .p-hw .panel-h h2::before{content:"\2655\FE0E"}
+  .p-big .panel-h h2::before{content:"\2656\FE0E"}
+  .p-week .panel-h h2::before{content:"\2658\FE0E"}
+  .x-name{font-family:var(--head);font-weight:700;font-size:14px;letter-spacing:0;text-transform:none}
+
+  /* countdown: a chess clock, its flag in the corner */
+  .now-card{position:relative;border-radius:6px;background:var(--ebony);color:var(--ivory);padding:10px 14px 12px}
+  .now-card::after{content:"";position:absolute;top:10px;right:12px;width:12px;height:16px;background:var(--flag);clip-path:polygon(0 0,100% 30%,0 60%);box-shadow:none}
+  .now-card .num{font-family:var(--mono);font-weight:600;font-size:34px;letter-spacing:-.02em;color:var(--ivory);font-variant-numeric:tabular-nums}
+  .now-card .lbl{font-weight:600}
+  .now-card .sub{color:color-mix(in srgb,var(--ivory) 72%,var(--ebony))}
+  .now-card .sub b{color:var(--ivory)}
+  .now-card .prog{height:4px;border-radius:0;background:color-mix(in srgb,var(--ivory) 20%,transparent)}
+  .now-card .prog i{border-radius:0;background:var(--flag)}
+
+  /* schedule: the block letters alternate light and dark squares */
+  .tl li{border-radius:3px}
+  .tl .blk{border-radius:2px;font-family:var(--mono);font-weight:600;font-size:12px}
+  .tl li:not(.free,.ev) .blk{border-bottom:3px solid var(--cc)}
+  .tl li:not(.free,.ev):nth-child(odd) .blk{background:var(--ebony);color:var(--ivory)}
+  .tl li:not(.free,.ev):nth-child(even) .blk{background:var(--surface);color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--ebony)}
+  .tl .tm{font-size:11.5px}
+  .tl li.now{background:var(--flag-soft)}
+  .tl li.now .tm{color:var(--flag);font-weight:600}
+  .tl li.now .prog i{background:var(--flag)}
+  .tl li.ev{background:transparent}
+
+  /* homework: the calendar is a board (five columns, so the squares alternate on their own) */
+  .cal .dow{font-family:var(--head);font-weight:700;font-size:12px;letter-spacing:.02em;text-transform:none}
+  .cell{border-radius:2px;border:1px solid var(--line);background:var(--surface)}
+  .cal > .cell:nth-child(even){background:var(--surface-2)}
+  .cell .top b{font-family:var(--mono);font-weight:600}
+  .cell.today .top b{background:var(--flag);color:var(--flag-fg);border-radius:2px}
+  .cell.sel{border-color:var(--ebony);box-shadow:inset 0 0 0 1px var(--ebony)}
+  .cell.off{background:transparent}
+  .chip2{border-radius:2px;background:var(--surface)}
+  .cal > .cell:nth-child(odd) .chip2{background:var(--surface-2)}
+  .chip2.major{font-weight:700;background:var(--flag-soft)}
+  .chip2.major::before{content:"!! ";color:var(--flag);font-weight:700}
+
+  /* checklist: a big move is marked !!; finishing one captures a queen */
+  .item{position:relative;border-radius:3px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--cc)}
+  .item.major{background:var(--surface)}
+  .item.major .title::after{content:" !!";color:var(--flag);font-weight:700}
+  .check{border-radius:2px;border-color:var(--ebony)}
+  .check:checked{background:var(--ebony)}
+  .check::after{border-color:var(--ivory)}
+  .title{font-weight:500}
+  .tag{border-radius:2px;background:var(--ebony);color:var(--ivory);font-family:var(--mono);font-weight:500;letter-spacing:.02em}
+  .tag.bad{background:var(--bad);color:#fff}
+  .item.leaving{opacity:1}
+  .item.leaving.done{opacity:.7;transition:opacity .3s .35s}
+  .item.leaving.done::after{content:"\265B\FE0E";position:absolute;right:46px;top:50%;margin-top:-14px;font-family:var(--glyph);font-size:24px;line-height:1;color:var(--flag);animation:ch-take .3s cubic-bezier(.3,1.5,.6,1);pointer-events:none}
+  .count{border-radius:2px;background:var(--ebony);color:var(--ivory)}
+
+  /* tests & quizzes: the date as a clock face */
+  .big li{border-radius:3px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--cc)}
+  .big .d{background:var(--ebony);color:var(--ivory);border-radius:3px;padding:4px 6px;font-family:var(--mono);font-size:16px}
+  .big .d small{color:color-mix(in srgb,var(--ivory) 70%,var(--ebony))}
+
+  /* rotation */
+  .seg{border-radius:3px}
+  .seg button{border-radius:2px}
+  .seg button[aria-pressed="true"]{background:var(--ebony);color:var(--ivory)}
+  .rot th{font-family:var(--head);font-weight:700;border-radius:2px}
+  .rot th small{font-family:var(--mono)}
+  .rot th.cur{background:var(--ebony);color:var(--ivory)}
+  .rot td{border-radius:2px}
+  .rot td.cur{outline:2px solid var(--flag);outline-offset:-2px}
+
+  /* extras */
+  :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:3px;background:var(--surface-2)}
+  .counts .n{font-family:var(--mono);color:var(--fg)}
+  dialog{border-radius:6px}
+
+  /* music: a checkered record under a clock-black band */
+  .sp{border-radius:4px;background:var(--surface);overflow:hidden}
+  .sp-head{background:var(--ebony);color:var(--ivory);margin:-10px -10px 0;padding:9px 10px}
+  .sp-k{color:var(--flag);font-family:var(--mono);font-weight:500}
+  #sp-title{font-family:var(--head);font-weight:700;font-size:16px}
+  .sp-disc{background:repeating-conic-gradient(var(--ivory) 0 25%,color-mix(in srgb,var(--ivory) 70%,var(--ebony)) 0 50%) 50% 50%/12px 12px;box-shadow:0 0 0 2px var(--ivory)}
+  .sp-disc::after{background:var(--ebony)}
+  .sp-size{background:transparent;color:var(--ivory);border-color:color-mix(in srgb,var(--ivory) 45%,transparent)}
+  .sp-frame{border-radius:6px}
+
+  @media (max-width:600px){
+    .chip2.major::before{content:none}
+  }
+}
+@keyframes ch-take{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}

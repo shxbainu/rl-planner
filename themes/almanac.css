@@ -1,47 +1,57 @@
-/* SEED ALMANAC: a vintage seed catalog and farmer's almanac. Kraft paper, cream seed packets, tomato / mustard / leaf.
-   Each panel is a packet with a small flat illustration and a scalloped foot. Cheerful, with plenty of air; no mascots. */
+/* SEED ALMANAC: a vintage seed catalog in a spring garden. Pea-green page scattered with seeds, a deep-green almanac masthead,
+   white seed packets printed in tomato / sunflower / cornflower / leaf, each with a small flat illustration and a scalloped foot.
+   Cheerful, with plenty of air; no mascots. */
 @import url("https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Work+Sans:wght@400;500;600;700&display=swap");
 
 html[data-skin="almanac"]:root{
-  --bg:#e6d5b8; --surface:#f6eedc; --surface-2:#f0e5cd; --fg:#3b2e22; --muted:#665544; --line:#ddcca9;
-  --tomato:#d9502f; --mustard:#e2a93b; --leaf:#5e8c4a;
-  --accent:#b8401f; --accent-fg:#fff8ea; --accent-soft:#f6dccd; --done:#968670;
-  --warn:#80570f; --warn-soft:#f5e3b5; --bad:#a83a1c; --bad-soft:#f5d9cd; --leaf-ink:#3f6a2e;
-  --c-glee:#3f9187; --c-latin:#e2a93b; --c-eng:#5a7fc2; --c-msi:#5e8c4a; --c-fr:#7a4e86; --c-fgc:#d9502f; --c-arts:#c95c83; --c-health:#d98632; --c-other:#968670;
+  --bg:#d2e2bd; --surface:#fdfdf9; --surface-2:#f1f5e9; --fg:#1f2b1c; --muted:#4e5e47; --line:#d3dfc5;
+  --tomato:#d8432b; --mustard:#eaa91c; --leaf:#3f7d3a; --sky:#4f86bd; --seed:#2f5a2b;
+  --mast:#2c5a29; --mast-fg:#f6f9ee; --mast-muted:#cfe0c4;
+  --accent:#b83a24; --accent-fg:#ffffff; --accent-soft:#f8e1da; --done:#87927f;
+  --warn:#7a5800; --warn-soft:#fbefc8; --bad:#a8321c; --bad-soft:#f7dbd3; --leaf-ink:#2f6a2b;
+  --c-glee:#2f8f86; --c-latin:#c98a00; --c-eng:#3f72c2; --c-msi:#3f7d3a; --c-fr:#7b3f86; --c-fgc:#d8432b; --c-arts:#c9507e; --c-health:#d97a1e; --c-other:#7d8a75;
   --sans:"Work Sans",system-ui,sans-serif; --mono:"Work Sans",system-ui,sans-serif; --head:"Abril Fatface",Georgia,serif;
-  --moon-dark:#cbb48c; --moon-lit:#f9f1dc;
+  --moon-dark:#5f8a58; --moon-lit:#f6f9ee;
+  --sp-k:"Variety";
   --leave-ms:700;
   color-scheme:light;
 }
 html[data-skin="almanac"][data-mode="dark"]:root{
-  --bg:#221a13; --surface:#2f251c; --surface-2:#382c21; --fg:#f1e6d0; --muted:#c4b398; --line:#4a3b2c;
-  --tomato:#ec6a48; --mustard:#f0bc55; --leaf:#7aaa62;
-  --accent:#ec6a48; --accent-fg:#221a13; --accent-soft:#45291e; --done:#8c7d68;
-  --warn:#f0bc55; --warn-soft:#3d3020; --bad:#f08a6c; --bad-soft:#45271d; --leaf-ink:#93c07b;
-  --c-glee:#5eb0a5; --c-latin:#f0bc55; --c-eng:#7c9ddb; --c-msi:#7aaa62; --c-fr:#a679b3; --c-fgc:#ec6a48; --c-arts:#e07fa2; --c-health:#ee9f4f;
-  --moon-dark:#4a3b2c; --moon-lit:#f1e6d0;
+  --bg:#111a13; --surface:#1a261c; --surface-2:#203024; --fg:#e7efdf; --muted:#a9b9a0; --line:#2f4232;
+  --tomato:#f0694e; --mustard:#f4bd45; --leaf:#74b267; --sky:#86b1dc; --seed:#9cc58f;
+  --mast:#16231a; --mast-fg:#e7efdf; --mast-muted:#a9b9a0;
+  --accent:#f0694e; --accent-fg:#111a13; --accent-soft:#3d2620; --done:#7f8c78;
+  --warn:#f4bd45; --warn-soft:#33301b; --bad:#f58b72; --bad-soft:#3d241e; --leaf-ink:#93c787;
+  --c-glee:#5ab8ad; --c-latin:#f4bd45; --c-eng:#7ca2e0; --c-msi:#74b267; --c-fr:#b07abf; --c-fgc:#f0694e; --c-arts:#e584a8; --c-health:#f09a4d;
+  --moon-dark:#2f4232; --moon-lit:#e7efdf;
   color-scheme:dark;
 }
 
 html[data-skin="almanac"]{
-  /* kraft paper fiber on the page only */
-  body{background-color:var(--bg);font-size:13.5px;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7 0.05' numOctaves='2' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.24 0 0 0 0 0.12 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23k)'/%3E%3C/svg%3E")}
+  /* the garden bed: a scatter of seeds on the page only */
+  body{background-color:var(--bg);font-size:14px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='%232f5a2b' fill-opacity='.16'%3E%3Cellipse cx='22' cy='30' rx='3' ry='5' transform='rotate(30 22 30)'/%3E%3Cellipse cx='96' cy='18' rx='2.6' ry='4.4' transform='rotate(-40 96 18)'/%3E%3Cellipse cx='150' cy='70' rx='3' ry='5' transform='rotate(70 150 70)'/%3E%3Cellipse cx='60' cy='98' rx='2.4' ry='4' transform='rotate(-15 60 98)'/%3E%3Cellipse cx='124' cy='136' rx='3' ry='5' transform='rotate(20 124 136)'/%3E%3Cellipse cx='30' cy='156' rx='2.6' ry='4.4' transform='rotate(-60 30 156)'/%3E%3C/svg%3E")}
+  &[data-mode="dark"] body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='%239cc58f' fill-opacity='.07'%3E%3Cellipse cx='22' cy='30' rx='3' ry='5' transform='rotate(30 22 30)'/%3E%3Cellipse cx='96' cy='18' rx='2.6' ry='4.4' transform='rotate(-40 96 18)'/%3E%3Cellipse cx='150' cy='70' rx='3' ry='5' transform='rotate(70 150 70)'/%3E%3Cellipse cx='60' cy='98' rx='2.4' ry='4' transform='rotate(-15 60 98)'/%3E%3Cellipse cx='124' cy='136' rx='3' ry='5' transform='rotate(20 124 136)'/%3E%3Cellipse cx='30' cy='156' rx='2.6' ry='4.4' transform='rotate(-60 30 156)'/%3E%3C/svg%3E")}
 
   /* header, with an almanac strip beside the date */
-  .bar{background:var(--surface);border-bottom:2px solid var(--fg)}
+  .bar{background:var(--mast);color:var(--mast-fg);border-bottom:3px solid var(--mustard)}
+  .bar-sub{color:var(--mast-muted)}
+  .bar-sub b{color:var(--mustard)}
   .bar-date{font-family:var(--head);font-weight:400;font-size:21px;letter-spacing:.01em}
-  .letter-pick select{border-radius:50%;background:var(--accent);color:var(--accent-fg);font-family:var(--head);font-weight:400;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--accent)}
+  .letter-pick select{border-radius:50%;background:var(--tomato);color:#fff;font-family:var(--head);font-weight:400;box-shadow:0 0 0 2px var(--mast),0 0 0 3.5px var(--tomato)}
   @media (min-width:1100px){
-    .almanac{display:flex;align-items:center;gap:8px;margin-left:10px;padding-left:12px;border-left:1px solid var(--line);font-size:12px;line-height:1.25;white-space:nowrap}
+    .almanac{display:flex;align-items:center;gap:8px;margin-left:10px;padding-left:12px;border-left:1px solid color-mix(in srgb,var(--mast-fg) 25%,transparent);font-size:12px;line-height:1.25;white-space:nowrap}
     .almanac svg{width:22px;height:22px;flex:none}
     .almanac .m-dark{fill:var(--moon-dark)}
-    .almanac .m-lit{fill:var(--moon-lit);stroke:var(--fg);stroke-width:.6}
+    .almanac .m-lit{fill:var(--moon-lit);stroke:var(--mast-fg);stroke-width:.6}
     .almanac b{display:block;font-variant:small-caps;font-weight:600;letter-spacing:.04em}
-    .almanac small{display:block;color:var(--muted);font-size:11.5px}
+    .almanac small{display:block;color:var(--mast-muted);font-size:11.5px}
   }
-  .bar-status span.pill{border-radius:999px;background:var(--surface-2)}
-  .btn,.icon-btn,.skin-pick{border-radius:6px;background:var(--surface-2)}
+  .bar-status{color:var(--mast-muted)}
+  .bar-status span.pill{border-radius:999px;background:rgb(255 255 255 / .1);border-color:transparent;color:var(--mast-fg)}
+  .bar .btn,.bar .icon-btn,.bar .skin-pick{background:rgb(255 255 255 / .1);border-color:transparent;color:var(--mast-fg)}
+  .bar .btn.primary{background:var(--mustard);color:#2a2a10}
+  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:6px;background:var(--surface-2)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
   .link{color:var(--accent)}
 
@@ -51,7 +61,7 @@ html[data-skin="almanac"]{
     mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat}
   .p-hw{--band:var(--tomato)}
   .p-sched{--band:var(--mustard)}
-  .p-big{--band:var(--tomato)}
+  .p-big{--band:var(--sky)}
   .p-week{--band:var(--leaf)}
   details.extra{border-radius:6px;border:1px solid var(--line);background:var(--surface)}
   .panel-h h2,.x-name{font-family:var(--head);font-weight:400;text-transform:none;letter-spacing:.01em;font-size:19px}
@@ -60,7 +70,8 @@ html[data-skin="almanac"]{
   /* carrot, sunflower, tomato, pea pod: flat, two or three colors each */
   .p-hw{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M12.5 6.5 4 17.5c-.6.7.2 1.4.9.9L15.5 9z' fill='%23d98632'/%3E%3Cpath d='M13 7c.5-2.5 1.8-4.6 3.6-5.4-.3 1.6-.9 3.2-2 4.6 1.6-.6 3.3-.6 4.4 0-1.7 1-3.5 1.6-5.3 1.6z' fill='%235e8c4a'/%3E%3C/svg%3E")}
   .p-sched{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='%23e2a93b'%3E%3Cellipse cx='10' cy='3.2' rx='1.8' ry='3'/%3E%3Cellipse cx='10' cy='16.8' rx='1.8' ry='3'/%3E%3Cellipse cx='3.2' cy='10' rx='3' ry='1.8'/%3E%3Cellipse cx='16.8' cy='10' rx='3' ry='1.8'/%3E%3Cellipse cx='5.2' cy='5.2' rx='1.7' ry='2.8' transform='rotate(-45 5.2 5.2)'/%3E%3Cellipse cx='14.8' cy='14.8' rx='1.7' ry='2.8' transform='rotate(-45 14.8 14.8)'/%3E%3Cellipse cx='14.8' cy='5.2' rx='1.7' ry='2.8' transform='rotate(45 14.8 5.2)'/%3E%3Cellipse cx='5.2' cy='14.8' rx='1.7' ry='2.8' transform='rotate(45 5.2 14.8)'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='3.6' fill='%235a3a22'/%3E%3C/svg%3E")}
-  .p-big{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 6.5c4.6 0 7.5 2.6 7.5 6s-3.2 6-7.5 6-7.5-2.6-7.5-6 2.9-6 7.5-6z' fill='%23d9502f'/%3E%3Cpath d='M10 7.5 7 4.5l2.2.6L10 2.5l.8 2.6L13 4.5z' fill='%235e8c4a'/%3E%3C/svg%3E")}
+  /* cornflower: blue petals round a dark eye */
+  .p-big{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='%234f86bd'%3E%3Cellipse cx='10' cy='3.6' rx='2' ry='3.4'/%3E%3Cellipse cx='10' cy='16.4' rx='2' ry='3.4'/%3E%3Cellipse cx='3.6' cy='10' rx='3.4' ry='2'/%3E%3Cellipse cx='16.4' cy='10' rx='3.4' ry='2'/%3E%3Cellipse cx='5.5' cy='5.5' rx='1.8' ry='3' transform='rotate(-45 5.5 5.5)'/%3E%3Cellipse cx='14.5' cy='14.5' rx='1.8' ry='3' transform='rotate(-45 14.5 14.5)'/%3E%3Cellipse cx='14.5' cy='5.5' rx='1.8' ry='3' transform='rotate(45 14.5 5.5)'/%3E%3Cellipse cx='5.5' cy='14.5' rx='1.8' ry='3' transform='rotate(45 5.5 14.5)'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='3' fill='%23243f5c'/%3E%3C/svg%3E")}
   .p-week{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M2.5 15C5 8 11 4.5 17.5 4.5 16 11 10.5 16 2.5 15z' fill='%235e8c4a'/%3E%3Cg fill='%239cc47e'%3E%3Ccircle cx='7' cy='12.2' r='1.7'/%3E%3Ccircle cx='10.2' cy='10' r='1.7'/%3E%3Ccircle cx='13.4' cy='7.6' r='1.7'/%3E%3C/g%3E%3C/svg%3E")}
   .panel-meta,.x-tease,.panel-foot{font-size:11.5px}
 
@@ -110,8 +121,8 @@ html[data-skin="almanac"]{
   .done-box:has(.count[data-stage="2"]) summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 20'%3E%3Cpath d='M9 19.5v-9' stroke='%235e8c4a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M9 15c0-2.5-2-4-4.5-3.8C4.5 13.6 6.5 15 9 15zM9 12c0-2.6 2-4.5 4.8-4.5 0 2.7-2 4.5-4.8 4.5z' fill='%235e8c4a'/%3E%3C/svg%3E")}
   .done-box:has(.count[data-stage="3"]) summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 20'%3E%3Cpath d='M9 19.5v-13' stroke='%235e8c4a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M9 15c0-2.5-2-4-4.5-3.8C4.5 13.6 6.5 15 9 15zM9 12c0-2.6 2-4.5 4.8-4.5 0 2.7-2 4.5-4.8 4.5z' fill='%235e8c4a'/%3E%3Cellipse cx='9' cy='4.5' rx='2.2' ry='3' fill='%23e2a93b'/%3E%3C/svg%3E")}
   .done-box:has(.count[data-stage="4"]) summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 20'%3E%3Cpath d='M9 19.5v-12' stroke='%235e8c4a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M9 15c0-2.5-2-4-4.5-3.8C4.5 13.6 6.5 15 9 15zM9 12c0-2.6 2-4.5 4.8-4.5 0 2.7-2 4.5-4.8 4.5z' fill='%235e8c4a'/%3E%3Cg fill='%23d9502f'%3E%3Ccircle cx='9' cy='2.4' r='2'/%3E%3Ccircle cx='11.6' cy='4.6' r='2'/%3E%3Ccircle cx='10.6' cy='7.4' r='2'/%3E%3Ccircle cx='7.4' cy='7.4' r='2'/%3E%3Ccircle cx='6.4' cy='4.6' r='2'/%3E%3C/g%3E%3Ccircle cx='9' cy='5.2' r='1.6' fill='%23e2a93b'/%3E%3C/svg%3E")}
-  .count{background:var(--leaf-ink);color:#fff8ea}
-  &[data-mode="dark"] .count{color:#221a13}
+  .count{background:var(--leaf-ink);color:#fff}
+  &[data-mode="dark"] .count{color:#111a13}
   .hw-note,.empty-state,.overdue-strip{border-radius:5px}
 
   /* tests & quizzes: germination-time labels */
@@ -137,6 +148,17 @@ html[data-skin="almanac"]{
   .counts .n{font-family:var(--head);font-weight:400;color:var(--accent)}
   .count-form input{border-radius:5px}
   dialog{border-radius:8px}
+
+  /* music: a seed packet for the record, the cover at the heart of a sunflower */
+  .sp{border:0;border-top:6px solid var(--mustard);border-radius:6px 6px 0 0;background:var(--surface);padding-bottom:18px;
+    -webkit-mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat;
+    mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat}
+  .sp-k{font-variant:small-caps;text-transform:lowercase;letter-spacing:.08em;font-size:12.5px;color:var(--leaf-ink)}
+  #sp-title{font-family:var(--head);font-weight:400;font-size:18px;line-height:1.15}
+  .sp-disc{width:52px;height:52px;background:radial-gradient(circle,#6b4423 0 34%,transparent 35%),repeating-conic-gradient(from 6deg,var(--mustard) 0 15deg,transparent 15deg 22.5deg);box-shadow:none}
+  .sp-disc img{inset:32%;width:36%;height:36%}
+  .sp-disc::after{display:none}
+  .sp-frame{border-radius:8px}
 
   @media (max-width:600px){
     .chip2{font-size:0;padding:0;height:5px;border:0;background:var(--cc)}

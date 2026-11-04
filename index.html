@@ -17,7 +17,8 @@
     var r = document.documentElement;
     try {
       var s = new URLSearchParams(location.search).get("theme") || localStorage.getItem("rlp-skin");
-      if (s && s !== "original" && /^[a-z]{2,20}$/.test(s)) {
+      // keep in step with SKINS in app.js; anything else (a retired skin) is dropped
+      if (s && "herbarium departure blueprint catalog nautical almanac arcade chess hardwood".split(" ").indexOf(s) > -1) {
         r.dataset.skin = s;
         document.write('<link rel="stylesheet" id="skin-css" href="themes/' + s + '.css?v=__V__">');
       }
@@ -99,6 +100,26 @@
     </section>
 
     <div class="extras" id="extras">
+      <details class="extra p-music" data-x="music">
+        <summary><span class="x-name">Music</span><span class="x-tease" id="t-music"></span></summary>
+        <div class="x-body">
+          <div class="sp" id="sp">
+            <div class="sp-head">
+              <span class="sp-disc" aria-hidden="true"><img id="sp-art" alt=""></span>
+              <span class="sp-now"><span class="sp-k"></span><b id="sp-title"></b></span>
+              <button class="sp-size" id="sp-size" type="button" aria-pressed="false">Taller</button>
+            </div>
+            <div class="sp-frame"><iframe id="sp-frame" title="Spotify player" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe></div>
+            <form class="sp-form" id="sp-form" autocomplete="off">
+              <input id="sp-url" inputmode="url" placeholder="Paste a Spotify playlist, album or song link" aria-label="Spotify link">
+              <button class="btn" type="submit">Play</button>
+            </form>
+            <p class="sp-err" id="sp-err" hidden>That isn't a Spotify link. In Spotify, tap Share, then Copy link.</p>
+            <p class="sp-note">Plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise. <button class="link" id="sp-reset" type="button" hidden>Back to lofi beats</button></p>
+          </div>
+        </div>
+      </details>
+
       <details class="extra" data-x="count">
         <summary><span class="x-name">Countdowns</span><span class="x-tease" id="t-count"></span></summary>
         <div class="x-body">

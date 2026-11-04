@@ -514,7 +514,6 @@
       return n ? `${t.name} ${new Date(n.date).toLocaleDateString(undefined, { weekday: "short" })}` : "";
     }).filter(Boolean);
     tease("t-teams", liveT.length ? liveT.join(" · ") : nextT.length ? `Next: ${esc(nextT.join(", "))}` : "");
-    $("#sports-meta").textContent = "ESPN";
   }
 
   // ---------- countdowns (yours, saved in this browser) ----------
@@ -608,6 +607,62 @@
       if (Math.abs(dy) > 1) (page ? window : sc).scrollBy({ top: dy, behavior: reduced() ? "auto" : "smooth" });
     }
   }));
+
+  // ---------- music: Spotify's embed player (no login; full songs when you're signed in to Spotify in this browser) ----------
+  // The player's inside is Spotify's own, either dark or tinted from the cover; each skin dresses the card around it
+  // and picks which with --sp-embed (dark | art). The iframe loads the first time the box opens.
+  const SP = "rlp-spotify";
+  const SP_DEFAULT = { type: "playlist", id: "37i9dQZF1DWWQRwui0ExPn", title: "lofi beats", art: "" };
+  const spParse = (s) => {
+    const m = /(?:open\.spotify\.com\/(?:intl-[a-z-]+\/)?(?:embed\/)?|spotify:)(playlist|album|track|episode|show|artist)[/:]([A-Za-z0-9]{22})/.exec(s || "");
+    return m && { type: m[1], id: m[2] };
+  };
+  let sp = (() => {
+    try { const v = JSON.parse(localStorage.getItem(SP)); if (v && spParse(`spotify:${v.type}:${v.id}`)) return { ...SP_DEFAULT, ...v }; } catch {}
+    return { ...SP_DEFAULT };
+  })();
+  const spSave = () => { try { localStorage.setItem(SP, JSON.stringify(sp)); } catch {} };
+  function spRender(load) {
+    const f = $("#sp-frame");
+    if (!f) return;
+    const de = document.documentElement, v = getComputedStyle(de).getPropertyValue("--sp-embed").trim();
+    const src = `https://open.spotify.com/embed/${sp.type}/${sp.id}?utm_source=generator${(v ? v === "dark" : de.dataset.mode === "dark") ? "&theme=0" : ""}`;
+    $("#sp-title").textContent = sp.title || "Spotify";
+    $("#t-music").textContent = sp.title || "";
+    $("#sp-art").src = sp.art || "";
+    $("#sp").classList.toggle("tall", !!sp.tall);
+    $("#sp-size").setAttribute("aria-pressed", String(!!sp.tall));
+    $("#sp-size").textContent = sp.tall ? "Shorter" : "Taller";
+    $("#sp-reset").hidden = sp.id === SP_DEFAULT.id;
+    if ((load || f.src) && f.src !== src) f.src = src;
+  }
+  // title and cover from Spotify's oEmbed, which allows requests from other sites
+  async function spMeta() {
+    try {
+      const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(`https://open.spotify.com/${sp.type}/${sp.id}`)}`);
+      if (!r.ok) return;
+      const d = await r.json();
+      sp = { ...sp, title: d.title || sp.title, art: d.thumbnail_url || "" };
+      spSave();
+      spRender();
+    } catch {}
+  }
+  $(".p-music").addEventListener("toggle", (e) => { if (e.target.open) spRender(true); });
+  $("#sp-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const got = spParse($("#sp-url").value.trim());
+    $("#sp-err").hidden = !!got;
+    if (!got) return;
+    sp = { ...got, title: "", art: "", tall: sp.tall };
+    $("#sp-url").value = "";
+    spSave();
+    spRender(true);
+    spMeta();
+  });
+  $("#sp-reset").onclick = () => { sp = { ...SP_DEFAULT, tall: sp.tall }; spSave(); spRender(true); spMeta(); };
+  $("#sp-size").onclick = () => { sp.tall = !sp.tall; spSave(); spRender(); };
+  spRender();
+  if (!sp.art) spMeta();
 
   // ---------- expanded view: a side box opens big; its contents move into the dialog and back ----------
   const xdlg = $("#xdlg");
@@ -1011,7 +1066,6 @@
       setDone(id, on);
       li.style.setProperty("--rnd", (Math.random() * 2 - 1).toFixed(2));
       li.classList.add("leaving");
-      if (on) skinFx(li);
       setTimeout(() => { renderHomework(); renderBig(); }, leaveMs());
       if (on) {
         toast("Moved to Done", () => { setDone(id, false); renderHomework(); renderBig(); });
@@ -1109,13 +1163,14 @@
     root.dataset.theme = next;
     try { localStorage.setItem(THEME, next); } catch {}
     paintThemeBtn();
+    spRender();
   };
-  matchMedia("(prefers-color-scheme:dark)").addEventListener("change", paintThemeBtn);
+  matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => { paintThemeBtn(); spRender(); });
   paintThemeBtn();
 
   // ---------- skins: optional looks from themes/, picked in the top bar (index.html applies the saved one before paint) ----------
   const SKIN = "rlp-skin";
-  const SKINS = { original: "Original", herbarium: "Herbarium", departure: "Departure board", riso: "Riso zine", starchart: "Star chart", catalog: "Card catalog", nautical: "Nautical chart", blueprint: "Blueprint", almanac: "Seed almanac" };
+  const SKINS = { original: "Original", herbarium: "Herbarium", departure: "Departure board", blueprint: "Blueprint", catalog: "Card catalog", nautical: "Nautical chart", almanac: "Seed almanac", arcade: "Arcade", chess: "Chess club", hardwood: "Hardwood" };
   const V = new URL(document.currentScript.src).searchParams.get("v") || "";
   const skinNow = () => root.dataset.skin || "original";
   function setSkin(name, remember = true) {
@@ -1127,12 +1182,16 @@
       l.rel = "stylesheet";
       l.id = "skin-css";
       l.href = `themes/${name}.css${V ? `?v=${V}` : ""}`;
+      l.onload = () => spRender(); // the player's dark or artwork-colored look comes from the skin
       document.head.append(l);
       root.dataset.skin = name;
     }
     if (remember) try { localStorage.setItem(SKIN, name); } catch {}
     if (schedule) { renderBar(); renderSchedule(); }
+    spRender();
   }
+  // a saved skin that's since been retired (Riso zine, Star chart) is forgotten; index.html already showed the original
+  try { const s = localStorage.getItem(SKIN); if (s && !SKINS[s]) localStorage.removeItem(SKIN); } catch {}
   const skinSels = document.querySelectorAll(".skin-select");
   skinSels.forEach((sel) => {
     sel.innerHTML = Object.entries(SKINS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
@@ -1190,19 +1249,6 @@
       line = `${n2} school day${n2 === 1 ? "" : "s"} to ${esc(homework.off[off])}`;
     }
     return `${moon}<span><b>${names[Math.round(p * 8) % 8]}</b>${line ? `<small>${line}</small>` : ""}</span>`;
-  }
-
-  // check-off flourishes that need more than CSS
-  function skinFx(li) {
-    if (reduced() || skinNow() !== "starchart") return;
-    // Star chart: a gold line from the checked star to the Done header
-    const a = li.querySelector(".check").getBoundingClientRect(), b = $(".done-box summary").getBoundingClientRect();
-    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2, x2 = b.left + 60, y2 = b.top + b.height / 2;
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("class", "fx-line");
-    svg.innerHTML = `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" pathLength="1"/>`;
-    document.body.append(svg);
-    setTimeout(() => svg.remove(), 900);
   }
 
   // ?font=Some+Family tries another Google font without editing the CSS
