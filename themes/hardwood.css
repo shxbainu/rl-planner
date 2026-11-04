@@ -5,14 +5,14 @@
 html[data-skin="hardwood"]:root{
   --bg:#d89f63; --plank:rgb(120 62 20 / .10); --court:rgb(255 255 255 / .6);
   --surface:#fbfbfd; --surface-2:#f1f3f8; --fg:#13213b; --muted:#4d5a71; --line:#d6dbe6;
-  --royal:#1d428a; --gold:#f5b700; --gold-ink:#7a5600; --ball:#e0702a; --shot:#ff3b30; --led:#111317; --led-fg:#f2f4f8;
+  --royal:#1d428a; --gold:#f5b700; --gold-ink:#7a5600; --ball:#e0702a; --shot:#c62a20; --led:#e8eef9; --led-fg:#13213b; --led-muted:#4a5872; --led-line:#c6d3ea; --led-k:#7a5600;
   --bar-bg:#1d428a; --stripe:#1d428a;
   --accent:#1d428a; --accent-fg:#ffffff; --accent-soft:#e3eaf7; --done:#8a93a6;
   --warn:#7a5600; --warn-soft:#fff2c9; --bad:#c4281c; --bad-soft:#fde4e1;
   --c-glee:#0c6b76; --c-latin:#8a5900; --c-eng:#1a53a8; --c-msi:#19733f; --c-fr:#5c3ca3; --c-fgc:#b23814; --c-arts:#9e2c69; --c-health:#4f6a0f; --c-other:#5c6578;
   --sans:"Barlow",system-ui,sans-serif; --mono:"Barlow Condensed","Arial Narrow",sans-serif; --head:"Graduate",Georgia,serif;
   --ballsvg:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='9' fill='%23e0702a'/%3E%3Cg fill='none' stroke='%232b1404' stroke-width='1.1'%3E%3Ccircle cx='10' cy='10' r='9'/%3E%3Cpath d='M1 10h18M10 1v18M3.6 3.6c3 2.6 3 10.2 0 12.8M16.4 3.6c-3 2.6-3 10.2 0 12.8'/%3E%3C/g%3E%3C/svg%3E");
-  --sp-embed:dark; --sp-k:"Now playing · arena";
+  --sp-embed:art; --sp-k:"Now playing · arena";
   --leave-ms:700;
   color-scheme:light;
 }
@@ -20,10 +20,11 @@ html[data-skin="hardwood"][data-mode="dark"]:root{
   --bg:#0b1324; --plank:rgb(255 255 255 / .025); --court:rgb(255 199 44 / .16);
   --surface:#121c33; --surface-2:#18233d; --fg:#eef2fa; --muted:#a3afc6; --line:#26324d;
   --royal:#5a86e0; --gold:#ffc72c; --gold-ink:#ffc72c;
+  --sp-embed:dark; --shot:#ff6a5e; --led:#18243f; --led-fg:#eef2fa; --led-muted:#a3afc6; --led-line:#2c3b5e; --led-k:#ffc72c;
   --bar-bg:#121c33; --stripe:#ffc72c;
   --accent:#ffc72c; --accent-fg:#0b1324; --accent-soft:#2c2c22; --done:#78829a;
   --warn:#ffc72c; --warn-soft:#332d17; --bad:#ff8a7a; --bad-soft:#3a1f22;
-  --c-glee:#3fc4cf; --c-latin:#f0b13a; --c-eng:#6f9df0; --c-msi:#55cf86; --c-fr:#a58af0; --c-fgc:#ff7f4f; --c-arts:#ef7fbc; --c-health:#b2d455; --c-other:#9aa4b8;
+  --c-glee:#3fc4cf; --c-latin:#f0b13a; --c-eng:#82abf3; --c-msi:#55cf86; --c-fr:#a58af0; --c-fgc:#ff7f4f; --c-arts:#ef7fbc; --c-health:#b2d455; --c-other:#9aa4b8;
   color-scheme:dark;
 }
 
@@ -60,13 +61,13 @@ html[data-skin="hardwood"]{
   .panel-h h2::before{width:17px;height:17px;border-radius:50%;background:var(--ballsvg) center/contain no-repeat}
 
   /* countdown: the shot clock */
-  .now-card{border-radius:8px;background:var(--led);color:var(--led-fg);box-shadow:inset 0 0 0 2px #2a2d33;padding:8px 14px 10px}
-  .now-card::before{content:"GAME CLOCK";font-family:var(--mono);font-weight:700;font-size:11.5px;letter-spacing:.22em;color:var(--gold)}
+  .now-card{border-radius:8px;background:var(--led);color:var(--led-fg);box-shadow:inset 0 0 0 1.5px var(--led-line);padding:8px 14px 10px}
+  .now-card::before{content:"GAME CLOCK";font-family:var(--mono);font-weight:700;font-size:11.5px;letter-spacing:.22em;color:var(--led-k)}
   .now-card .num{font-family:var(--mono);font-weight:700;font-size:46px;line-height:.9;color:var(--shot);font-variant-numeric:tabular-nums;letter-spacing:.02em}
   .now-card .lbl{font-weight:600;color:var(--led-fg)}
-  .now-card .sub{color:#b9c0cc}
-  .now-card .sub b{color:#fff}
-  .now-card .prog{height:5px;background:#2a2d33}
+  .now-card .sub{color:var(--led-muted)}
+  .now-card .sub b{color:var(--led-fg)}
+  .now-card .prog{height:5px;background:var(--led-line)}
   .now-card .prog i{background:var(--gold)}
 
   /* schedule: jersey numbers */
@@ -105,8 +106,8 @@ html[data-skin="hardwood"]{
 
   /* tests & quizzes: scoreboard dates */
   .big li{border-radius:8px;border-left:4px solid var(--cc)}
-  .big .d{background:var(--led);color:var(--gold);border-radius:5px;padding:4px 6px;font-family:var(--mono);font-size:21px}
-  .big .d small{color:#b9c0cc}
+  .big .d{background:var(--led);color:var(--royal);box-shadow:inset 0 0 0 1.5px var(--led-line);border-radius:5px;padding:4px 6px;font-family:var(--mono);font-size:21px}
+  .big .d small{color:var(--led-muted)}
 
   /* rotation */
   .seg{border-radius:6px}
@@ -127,20 +128,19 @@ html[data-skin="hardwood"]{
   dialog{border-radius:12px;border-top:5px solid var(--stripe)}
 
   /* music: the jumbotron, a basketball for the record */
-  .sp{border-radius:10px;border:3px solid #2a2d33;color:var(--led-fg);
-    background:radial-gradient(circle,#1c2029 1px,transparent 1.6px) 0 0/5px 5px,#0c0e12}
-  .sp-k{color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.16em}
-  #sp-title{font-family:var(--head);font-weight:400;font-size:15px;color:#fff}
+  .sp{border-radius:10px;border:1.5px solid var(--led-line);color:var(--led-fg);background:var(--led)}
+  .sp-k{color:var(--led-k);font-family:var(--mono);font-size:12px;letter-spacing:.16em}
+  #sp-title{font-family:var(--head);font-weight:400;font-size:15px;color:var(--led-fg)}
   .sp-disc{background:var(--ballsvg) center/100% no-repeat;box-shadow:0 2px 6px rgb(0 0 0 / .5)}
   .sp-disc img{inset:28%;width:44%;height:44%;box-shadow:0 0 0 2px #2b1404}
   .sp-disc::after{display:none}
-  .sp-size{background:transparent;color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,transparent)}
+  .sp-size{background:transparent;color:var(--led-k);border-color:color-mix(in srgb,var(--led-k) 55%,transparent)}
   .sp-frame{border-radius:8px}
-  .sp-form input{background:#171a21;border-color:#2a2d33;color:#fff}
-  .sp-form input::placeholder{color:#8b93a3}
-  .sp-note{color:#a7afbd}
-  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--gold)}
-  .sp-err{color:#ff8a7a}
+  .sp-form input{background:var(--surface);border-color:var(--led-line);color:var(--fg)}
+  .sp-form input::placeholder{color:var(--muted)}
+  .sp-note{color:var(--led-muted)}
+  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--led-k)}
+  .sp-err{color:var(--bad)}
 }
 @keyframes hw-swish{from{transform:rotate(-6deg) scale(0)}to{transform:rotate(-6deg) scale(1)}}
 
@@ -154,12 +154,12 @@ html[data-skin="hardwood"]{
 
 /* the scoreboard clock is an arena scoreboard */
 html[data-skin="hardwood"]{
-  .sbc{background:var(--led);color:var(--led-fg);border:0;box-shadow:inset 0 0 0 2px #2a2d33}
+  .sbc{background:var(--led);color:var(--led-fg);border:0;box-shadow:inset 0 0 0 1.5px var(--led-line)}
   .sbc-q{background:var(--gold);color:#13213b;font-family:var(--mono);font-size:13px}
   .sbc-n{font-family:var(--head);font-weight:400;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
   .sbc-t{color:var(--shot);font-family:var(--mono);font-weight:700;font-size:18px}
   .sbc-bar i{box-shadow:inset -1.5px 0 0 var(--led)}
-  .sbc-mk{background:#fff;box-shadow:0 0 0 2px var(--led)}
+  .sbc-mk{background:var(--led-fg);box-shadow:0 0 0 2px var(--led)}
   .dock a{border-radius:8px;border:0;box-shadow:0 2px 0 rgb(0 0 0 / .14)}
 }
 
@@ -173,4 +173,13 @@ html[data-skin="hardwood"]{
   .tabs button{font-family:var(--head);font-weight:400;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
   .tabs button[aria-selected="true"]{border-bottom:3px solid var(--gold)}
   .tabbar{border-top:4px solid var(--gold)}
+}
+
+/* the now-playing card in this theme */
+html[data-skin="hardwood"]{
+  .np-art{border-radius:6px}
+  .np-track{font-family:var(--head);font-weight:400;font-size:16px;color:var(--led-fg)}
+  .np-ctl .np-play{background:var(--gold);color:#13213b}
+  .np-bar i{background:var(--gold)}
+  .np-prog{color:var(--led-muted);opacity:1}
 }

@@ -3,9 +3,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Libre+Franklin:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap");
 
 html[data-skin="chess"]:root{
-  --bg:#e8eaed; --sq:#dde0e4; --surface:#ffffff; --surface-2:#f3f4f6; --fg:#16181b; --muted:#545b65; --line:#d4d8dd;
-  --ebony:#1c1e22; --ivory:#fafaf8; --flag:#b83d0a; --flag-soft:#fbe9e0; --flag-fg:#ffffff;
-  --accent:#1c1e22; --accent-fg:#fafaf8; --accent-soft:#eceef1; --done:#8b9098;
+  --bg:#eceef0; --sq:#e5e8eb; --surface:#ffffff; --surface-2:#f3f4f6; --fg:#16181b; --muted:#545b65; --line:#d4d8dd;
+  --ebony:#3a3f47; --ivory:#fafaf8; --flag:#b83d0a; --flag-soft:#fbe9e0; --flag-fg:#ffffff;
+  --accent:#3a3f47; --accent-fg:#fafaf8; --accent-soft:#eceef1; --done:#8b9098;
   --warn:#8a4b00; --warn-soft:#fbeedd; --bad:#b42318; --bad-soft:#fde8e6;
   --c-glee:#0f6e72; --c-latin:#855b00; --c-eng:#214f96; --c-msi:#1f6d3e; --c-fr:#55399a; --c-fgc:#ad3a0b; --c-arts:#972d63; --c-health:#556c10; --c-other:#5f6672;
   --sans:"Libre Franklin",system-ui,sans-serif; --mono:"Roboto Mono",ui-monospace,monospace; --head:"Playfair Display",Georgia,serif;
@@ -151,4 +151,12 @@ html[data-skin="chess"]{
   .p-music .panel-h h2::before{content:"\2657\FE0E"}
   .tabs button{font-family:var(--head);font-weight:700;font-size:14px}
   .tabs button[aria-selected="true"]{border-bottom-color:var(--flag)}
+}
+
+/* the now-playing card in this theme */
+html[data-skin="chess"]{
+  .np-art{border-radius:4px}
+  .np-track{font-family:var(--head);font-weight:700;font-size:18px}
+  .np-ctl .np-play{background:var(--ebony);color:var(--ivory)}
+  .np-bar i{background:var(--flag)}
 }

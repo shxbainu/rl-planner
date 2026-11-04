@@ -165,3 +165,10 @@ html[data-skin="nautical"]{
 html[data-skin="nautical"]{
   .tabs button{font-family:var(--head);font-style:italic;font-weight:400;text-transform:uppercase;letter-spacing:.12em;font-size:12px}
 }
+
+/* the now-playing card in this theme */
+html[data-skin="nautical"]{
+  .np-art{border-radius:4px;box-shadow:0 0 0 1px var(--line),0 4px 12px rgb(0 0 0 / .15)}
+  .np-track{font-family:var(--head);font-style:italic;font-weight:400;font-size:18px}
+  .np-k{font-family:var(--mono);letter-spacing:.14em;color:var(--magenta)}
+}

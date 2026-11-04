@@ -1,17 +1,17 @@
-/* ARCADE: a retro console. Notched pixel boxes, a HUD countdown with an HP bar, butter-yellow numbers, faint scanlines.
-   Light mode is a handheld's green LCD. Pixel lettering only for short labels; everything you read is a plain, sturdy face. */
+/* ARCADE: a retro console. Notched pixel boxes, a HUD countdown with an HP bar, big pixel numbers, faint scanlines in the dark.
+   Light mode is a cream-and-red home console. Pixel lettering only for short labels; everything you read is a plain, sturdy face. */
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Chakra+Petch:wght@400;500;600;700&display=swap");
 
 html[data-skin="arcade"]:root{
-  /* light: green handheld screen */
-  --bg:#8bac0f; --surface:#c9d98f; --surface-2:#b8cc74; --fg:#0f380f; --muted:#22461f; --line:#7f9d2e; --edge:#306230;
-  --screen:#0f380f; --screen-fg:#c9d98f; --coin:#0f380f; --hp:#306230; --neon:#306230;
-  --accent:#306230; --accent-fg:#d6e4a4; --accent-soft:#adc366; --done:#4f6f3a;
-  --warn:#5c4a00; --warn-soft:#d8d98a; --bad:#8a1c10; --bad-soft:#d9c98a;
-  --c-glee:#0f524f; --c-latin:#5a4300; --c-eng:#193d70; --c-msi:#1c4d1c; --c-fr:#47307a; --c-fgc:#782b08; --c-arts:#702352; --c-health:#384a0a; --c-other:#3d4a30;
+  /* light: a cream-and-red home console, the way old cartridge consoles looked; warm, soft, no screen-black */
+  --bg:#e7e1d2; --surface:#f7f3ea; --surface-2:#eee8da; --fg:#2a2420; --muted:#5e554c; --line:#d6cdb9; --edge:#c2b59c;
+  --screen:#fbf8f1; --screen-fg:#2a2420; --coin:#b3362b; --hp:#3f7d4a; --neon:#9a3127;
+  --accent:#b3362b; --accent-fg:#ffffff; --accent-soft:#f3ddd7; --done:#978d80;
+  --warn:#7a5800; --warn-soft:#f3e7c6; --bad:#a3261c; --bad-soft:#f5dad5;
+  --c-glee:#176864; --c-latin:#755407; --c-eng:#284f8d; --c-msi:#27633a; --c-fr:#5a3f84; --c-fgc:#963c17; --c-arts:#87305c; --c-health:#4a5e10; --c-other:#5f594f;
   --sans:"Chakra Petch",system-ui,sans-serif; --mono:"Chakra Petch",system-ui,sans-serif; --pixel:"Press Start 2P",monospace; --digits:"VT323",monospace;
   --notch:polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px));
-  --sp-embed:dark; --sp-k:"SOUND TEST";
+  --sp-embed:art; --sp-k:"SOUND TEST";
   --leave-ms:750;
   color-scheme:light;
 }
@@ -23,15 +23,15 @@ html[data-skin="arcade"][data-mode="dark"]:root{
   --accent:#e3a08a; --accent-fg:#1a1c1f; --accent-soft:#3a2f2b; --done:#7c8087;
   --warn:#ead28c; --warn-soft:#35311f; --bad:#ec9a8f; --bad-soft:#3b2726;
   --c-glee:#8ccacc; --c-latin:#e4c47e; --c-eng:#97b6df; --c-msi:#9fcf93; --c-fr:#b8abd6; --c-fgc:#e3a08a; --c-arts:#dba5bf; --c-health:#c6d08a; --c-other:#a4a8ae;
+  --sp-embed:dark;
   color-scheme:dark;
 }
 
 html[data-skin="arcade"]{
-  /* the floor: a faint pixel grid; scanlines over everything in the dark, LCD dots in the light */
+  /* the floor: a faint pixel grid; faint scanlines in the dark */
   body{background-color:var(--bg);font-size:14px;
     background-image:linear-gradient(color-mix(in srgb,var(--edge) 22%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--edge) 22%,transparent) 1px,transparent 1px);background-size:24px 24px}
-  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(rgb(0 0 0 / .05) 0 1px,transparent 1px 3px)}
-  &[data-mode="light"] body::after{background:repeating-linear-gradient(90deg,rgb(15 56 15 / .035) 0 1px,transparent 1px 3px),repeating-linear-gradient(rgb(15 56 15 / .035) 0 1px,transparent 1px 3px)}
+  &[data-mode="dark"] body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(rgb(0 0 0 / .05) 0 1px,transparent 1px 3px)}
 
   /* header */
   .bar{background:var(--surface);border-bottom:3px solid var(--edge)}
@@ -56,20 +56,16 @@ html[data-skin="arcade"]{
   /* countdown: a HUD with an HP bar */
   .now-card{border-radius:0;clip-path:var(--notch);background:var(--screen);color:var(--screen-fg);border:3px solid var(--neon);padding:8px 14px 10px}
   .now-card::before{content:"PLAYER 1";font-family:var(--pixel);font-size:9px;color:var(--neon)}
-  &[data-mode="light"] .now-card::before{color:var(--screen-fg)}
   .now-card .num{font-family:var(--digits);font-weight:400;font-size:50px;line-height:.8;color:var(--coin)}
-  &[data-mode="light"] .now-card .num{color:var(--screen-fg)}
   .now-card .lbl{font-weight:700}
   .now-card .sub{color:color-mix(in srgb,var(--screen-fg) 75%,var(--screen))}
   .now-card .sub b{color:var(--screen-fg)}
   .now-card .prog{height:10px;border-radius:0;background:color-mix(in srgb,var(--screen-fg) 14%,transparent)}
   .now-card .prog i{border-radius:0;background:repeating-linear-gradient(90deg,var(--hp) 0 7px,transparent 7px 9px)}
-  &[data-mode="light"] .now-card .prog i{background:repeating-linear-gradient(90deg,var(--screen-fg) 0 7px,transparent 7px 9px)}
 
   /* schedule: tiles, and a cursor on the block you're in */
   .tl li{border-radius:0}
   .tl .blk{border-radius:0;clip-path:var(--notch);color:var(--bg);font-family:var(--pixel);font-weight:400;font-size:9px}
-  &[data-mode="light"] .tl li:not(.free,.ev) .blk{color:#e2edb8}
   .tl .tm{font-size:12px}
   .tl li.now{background:var(--accent-soft)}
   .tl li.now .cn::before{content:"▶ ";color:var(--coin)}
@@ -82,7 +78,6 @@ html[data-skin="arcade"]{
   .cell{border-radius:0;clip-path:var(--notch);background:var(--surface-2);border:2px solid transparent}
   .cell .top b{font-family:var(--digits);font-weight:400;font-size:21px;line-height:.9}
   .cell.today .top b{background:var(--coin);color:var(--bg);border-radius:0;padding:0 5px}
-  &[data-mode="light"] .cell.today .top b{background:var(--screen);color:var(--screen-fg)}
   .cell.sel{border-color:var(--accent);box-shadow:none}
   .cell.off{clip-path:none;border:2px dashed var(--line)}
   .chip2{border-radius:0;background:var(--surface)}
@@ -96,7 +91,6 @@ html[data-skin="arcade"]{
   .title{font-weight:600}
   .chip{text-transform:uppercase;letter-spacing:.04em;font-size:11px}
   .tag{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:7.5px;letter-spacing:0;padding:3px 4px 2px;color:var(--bg)}
-  &[data-mode="light"] .tag{color:#e2edb8}
   .tag.unsure{color:var(--muted)}
   .item.leaving{opacity:1}
   .item.leaving.done{clip-path:none;opacity:.7;transition:opacity .3s .4s}
@@ -104,7 +98,6 @@ html[data-skin="arcade"]{
     text-shadow:2px 2px 0 var(--bg);animation:ar-coin .7s steps(7) forwards;pointer-events:none}
   .hw-note,.empty-state,.overdue-strip{border-radius:0}
   .count{border-radius:0;background:var(--coin);color:var(--bg);font-family:var(--digits);font-size:15px;font-weight:400;line-height:1.1}
-  &[data-mode="light"] .count{background:var(--screen);color:var(--screen-fg)}
 
   /* tests & quizzes: boss fights */
   .big li{border-radius:0;clip-path:var(--notch);background:var(--surface-2);border-left:5px solid var(--cc)}
@@ -121,21 +114,17 @@ html[data-skin="arcade"]{
   .rot td{border-radius:0;font-weight:700}
   .rot td.tm{font-size:11.5px}
   .rot td.cur{outline:2px solid var(--coin);outline-offset:-2px}
-  &[data-mode="light"] .rot td.cur{outline-color:var(--screen)}
 
   /* extras */
   :is(.team,.counts li,.sb li,.moves li,.ff-match){border-radius:0;background:var(--surface-2);border:2px solid var(--line)}
   .counts .n{font-family:var(--digits);font-weight:400;font-size:28px;color:var(--coin)}
-  &[data-mode="light"] .counts .n{color:var(--fg)}
   .count-form input,.sp-form input{border-radius:0;border-width:2px}
   dialog{border-radius:0;border:3px solid var(--neon)}
 
   /* music: a sound-test screen, the cover as a cartridge label */
   .sp{border-radius:0;clip-path:var(--notch);background:var(--screen);border:3px solid var(--accent);color:var(--screen-fg)}
   .sp-k{font-family:var(--pixel);font-weight:400;font-size:8px;letter-spacing:0;color:var(--neon);margin-bottom:3px}
-  &[data-mode="light"] .sp-k{color:var(--screen-fg)}
   #sp-title{font-family:var(--digits);font-weight:400;font-size:24px;line-height:1;color:var(--coin)}
-  &[data-mode="light"] #sp-title{color:var(--screen-fg)}
   .sp-disc{border-radius:0;width:44px;height:48px;background:var(--edge);clip-path:polygon(0 0,75% 0,100% 18%,100% 100%,0 100%);box-shadow:none}
   .sp-disc img{inset:6px 6px 10px;width:calc(100% - 12px);height:calc(100% - 16px);border-radius:0}
   .sp-disc::after{display:none}
@@ -144,7 +133,6 @@ html[data-skin="arcade"]{
   .sp-form input{background:var(--surface);color:var(--fg);border-color:var(--line)}
   .sp-note{color:color-mix(in srgb,var(--screen-fg) 75%,var(--screen))}
   :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--coin)}
-  &[data-mode="light"] :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--screen-fg)}
   .sp-err{color:#ff8a8a}
 
   @media (max-width:759px){
@@ -167,9 +155,7 @@ html[data-skin="arcade"]{
 html[data-skin="arcade"]{
   .sbc,.dock a{border-radius:0;clip-path:var(--notch)}
   .sbc-q{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:9px;padding:4px 6px 3px;background:var(--coin);color:var(--bg)}
-  &[data-mode="light"] .sbc-q{background:var(--screen);color:var(--screen-fg)}
   .sbc-t{font-family:var(--digits);font-size:20px;line-height:.8;color:var(--coin)}
-  &[data-mode="light"] .sbc-t{color:var(--fg)}
   .sbc-bar i{border-radius:0}
   .ss-form i{border-radius:0;font-family:var(--pixel);font-size:7px}
 }
@@ -185,4 +171,16 @@ html[data-skin="arcade"]{
   .tabs button[aria-selected="true"]{color:var(--neon);border-bottom-color:var(--coin)}
   .tabbar button{font-family:var(--pixel);font-weight:400;font-size:7px;gap:5px}
   .tabbar{border-top:3px solid var(--edge)}
+}
+
+/* the now-playing card in this theme */
+html[data-skin="arcade"]{
+  .np-art{border-radius:0;clip-path:var(--notch)}
+  .np-track{font-family:var(--digits);font-weight:400;font-size:26px;line-height:.95;color:var(--coin)}
+  .np-ctl button{border-radius:0}
+  .np-ctl .np-play{background:var(--coin);color:var(--bg)}
+  .np-bar,.np-bar i{border-radius:0}
+  .np-bar i{background:repeating-linear-gradient(90deg,var(--hp) 0 6px,transparent 6px 8px)}
+  .np-bar i::after{display:none}
+  .np-k{font-family:var(--pixel);font-size:7.5px}
 }

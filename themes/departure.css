@@ -1,46 +1,46 @@
-/* DEPARTURE BOARD: a European station at dawn. Dark board, split tiles, amber times, condensed sign lettering.
-   Dark is the main look; light is station signage that keeps black tiles for the countdown and the times.
+/* DEPARTURE BOARD: a European station at dawn. Slate board, split tiles, amber times, sign lettering for headings.
+   Everything you read is a plain, legible sans in normal case; the board fonts are kept for headings, times and tiles.
    The only continuous motion is the clock; flips happen when a value changes. */
-@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:wght@400;500;600;700&display=swap");
 
 html[data-skin="departure"]:root{
   /* light: station signage */
-  --bg:#f2f0ea; --surface:#fbfaf6; --surface-2:#ecebe4; --fg:#1a1a1a; --muted:#57544d; --line:#d3d0c6;
+  --bg:#eeece6; --surface:#faf9f5; --surface-2:#f0eee8; --fg:#24272b; --muted:#5a5c60; --line:#d8d5cc;
   --accent:#8a5500; --accent-fg:#ffffff; --accent-soft:#f6e8cf; --done:#8c8a84;
   --warn:#8a5500; --warn-soft:#f6e8cf; --bad:#b33a28; --bad-soft:#f7dfda;
-  --amber:#f2a93b; --amber-ink:#8a5500; --green:#2e7d3c; --red:#b33a28; --tile:#1f1f1f; --tile-2:#141414; --split:#0a0a0a; --tile-fg:#ede6d6;
-  --c-glee:#1f9ea3; --c-latin:#c98516; --c-eng:#2f78d0; --c-msi:#2f9e45; --c-fr:#7f5cd6; --c-fgc:#d9472f; --c-arts:#d2549a; --c-health:#7ea12a; --c-other:#7b7870;
-  --sans:"JetBrains Mono",ui-monospace,monospace; --mono:"JetBrains Mono",ui-monospace,monospace; --sign:"Oswald","Arial Narrow",sans-serif;
+  --amber:#f2a93b; --amber-ink:#8a5500; --green:#2e7d3c; --red:#b33a28; --tile:#33383f; --tile-2:#2b3036; --split:#22262b; --tile-fg:#eeeae0;
+  --c-glee:#14777b; --c-latin:#905c08; --c-eng:#225ea9; --c-msi:#1f7334; --c-fr:#6243b3; --c-fgc:#b3351e; --c-arts:#a33a74; --c-health:#58741a; --c-other:#64615a;
+  --sans:"Public Sans",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace; --sign:"Oswald","Arial Narrow",sans-serif;
   --leave-ms:700;
   color-scheme:light;
 }
 html[data-skin="departure"][data-mode="dark"]:root{
-  --bg:#141414; --surface:#1b1b1b; --surface-2:#1f1f1f; --fg:#ede6d6; --muted:#a39c8e; --line:#2e2e2e;
-  --accent:#f2a93b; --accent-fg:#141414; --accent-soft:#2a2113; --done:#77726a;
+  --bg:#1a1d21; --surface:#22262b; --surface-2:#272b31; --fg:#e6e1d6; --muted:#a8a296; --line:#353a41;
+  --accent:#f4b04a; --accent-fg:#141414; --accent-soft:#2f2717; --done:#77726a;
   --warn:#f2a93b; --warn-soft:#2a2113; --bad:#e5604d; --bad-soft:#2e1a17;
-  --amber-ink:#f2a93b; --green:#6fcf7f; --red:#e5604d;
-  --c-glee:#4fc3c7; --c-latin:#f2a93b; --c-eng:#5b9be6; --c-msi:#6fcf7f; --c-fr:#a98be8; --c-fgc:#e5604d; --c-arts:#e784b4; --c-health:#b5d45a; --c-other:#8a857c;
+  --amber-ink:#f2a93b; --green:#6fcf7f; --red:#e5604d; --tile:#2d3238; --tile-2:#25292e; --split:#1b1e22;
+  --c-glee:#4fc3c7; --c-latin:#f2a93b; --c-eng:#5b9be6; --c-msi:#6fcf7f; --c-fr:#a98be8; --c-fgc:#ec7563; --c-arts:#e784b4; --c-health:#b5d45a; --c-other:#8a857c;
   color-scheme:dark;
 }
 
 html[data-skin="departure"]{
-  body{font-size:13px;letter-spacing:-.01em}
+  body{font-size:14px}
 
   /* header: the station name sign, a clock beside the pill */
   .bar{background:var(--tile-2);color:var(--tile-fg);border-bottom:3px solid var(--amber)}
-  .bar-date{font-family:var(--sign);font-weight:600;font-size:21px;text-transform:uppercase;letter-spacing:.06em;color:#fff}
-  .bar-sub{color:#b9b2a3;font-size:12px}
+  .bar-date{font-family:var(--sign);font-weight:500;font-size:20px;text-transform:uppercase;letter-spacing:.05em;color:var(--tile-fg)}
+  .bar-sub{color:#c3bdb0;font-size:12.5px}
   .bar-sub b{color:var(--amber)}
   .letter-pick select{border-radius:3px;background:var(--amber);color:#141414;font-family:var(--mono);font-weight:700}
   .bar-status{align-items:center;gap:10px}
-  .bar-status span.pill{border-radius:3px;background:#262626;border:0;color:#d8d1c2;font-size:11.5px}
+  .bar-status span.pill{border-radius:3px;background:rgb(255 255 255 / .08);border:0;color:#ddd7ca;font-size:12px}
   .bar-status .dot{background:var(--amber)}
   .bar-status.stale span.pill{background:#3a2a12;color:var(--amber)}
   .skin-clock{display:inline-flex;gap:2px;font-size:15px;font-weight:700;color:var(--amber)}
   .skin-clock .flap{padding:3px 4px}
-  .bar .btn{border-radius:3px;background:#262626;border-color:#3a3a3a;color:#ede6d6;font-family:var(--sign);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+  .bar .btn{border-radius:3px;background:rgb(255 255 255 / .08);border-color:rgb(255 255 255 / .12);color:#eeeae0;font-family:var(--sign);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
   .bar .btn.primary{background:var(--amber);border-color:var(--amber);color:#141414}
-  .bar .icon-btn,.bar .skin-pick{border-radius:3px;background:#262626;border-color:#3a3a3a;color:#ede6d6}
+  .bar .icon-btn,.bar .skin-pick{border-radius:3px;background:rgb(255 255 255 / .08);border-color:rgb(255 255 255 / .12);color:#eeeae0}
   .btn,.icon-btn,.skin-pick{border-radius:3px}
   .link{color:var(--accent)}
 
@@ -55,22 +55,22 @@ html[data-skin="departure"]{
   .panel-h h2,.x-name{font-family:var(--sign);font-weight:500;font-size:15px;letter-spacing:.12em;text-transform:uppercase}
   .x-name{font-size:14px}
   .panel-h h2::before{width:8px;height:8px;border-radius:50%;background:var(--amber)}
-  .panel-meta,.x-tease,.panel-foot{font-size:11px}
+  .panel-meta,.x-tease,.panel-foot{font-size:12px}
 
   /* countdown: split-flap tiles with a ticker line */
   .now-card{border-radius:4px;background:var(--tile-2);color:var(--tile-fg)}
   .now-card .num{display:inline-flex;gap:3px;font-family:var(--mono);font-weight:700;font-size:28px;color:var(--amber)}
   .now-card .num .flap{padding:4px 5px}
-  .now-card .lbl{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#fff}
-  .now-card .sub{color:#c7c0b1;font-size:12px;text-transform:uppercase;letter-spacing:.02em;border-top:1px solid #2e2e2e;padding-top:6px}
+  .now-card .lbl{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.05em;font-size:17px;color:var(--tile-fg)}
+  .now-card .sub{color:#cfc9bc;font-size:13px;border-top:1px solid rgb(255 255 255 / .1);padding-top:6px}
   .now-card .sub b{color:var(--amber)}
-  .prog{height:3px;border-radius:0;background:#2e2e2e}
+  .prog{height:3px;border-radius:0;background:rgb(127 127 127 / .3)}
   .prog i{border-radius:0;background:var(--amber)}
 
   /* schedule: board rows. class | platform | time tile with its status underneath */
   .tl{gap:0}
   .tl li{border-radius:0;border-bottom:1px solid var(--line);padding:6px 4px}
-  .tl .tm::after{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-align:right;line-height:1.4}
+  .tl .tm::after{display:block;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-align:right;line-height:1.5}
   .tl li.past .tm::after{content:"DEPARTED";color:#6fcf7f}
   .tl li.now .tm::after{content:"NOW";color:var(--amber)}
   .tl li:is(.class,.ev):not(.past,.now):is(.now + li,.past + li) .tm::after,
@@ -78,11 +78,11 @@ html[data-skin="departure"]{
   .tl .blk{position:relative;border-radius:3px;background:var(--tile);color:var(--tile-fg);font-family:var(--mono)}
   .tl .blk::after{content:"";position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:var(--cc);box-shadow:0 0 0 1.5px var(--surface)}
   .tl li.ev .blk::after,.tl li.free .blk::after{display:none}
-  .tl .cn{font-family:var(--sign);font-weight:500;text-transform:uppercase;font-size:14px;letter-spacing:.04em}
-  .tl .who{font-family:var(--mono);text-transform:none;font-weight:400;font-size:11px;letter-spacing:-.02em}
+  .tl .cn{font-weight:600;font-size:14px}
+  .tl .who{font-weight:400;font-size:12px}
   .tl .split{font-family:var(--mono)}
-  .tl .rm::before{content:"PLATFORM ";font-size:8.5px;font-weight:700;letter-spacing:.06em;color:var(--amber-ink)}
-  .tl .tm{background:var(--tile);color:var(--amber);padding:2px 5px;border-radius:3px;font-size:11.5px;font-weight:500}
+  .tl .rm::before{content:"Platform ";font-weight:600;color:var(--amber-ink)}
+  .tl .tm{background:var(--tile);color:var(--amber);padding:2px 6px;border-radius:3px;font-size:12px;font-weight:500}
   .tl .split{color:var(--muted)}
   .tl .pass{color:#b9b1a2;font-family:var(--mono);font-weight:400}
   .tl li.now{background:var(--accent-soft)}
@@ -90,17 +90,17 @@ html[data-skin="departure"]{
   .tl li.now .prog{background:transparent}
   .tl li.ev{background:transparent}
   .tl li.ev .cn{color:var(--muted)}
-  .after{border-top-style:solid;text-transform:uppercase;font-size:11.5px}
+  .after{border-top-style:solid;font-size:12.5px}
 
   /* homework: dark tiles, single-line rows with a class lamp */
   .cal .dow{font-family:var(--sign);font-weight:500;letter-spacing:.14em}
   .cell{border-radius:3px;background:var(--surface-2);border:1px solid var(--line)}
-  &[data-mode="dark"] .cell{background:#191919;border-color:#262626}
+  &[data-mode="dark"] .cell{background:var(--surface-2);border-color:var(--line)}
   .cell .top b{font-weight:700}
   .cell.today .top b{background:var(--tile);color:var(--amber);border-radius:3px}
   .cell.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-  .chip2{position:relative;border:0;border-radius:2px;padding:2px 4px 2px 13px;background:var(--surface);font-size:11px}
-  &[data-mode="dark"] .chip2{background:#232323}
+  .chip2{position:relative;border:0;border-radius:2px;padding:2px 4px 2px 13px;background:var(--surface);font-size:11.5px}
+  &[data-mode="dark"] .chip2{background:var(--surface)}
   .chip2::before{content:"";position:absolute;left:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--cc)}
   .chip2.major{background:var(--accent-soft);font-weight:700}
 
@@ -129,14 +129,14 @@ html[data-skin="departure"]{
 
   /* rotation: a timetable board, today's column lit a little brighter */
   .seg{border-radius:3px}
-  .seg button{border-radius:2px;text-transform:uppercase;font-size:10.5px;letter-spacing:.05em}
+  .seg button{border-radius:2px;font-size:12px}
   .seg button[aria-pressed="true"]{background:var(--tile);color:var(--amber)}
   .rot th{font-family:var(--sign);font-weight:500;letter-spacing:.1em;text-transform:uppercase}
   .rot th small{font-family:var(--mono)}
   .rot th.cur{background:var(--tile);color:var(--amber);border-radius:3px}
   .rot td{border-radius:2px;background:var(--surface-2);color:var(--fg);font-weight:500;box-shadow:inset 0 2px 0 var(--cc)}
-  &[data-mode="dark"] .rot td{background:#1a1a1a}
-  &[data-mode="dark"] .rot td.cur{background:#2a2a2a}
+  &[data-mode="dark"] .rot td{background:var(--surface-2)}
+  &[data-mode="dark"] .rot td.cur{background:var(--tile)}
   .rot td.cur{outline:0;background:color-mix(in srgb,var(--amber) 16%,var(--surface))}
   .rot td.x,.rot td.tm{box-shadow:none;background:none}
   .rot td.ev{box-shadow:none;color:var(--muted)}
@@ -146,7 +146,7 @@ html[data-skin="departure"]{
   .sb .row .sc{display:inline-block;position:relative;background:var(--tile);color:var(--amber);border-radius:3px;padding:1px 4px;text-align:center}
   .sb .row .sc::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--split)}
   .sb .row.lost .sc{color:#b9b2a3}
-  .sb .st2{color:var(--muted);text-transform:uppercase;font-size:10.5px;letter-spacing:.04em}
+  .sb .st2{color:var(--muted);font-size:11.5px}
   .counts .n{color:var(--accent)}
   .news .hl{font-family:var(--sans);font-weight:500}
   dialog{border-radius:4px}
@@ -171,7 +171,7 @@ html[data-skin="departure"]{
   .sp-disc::after{background:var(--tile)}
   .sp-size{background:transparent;color:var(--amber);border-color:color-mix(in srgb,var(--amber) 50%,transparent)}
   .sp-frame{border-radius:3px}
-  .sp-form input{background:var(--tile-2);border-color:#333;color:var(--tile-fg)}
+  .sp-form input{background:var(--tile-2);border-color:rgb(255 255 255 / .14);color:var(--tile-fg)}
   .sp-note{color:#b5ad9c}
   :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--amber)}
   .sp-err{color:#f08a78}
@@ -197,4 +197,13 @@ html[data-skin="departure"]{
 html[data-skin="departure"]{
   .tabs button{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.08em}
   .tabs button[aria-selected="true"]{color:var(--amber-ink);border-bottom-color:var(--amber)}
+}
+
+/* the now-playing card in this theme */
+html[data-skin="departure"]{
+  .np-art{border-radius:3px}
+  .np-track{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.05em;font-size:17px;color:var(--tile-fg)}
+  .np-ctl .np-play{background:var(--amber);color:#141414}
+  .np-bar i{background:var(--amber)}
+  .np-prog{color:var(--amber);opacity:1}
 }

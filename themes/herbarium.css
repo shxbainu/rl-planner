@@ -159,3 +159,10 @@ html[data-skin="herbarium"]{
 html[data-skin="herbarium"]{
   .tabs button{font-family:var(--head);font-weight:500;font-size:14px}
 }
+
+/* the now-playing card in this theme */
+html[data-skin="herbarium"]{
+  .np-art{border-radius:2px;box-shadow:0 0 0 4px var(--surface),0 0 0 5px var(--line),0 3px 10px rgb(0 0 0 / .15)}
+  .np-track{font-family:var(--head);font-style:italic;font-weight:500;font-size:18px}
+  .np-k{font-family:var(--mono);text-transform:none;letter-spacing:.02em;color:var(--accent-ink)}
+}

@@ -652,7 +652,8 @@
   // ?npdemo previews the now-playing card with a made-up track, no account needed
   const NP_DEMO = new URLSearchParams(location.search).has("npdemo");
   const spConnected = () => NP_DEMO || !!(spA.access && spA.refresh);
-  const playing = () => musicSrc === "spotify" && spConnected() && np?.item && np.is_playing;
+  // the now-playing card stays up for a paused track too; only "nothing on the account" falls back to the player
+  const npShown = () => musicSrc === "spotify" && spConnected() && !!np?.item;
   const mmss = (ms) => { const t = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(t / 60)}:${pad(t % 60)}`; };
 
   function spRender(load) {
@@ -660,7 +661,7 @@
     if (!f) return;
     const de = document.documentElement, v = getComputedStyle(de).getPropertyValue("--sp-embed").trim();
     const src = `https://open.spotify.com/embed/${sp.type}/${sp.id}?utm_source=generator${(v ? v === "dark" : de.dataset.mode === "dark") ? "&theme=0" : ""}`;
-    const lofi = musicSrc === "lofi", live = playing();
+    const lofi = musicSrc === "lofi", live = npShown();
     document.querySelectorAll("[data-src]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.src === musicSrc)));
     $("#sp").classList.toggle("tall", !!sp.tall && !lofi && !live);
     $("#sp").classList.toggle("np", live);
@@ -781,7 +782,7 @@
   async function spPoll() {
     clearTimeout(npTimer);
     if (!spConnected() || musicSrc !== "spotify" || document.hidden) return;
-    if (NP_DEMO) { np = np || { is_playing: true, progress_ms: 61000, device: { name: "Brian's iPhone" }, item: { name: "Snowman", duration_ms: 165000, artists: [{ name: "WYS" }], album: { images: [{ url: "https://i.scdn.co/image/ab67706f00000002266beb50b0032b0f140a749e" }] } } }; npAt = npAt || Date.now(); spRender(); return; }
+    if (NP_DEMO) { np = np || { is_playing: new URLSearchParams(location.search).get("npdemo") !== "paused", progress_ms: 61000, device: { name: "Brian's iPhone" }, item: { name: "Snowman", duration_ms: 165000, artists: [{ name: "WYS" }], album: { images: [{ url: "https://i.scdn.co/image/ab67706f00000002266beb50b0032b0f140a749e" }] } } }; npAt = npAt || Date.now(); spRender(); return; }
     try {
       const r = await spApi("/me/player?additional_types=episode");
       if (r?.status === 200) { np = await r.json(); npAt = Date.now(); spMsg = ""; }
@@ -793,40 +794,42 @@
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) spPoll(); });
   // the bar moves every second between polls
-  setInterval(() => { if (playing()) spRenderNP(); }, 1000);
+  setInterval(() => { if (npShown() && np.is_playing) spRenderNP(); }, 1000);
 
   function spRenderNP() {
-    if (!playing()) return;
+    if (!npShown()) return;
     const it = np.item, dur = it.duration_ms || 1, at = Math.min(dur, (np.progress_ms || 0) + (np.is_playing ? Date.now() - npAt : 0));
     const art = it.album?.images?.[0]?.url || it.images?.[0]?.url || it.show?.images?.[0]?.url || "";
     if ($("#np-art").getAttribute("src") !== art) $("#np-art").src = art;
+    $("#sp-np").classList.toggle("paused", !np.is_playing);
+    $("#np-k").textContent = `${np.is_playing ? "Playing" : "Paused"}${np.device?.name ? ` · ${np.device.name}` : ""}`;
     $("#np-track").textContent = it.name;
     $("#np-artist").textContent = (it.artists || []).map((a) => a.name).join(", ") || it.show?.name || "";
-    $("#np-dev").textContent = np.device ? `on ${np.device.name}` : "";
     $("#np-t0").textContent = mmss(at);
     $("#np-t1").textContent = mmss(dur);
     $("#np-bar").style.width = `${(at / dur) * 100}%`;
     $("#np-ctl").hidden = !!spA.noControl;
-    $("#np-icon").innerHTML = np.is_playing ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M7 4v16l13-8z"/>';
+    const play = $("#np-ctl .np-play");
+    play.setAttribute("aria-label", np.is_playing ? "Pause" : "Play");
+    $("#np-icon").innerHTML = np.is_playing ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M8 4.5v15l12-7.5z"/>';
   }
   async function spControl(what) {
     const paths = { prev: ["POST", "/me/player/previous"], next: ["POST", "/me/player/next"], toggle: np?.is_playing ? ["PUT", "/me/player/pause"] : ["PUT", "/me/player/play"] };
     const [method, path] = paths[what];
     const r = await spApi(path, { method });
     if (r?.status === 403) { spA.noControl = true; spSaveAuth(); spRender(); toast("Play controls need Spotify Premium"); return; }
+    if (what === "toggle" && np && r?.ok) { np = { ...np, progress_ms: np.progress_ms + (np.is_playing ? Date.now() - npAt : 0), is_playing: !np.is_playing }; npAt = Date.now(); spRenderNP(); }
     setTimeout(spPoll, 400);
   }
   document.addEventListener("click", (e) => { const b = e.target.closest("[data-np]"); if (b) spControl(b.dataset.np); });
 
   function spRenderAcct() {
     const el = $("#sp-acct"), note = $("#sp-note"), lofi = musicSrc === "lofi";
-    note.textContent = lofi ? "Lofi Girl's 24/7 stream on YouTube. Press play in the video." : playing() ? "" : "The player plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise.";
+    note.textContent = lofi ? "Lofi Girl's 24/7 stream on YouTube. Press play in the video." : npShown() ? "" : "The player plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise.";
     if (lofi) { el.innerHTML = ""; return; }
-    const paused = spConnected() && np?.item && !np.is_playing;
     const reset = sp.id !== SP_DEFAULT.id ? `<button class="link" type="button" data-sp="reset">Back to lofi beats</button>` : "";
     if (spConnected()) {
-      el.innerHTML = `${paused ? `<div class="sp-paused">Paused on Spotify: <b>${esc(np.item.name)}</b>${spA.noControl ? "" : ` <button class="link" type="button" data-np="toggle">Resume</button>`}</div>` : ""}
-        <div class="sp-row"><span class="sp-ok">Spotify account connected${playing() ? "" : " · nothing playing"}</span>${reset}<button class="link" type="button" data-sp="disconnect">Disconnect</button></div>${spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : ""}`;
+      el.innerHTML = `<div class="sp-row"><span class="sp-ok">Connected to Spotify${npShown() ? "" : " · nothing playing right now"}</span>${npShown() ? "" : reset}<button class="link" type="button" data-sp="disconnect">Disconnect</button></div>${spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : ""}`;
       return;
     }
     el.innerHTML = `<div class="sp-row"><button class="link" type="button" data-sp="setup" aria-expanded="${spSetup}">${spSetup ? "Hide setup" : "Connect your Spotify account"}</button>${reset}</div>${spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : ""}

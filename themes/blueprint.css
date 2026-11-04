@@ -172,3 +172,12 @@ html[data-skin="blueprint"]{
 html[data-skin="blueprint"]{
   .tabs button{font-family:var(--head);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
 }
+
+/* the now-playing card in this theme */
+html[data-skin="blueprint"]{
+  .np-art{border-radius:0;box-shadow:0 0 0 1px var(--sheet-line)}
+  .np-track{font-family:var(--head);font-weight:600}
+  .np-ctl button{border-radius:0}
+  .np-bar,.np-bar i{border-radius:0}
+  .np-bar i::after{border-radius:0;width:2px;right:-1px;height:12px;margin-top:-6px}
+}

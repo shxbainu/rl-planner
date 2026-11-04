@@ -150,3 +150,11 @@ html[data-skin="catalog"]{
   .tabs button{font-family:var(--head);font-weight:600;font-size:14px}
   .tabs button[aria-selected="true"]{border-bottom-color:var(--red)}
 }
+
+/* the now-playing card in this theme */
+html[data-skin="catalog"]{
+  .np-art{border-radius:3px;box-shadow:0 2px 8px rgb(0 0 0 / .2)}
+  .np-track{font-family:var(--head);font-weight:600;font-size:18px}
+  .np-k{font-family:var(--mono);letter-spacing:.06em;color:var(--accent)}
+  .np-bar i{background:var(--stamp)}
+}

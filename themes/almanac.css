@@ -180,3 +180,11 @@ html[data-skin="almanac"]{
   .tabs button{font-family:var(--head);font-weight:400;font-size:15px}
   .tabs button[aria-selected="true"]{border-bottom-color:var(--tomato)}
 }
+
+/* the now-playing card in this theme */
+html[data-skin="almanac"]{
+  .np-art{border-radius:12px}
+  .np-track{font-family:var(--head);font-weight:400;font-size:19px;line-height:1.15}
+  .np-k{color:var(--leaf-ink)}
+  .np-bar i{background:var(--leaf)}
+}
