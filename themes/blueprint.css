@@ -162,3 +162,8 @@ html[data-skin="blueprint"]{
   .st-check{border-radius:0}
   .st-k{font-family:var(--mono);letter-spacing:.12em}
 }
+
+/* a studied test or quiz */
+html[data-skin="blueprint"]{
+  .studied-mk{border-radius:0;background:transparent;font-family:var(--mono);box-shadow:inset 0 0 0 1px var(--sheet-line)}
+}

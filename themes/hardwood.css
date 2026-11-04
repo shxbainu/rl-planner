@@ -162,3 +162,8 @@ html[data-skin="hardwood"]{
   .sbc-mk{background:#fff;box-shadow:0 0 0 2px var(--led)}
   .dock a{border-radius:8px;border:0;box-shadow:0 2px 0 rgb(0 0 0 / .14)}
 }
+
+/* a studied test or quiz */
+html[data-skin="hardwood"]{
+  .studied-mk{border-radius:3px;background:var(--gold);color:#13213b;box-shadow:none;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+}

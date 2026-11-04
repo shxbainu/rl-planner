@@ -112,6 +112,12 @@
     return [...out.values()].sort((a, b) => a.due.localeCompare(b.due) || (MAJOR.has(b.type) - MAJOR.has(a.type)) || a.class.localeCompare(b.class));
   }
   const isDone = (it) => it.keys.some((k) => state.done[k]);
+  // a checked test or quiz means "studied", not "taken": it stays where it is (and on Tests & quizzes until its day is
+  // over) with a Studied mark, under the same saved check-off. Everything else checked is finished: crossed out, in Done.
+  const isTest = (it) => it.type === "test" || it.type === "quiz";
+  const studied = (it) => isTest(it) && isDone(it);
+  const finished = (it) => isDone(it) && !isTest(it);
+  const STUDIED = `<span class="studied-mk">Studied ✓</span>`;
   const pad4 = (id) => String(parseInt(hash(id), 36) % 10000).padStart(4, "0");
 
   // ---------- rendering ----------
@@ -135,20 +141,21 @@
   }
 
   function itemHTML(it, { showDue = false, overdue = false } = {}) {
-    const done = isDone(it);
+    const done = finished(it), checked = isDone(it);
     const major = MAJOR.has(it.type);
     const meta = [
       `<span class="chip">${esc(it.class)}</span>`,
       major ? `<span class="tag">${esc(it.type)}</span>` : "",
+      studied(it) ? STUDIED : "",
       it.unconfirmed ? `<span class="tag unsure">Unconfirmed</span>` : "",
       overdue ? `<span class="tag bad">Overdue</span>` : "",
       showDue ? `<span>due ${esc(relDay(it.due))}</span>` : "",
       it.manual ? `<span class="mine">yours</span>` : "",
     ].filter(Boolean).join("");
-    const nm = !done && nextMeeting(it.class);
+    const nm = !checked && nextMeeting(it.class);
     const next = nm ? `<span class="next" title="${nm.unsure ? "Based on a guessed day letter" : ""}">next class ${esc(/^(Today|Tomorrow)$/.test(relDay(nm.date)) ? relDay(nm.date).toLowerCase() : relDay(nm.date))} ${esc(nm.time)}${nm.unsure ? "?" : ""}</span>` : "";
     return `<li class="item${done ? " done" : ""}${major && !done ? " major" : ""}${overdue ? " overdue" : ""}" style="${cc(it.class)}" data-id="${esc(it.id)}">
-      <input type="checkbox" class="check" ${done ? "checked" : ""} aria-label="Done: ${esc(it.title)}">
+      <input type="checkbox" class="check" ${checked ? "checked" : ""} aria-label="${isTest(it) ? "Studied" : "Done"}: ${esc(it.title)}">
       <div class="body">
         <span class="title">${esc(it.title)}</span>
         <span class="meta">${meta}${next}</span>
@@ -432,9 +439,9 @@
       const off = offName(d);
       const num = parse(d).getDate();
       if (off) return `<div class="cell off"><div class="top"><b>${num}</b></div><span class="offn">${esc(off)}</span></div>`;
-      const list = (byDay.get(d) || []).sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
+      const list = (byDay.get(d) || []).sort((a, b) => finished(a) - finished(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
       const { letter } = letterFor(d);
-      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" data-no="${pad4(i.id)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
+      const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${finished(i) ? " done" : studied(i) ? " studied" : ""}" style="${cc(i.class)}" data-no="${pad4(i.id)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
       const more = list.length > cap ? `<span class="more">+${list.length - cap} more</span>` : "";
       return `<button type="button" class="cell${d === t ? " today" : ""}${d === selDay && !showOverdue ? " sel" : ""}${d < t ? " past" : ""}" data-day="${d}" aria-label="${esc(fmt(d, { weekday: "long", month: "long", day: "numeric" }))}, ${list.length} due">
         <div class="top"><b>${num}</b><span class="lt">${letter || ""}</span></div>${chips}${more}</button>`;
@@ -447,7 +454,7 @@
     let list, head;
     if (showOverdue && overdue.length) { list = overdue; head = "Overdue"; }
     else { showOverdue = false; list = (byDay.get(selDay) || []); head = `${relDay(selDay)}${daysBetween(t, selDay) >= 2 && daysBetween(t, selDay) < 7 ? `, ${fmt(selDay, { month: "short", day: "numeric" })}` : ""}`; }
-    list = [...list].sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
+    list = [...list].sort((a, b) => finished(a) - finished(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
     const openN = list.filter((i) => !isDone(i)).length;
     $("#ag-h").textContent = head;
     $("#hw-meta").textContent = list.length ? `${openN} of ${list.length} left` : "";
@@ -456,7 +463,7 @@
       : `<li class="empty-state">Nothing due${offName(selDay) ? ` (${esc(offName(selDay))})` : ""}.</li>`;
     $("#hw-notes").innerHTML = (homework?.notes || []).map((n) => `<p class="hw-note">${esc(n)}</p>`).join("");
 
-    const done = items.filter(isDone).sort((a, b) => b.due.localeCompare(a.due));
+    const done = items.filter(finished).sort((a, b) => b.due.localeCompare(a.due));
     $("#done-count").textContent = done.length;
     const doneToday = Object.values(state.done).filter((v) => typeof v === "string" && iso(new Date(v)) === today()).length;
     $("#done-count").dataset.stage = Math.min(4, doneToday);
@@ -1043,13 +1050,14 @@
 
   // ---------- tests & quizzes (from homework) ----------
   function renderBig() {
-    const t = today(), until = addDays(t, 28);
-    const list = allItems().filter((i) => MAJOR.has(i.type) && i.due >= t && i.due <= until);
+    const t = today(), until = addDays(t, 28), n0 = now();
+    const dayOver = n0.getHours() * 60 + n0.getMinutes() >= 15 * 60 + 30; // today's drop off after the school day
+    const list = allItems().filter((i) => MAJOR.has(i.type) && (i.due > t || (i.due === t && !dayOver)) && i.due <= until);
     $("#big-meta").textContent = list.length ? "next 4 weeks" : "";
     $("#big").innerHTML = list.length ? list.map((i) => {
-      const n = daysBetween(t, i.due), done = isDone(i);
-      return `<li class="${done ? "done" : ""}${n === 0 ? " today" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
-        <span class="w"><b>${esc(i.title)}</b><small>${esc(cls(i.class).short || i.class)} · ${esc(i.type)} · ${esc(fmt(i.due))}</small></span></li>`;
+      const n = daysBetween(t, i.due), done = finished(i);
+      return `<li class="${done ? "done" : ""}${studied(i) ? " studied" : ""}${n === 0 ? " today" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
+        <span class="w"><b>${esc(i.title)}</b>${studied(i) ? STUDIED : ""}<small>${esc(cls(i.class).short || i.class)} · ${esc(i.type)} · ${esc(fmt(i.due))}</small></span></li>`;
     }).join("") : `<li class="empty-state" style="display:block;border:0">No tests or quizzes in the next 4 weeks.</li>`;
   }
 
@@ -1089,8 +1097,14 @@
     if (e.target.matches(".check")) {
       const li = e.target.closest(".item");
       const id = li.dataset.id, on = e.target.checked;
-      li.classList.toggle("done", on);
+      const it = allItems().find((i) => i.id === id);
       setDone(id, on);
+      if (it && isTest(it)) { // studied: stays put, just gains (or loses) its mark
+        renderHomework(); renderBig();
+        if (on) toast("Marked studied", () => { setDone(id, false); renderHomework(); renderBig(); });
+        return;
+      }
+      li.classList.toggle("done", on);
       li.style.setProperty("--rnd", (Math.random() * 2 - 1).toFixed(2));
       li.classList.add("leaving");
       setTimeout(() => { renderHomework(); renderBig(); }, leaveMs());

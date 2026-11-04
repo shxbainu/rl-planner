@@ -173,3 +173,8 @@ html[data-skin="arcade"]{
   .sbc-bar i{border-radius:0}
   .ss-form i{border-radius:0;font-family:var(--pixel);font-size:7px}
 }
+
+/* a studied test or quiz */
+html[data-skin="arcade"]{
+  .studied-mk{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:7.5px;padding:3px 5px 2px;line-height:1}
+}

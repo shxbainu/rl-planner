@@ -155,3 +155,8 @@ html[data-skin="nautical"]{
   .st-k{font-family:var(--mono);letter-spacing:.2em}
   .st-check{border-radius:50%}
 }
+
+/* a studied test or quiz */
+html[data-skin="nautical"]{
+  .studied-mk{border-radius:2px;font-family:var(--mono);font-weight:500}
+}

@@ -140,3 +140,8 @@ html[data-skin="chess"]{
   .st-card{border-radius:4px}
   .st-check{border-radius:3px}
 }
+
+/* a studied test or quiz */
+html[data-skin="chess"]{
+  .studied-mk{border-radius:2px;background:var(--ebony);color:var(--ivory);box-shadow:none;font-family:var(--mono);font-weight:500}
+}

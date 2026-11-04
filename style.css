@@ -102,6 +102,10 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .big .w small{display:block;font-size:12px;color:var(--muted)}
 .big li.done{opacity:.5}
 .big li.done b{text-decoration:line-through}
+/* a test or quiz checked off in the homework list: studied, still coming up */
+.studied-mk{display:inline-block;vertical-align:1px;margin-left:6px;padding:0 6px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.03em;line-height:1.6;white-space:nowrap;
+  color:var(--fg);background:color-mix(in srgb,var(--cc,var(--accent)) 16%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc,var(--accent)) 50%,transparent)}
+.meta .studied-mk{margin-left:0}
 
 /* extras: collapsed dropdowns with a one-line preview */
 .extras{display:grid;gap:8px}
