@@ -162,3 +162,14 @@ html[data-skin="arcade"]{
   .st-check{border-radius:0}
   .st-k{font-family:var(--pixel);font-weight:400;font-size:8px;letter-spacing:0;color:var(--neon)}
 }
+
+/* the scoreboard clock and dock as pixel boxes */
+html[data-skin="arcade"]{
+  .sbc,.dock a{border-radius:0;clip-path:var(--notch)}
+  .sbc-q{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:9px;padding:4px 6px 3px;background:var(--coin);color:var(--bg)}
+  &[data-mode="light"] .sbc-q{background:var(--screen);color:var(--screen-fg)}
+  .sbc-t{font-family:var(--digits);font-size:20px;line-height:.8;color:var(--coin)}
+  &[data-mode="light"] .sbc-t{color:var(--fg)}
+  .sbc-bar i{border-radius:0}
+  .ss-form i{border-radius:0;font-family:var(--pixel);font-size:7px}
+}

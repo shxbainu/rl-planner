@@ -304,6 +304,7 @@
 
   // once a second: update the number and bar in place; redraw the card when the block changes
   function tickNow() {
+    renderScoreboard();
     const day = schoolDay(), { letter } = letterFor(day);
     const num = $("#now-card .num");
     if (!num) return;
@@ -363,6 +364,7 @@
     skinSchedule();
     const af = schedule.after_school;
     $("#after").innerHTML = af ? `After school: <b>${esc(af.name)}</b>, ${esc(af.coach)}` : "";
+    renderScoreboard();
   }
 
   function renderRotation() {
@@ -459,6 +461,7 @@
     const doneToday = Object.values(state.done).filter((v) => typeof v === "string" && iso(new Date(v)) === today()).length;
     $("#done-count").dataset.stage = Math.min(4, doneToday);
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
+    renderSeasonal();
   }
   $("#cal").addEventListener("click", (e) => {
     const c = e.target.closest("[data-day]");
@@ -526,6 +529,7 @@
         <div><div class="tn">${esc(t.name)} <span class="rec">${esc(me.recordSummary || "")}${me.standingSummary ? ` · ${esc(me.standingSummary.replace(/ Division$/, ""))}` : ""}</span></div>${lines.join("")}</div></div>`;
     }).join("");
     $("#teams").innerHTML = html;
+    renderGameNight();
     const liveT = (schedule.teams || []).map((t) => {
       const ev = boards[t.league]?.events?.find((e) => evState(e).state === "in" && e.competitions[0].competitors.some((c) => c.team.abbreviation === t.id.toUpperCase()));
       if (!ev) return "";
@@ -1542,6 +1546,219 @@
   stDockMQ.addEventListener("change", stPlaceMusic);
   document.addEventListener("visibilitychange", () => { if (!document.hidden && st.open) { stWake(); stTick(); } });
 
+  // ---------- scoreboard clock: the school day as a game. Classes are quarters, passing is a timeout, lunch is halftime ----------
+  let sbcKey = "";
+  function renderScoreboard() {
+    const el = $("#sbc"), p = periodNow();
+    if (!p.day || p.mode === "off") { el.hidden = true; sbcKey = ""; return; }
+    el.hidden = false;
+    let q = 0;
+    const quarters = p.day.map((s) => (s.name ? ++q : 0));
+    const cur = p.mode === "class" ? p.seg : null;
+    const call = p.mode === "before" ? ["PRE", "Pregame"] : p.mode === "after" ? ["FINAL", `${q} quarters played`] : p.mode === "passing" ? ["T/O", "Timeout"]
+      : cur.name ? [`Q${quarters[p.i]}`, cls(cur.name).name] : /lunch/i.test(cur.label) ? ["HALF", "Halftime"] : ["WARM", `Warmups · ${cur.label}`];
+    const key = `${p.mode}|${p.i}`;
+    if (key !== sbcKey) {
+      sbcKey = key;
+      const span = p.end - p.start, at = (t) => ((minutes(t) - p.start) / span) * 100;
+      el.innerHTML = `<span class="sbc-q">${call[0]}</span><span class="sbc-n">${esc(call[1])}</span><span class="sbc-t" id="sbc-t"></span>
+        <div class="sbc-bar" aria-hidden="true">${p.day.map((s, i) => `<i class="${s.name ? "" : "ev"}${i < p.i || p.mode === "after" ? " gone" : ""}" style="left:${at(s.start).toFixed(2)}%;width:${(at(s.end) - at(s.start)).toFixed(2)}%;${s.name ? cc(s.name) : ""}" title="${esc(s.name ? `Q${quarters[i]} · ${cls(s.name).name}` : s.label)}"></i>`).join("")}<b class="sbc-mk" id="sbc-mk"></b></div>`;
+      el.setAttribute("aria-label", `${call[1]}`);
+    }
+    $("#sbc-t").textContent = p.left != null ? clock(p.left) : "";
+    $("#sbc-mk").style.left = `${(Math.min(Math.max(p.m, p.start), p.end) - p.start) / (p.end - p.start) * 100}%`;
+  }
+
+  // ---------- the season: each day with homework due is a W if all of it got done, an L if not ----------
+  // Computed from check-offs in this browser; nothing personal goes into the repo.
+  const PTS = { homework: 2, reading: 2, quiz: 4, test: 6, essay: 8, project: 8 };
+  function season() {
+    const mp = schedule.marking_period, t = today(), items = allItems(), byDay = groupBy(items);
+    const ended = mp?.ends && t > mp.ends;
+    const from = ended ? addDays(mp.ends, 1) : items.reduce((m, i) => (i.due < m ? i.due : m), t);
+    const days = [...byDay.keys()].filter((d) => d >= from && d < t && isSchoolDay(d) && (!mp?.ends || ended || d <= mp.ends)).sort();
+    const res = days.map((d) => (byDay.get(d).every(isDone) ? "W" : "L"));
+    if (byDay.get(t)?.length && byDay.get(t).every(isDone)) { days.push(t); res.push("W"); } // today counts once it's all done
+    let streak = 0, best = 0, run = 0;
+    for (const r of res) { run = r === "W" ? run + 1 : 0; best = Math.max(best, run); }
+    for (let i = res.length - 1; i >= 0 && res[i] === res.at(-1); i--) streak++;
+    return { name: ended ? "Next season" : mp?.name || "Season", days, res, w: res.filter((r) => r === "W").length, l: res.filter((r) => r === "L").length, streak: res.length ? `${res.at(-1)}${streak}` : "", best };
+  }
+  function renderSeason() {
+    const s = season(), t = today(), by = isSchoolDay(t) && now().getHours() < 15 ? t : nextSchoolDay(t);
+    const tonight = allItems().filter((i) => i.due === by);
+    const proj = tonight.reduce((n, i) => n + (PTS[i.type] || 2), 0), scored = tonight.filter(isDone).reduce((n, i) => n + (PTS[i.type] || 2), 0);
+    $("#season").innerHTML = `<span class="ss-rec" title="${esc(s.name)}: days with everything done are wins"><b>${s.w}-${s.l}</b> ${esc(s.name)}${s.streak ? ` · Streak ${s.streak}` : ""}</span>
+      <span class="ss-form" aria-hidden="true">${s.res.slice(-8).map((r) => `<i class="${r}">${r}</i>`).join("")}</span>
+      ${tonight.length ? `<span class="ss-pts" title="Points: homework 2, quiz 4, test 6, essay or project 8"><b>${scored}</b> / ${proj} proj · ${esc(relDay(by))}<span class="ss-bar"><i style="width:${proj ? Math.round((scored / proj) * 100) : 0}%"></i></span></span>` : ""}`;
+  }
+
+  // ---------- voyage to Ithaca: every W moves the ship one stop; a new marking period starts the voyage over ----------
+  // a loop west from Troy past the monsters and back east to Ithaca, roughly where the stories put each stop
+  const STOPS = [["Troy", 296, 40], ["Ismarus", 262, 20], ["Lotus-Eaters", 218, 126], ["Cyclops", 170, 104], ["Aeolus", 140, 64], ["Laestrygonians", 104, 34],
+    ["Circe", 70, 52], ["Underworld", 34, 28], ["Sirens", 38, 82], ["Scylla & Charybdis", 76, 104], ["Thrinacia", 112, 124], ["Calypso", 46, 138], ["Phaeacians", 158, 140], ["Ithaca", 204, 84]];
+  function renderVoyage() {
+    const s = season(), at = Math.min(s.w, STOPS.length - 1), [name, x, y] = STOPS[at];
+    const route = STOPS.map(([, sx, sy], i) => `${i ? "L" : "M"}${sx} ${sy}`).join(" ");
+    $("#voyage").innerHTML = `<svg viewBox="0 0 320 150" role="img" aria-label="Odysseus's ship at ${esc(name)}, stop ${at} of ${STOPS.length - 1}">
+      <rect width="320" height="150" rx="8" class="vy-sea"/>${Array.from({ length: 9 }, (_, i) => `<path class="vy-wave" d="M${(i * 37) % 300 + 6} ${(i * 53) % 130 + 10}q4-3 8 0t8 0"/>`).join("")}
+      <path d="${route}" class="vy-route"/><path d="${STOPS.slice(0, at + 1).map(([, sx, sy], i) => `${i ? "L" : "M"}${sx} ${sy}`).join(" ")}" class="vy-done"/>
+      ${STOPS.map(([n, sx, sy], i) => `<circle cx="${sx}" cy="${sy}" r="${i === STOPS.length - 1 ? 5 : 3.2}" class="vy-stop${i <= at ? " on" : ""}${i === STOPS.length - 1 ? " home" : ""}"><title>${esc(n)}</title></circle>`).join("")}
+      <g class="vy-ship" transform="translate(${x} ${y - 9})"><path d="M-9 6h18l-4 5h-10z"/><path d="M0-8v14M0-7l7 9H0z" class="vy-sail"/></g>
+      ${at < STOPS.length - 1 ? `<text x="${STOPS.at(-1)[1]}" y="${STOPS.at(-1)[2] + 17}" text-anchor="middle" class="vy-name vy-home">Ithaca</text>` : ""}
+      <text x="${Math.min(Math.max(x, 40), 280)}" y="${y > 120 ? y - 16 : y + 20}" text-anchor="middle" class="vy-name">${esc(name)}</text></svg>
+      <p class="vy-note">${at === STOPS.length - 1 ? "Home to Ithaca. The voyage starts over next marking period." : `${s.w} win${s.w === 1 ? "" : "s"} so far in ${esc(s.name)}. Every day you finish everything sails one stop closer to Ithaca.`}</p>`;
+    tease("t-voyage", `${at === STOPS.length - 1 ? "Home" : `Stop ${at}/${STOPS.length - 1}`} · ${esc(name)}`);
+  }
+
+  // ---------- player card: Brian's stats from this browser, the frame upgrades with them ----------
+  function renderCard() {
+    const s = season(), t = today(), items = allItems();
+    const done = Object.keys(state.done).length;
+    const tests = items.filter((i) => MAJOR.has(i.type) && (i.due < t || (i.due === t && now().getHours() >= 15))).length;
+    const score = done + tests * 3 + s.best * 4;
+    const [tier, name] = score >= 90 ? ["legend", "Legendary"] : score >= 40 ? ["epic", "Epic"] : score >= 15 ? ["rare", "Rare"] : ["common", "Common"];
+    const owner = schedule.owner || "Player";
+    $("#pcard").innerHTML = `<div class="pcard ${tier}">
+      <div class="pc-top"><b>${esc(owner)}</b><span>${esc((schedule.term || "").replace(/ · .*/, ""))}</span></div>
+      <div class="pc-art"><span class="pc-mono">${esc(owner[0])}</span><span class="pc-pos">Freshman</span></div>
+      <dl class="pc-stats"><div><dt>Record</dt><dd>${s.w}-${s.l}</dd></div><div><dt>Best streak</dt><dd>${s.best}</dd></div><div><dt>Items done</dt><dd>${done}</dd></div><div><dt>Tests survived</dt><dd>${tests}</dd></div></dl>
+      <div class="pc-foot"><span>${name}</span><span>${score} pts</span></div></div>
+      <p class="vy-note">Frames: Common, Rare at 15 points, Epic at 40, Legendary at 90. Points: items done + 3 per test or quiz behind you + 4 per day of your best streak.</p>`;
+    tease("t-card", `${name} · ${score} pts`);
+  }
+  function renderSeasonal() { renderSeason(); renderVoyage(); renderCard(); }
+
+  // ---------- snow day odds: Open-Meteo (no key) for West Roxbury; the box shows itself only when snow is forecast ----------
+  async function loadSnow() {
+    let days = [];
+    const force = new URLSearchParams(location.search).get("snow"); // ?snow=cm previews the meter
+    if (force) days = [{ date: nextSchoolDay(today()), cm: +force || 0, low: -4 }];
+    else try {
+      const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=42.2793&longitude=-71.1495&daily=snowfall_sum,temperature_2m_min&timezone=America%2FNew_York&forecast_days=4");
+      const d = await r.json();
+      days = d.daily.time.map((date, i) => ({ date, cm: d.daily.snowfall_sum[i] || 0, low: d.daily.temperature_2m_min[i] })).filter((x) => x.date > today() && isSchoolDay(x.date));
+    } catch {}
+    const best = days.filter((x) => x.cm > 0).sort((a, b) => b.cm - a.cm)[0];
+    $("#snow-box").hidden = !best;
+    if (!best) return;
+    const inch = best.cm / 2.54;
+    // a rough local rule of thumb: under 2 inches rarely closes school, 6+ often does, a foot almost always
+    const odds = Math.round(Math.min(95, Math.max(3, inch < 2 ? inch * 4 : inch < 6 ? 8 + (inch - 2) * 9 : 44 + (inch - 6) * 8.5)));
+    const say = odds < 10 ? "Do the homework." : odds < 30 ? "Do the homework anyway." : odds < 55 ? "Coin flip. Pajamas inside out." : odds < 80 ? "Looking good. Still pack your bag." : "Start planning the sledding.";
+    $("#snow").innerHTML = `<div class="snow-day">${esc(relDay(best.date))}: about ${inch < 1 ? "<1" : Math.round(inch)} in of snow</div>
+      <div class="snow-meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${odds}" aria-label="Snow day odds"><i style="width:${odds}%"></i><b style="left:${odds}%">❄</b></div>
+      <div class="snow-odds"><b>${odds}%</b> ${say}</div><p class="vy-note">Forecast from Open-Meteo. The odds are a guess from the snowfall, not anything the school said.</p>`;
+    tease("t-snow", `${esc(relDay(best.date))} · ${odds}%`);
+  }
+
+  // ---------- game night: on a Warriors or 49ers game day, a band under the top bar with the matchup and the countdown ----------
+  let gnTimer;
+  function renderGameNight() {
+    clearInterval(gnTimer);
+    const t = today(), el = $("#gn");
+    const games = (schedule.teams || []).map((tm) => {
+      const d = teamData[tm.id], e = d?.events?.find((x) => iso(new Date(x.date)) === t && x.competitions[0].status.type.state !== "post");
+      if (!e) return null;
+      const fresh = boards[tm.league]?.events?.find((x) => x.id === e.id) || e, c = fresh.competitions[0].competitors;
+      const us = c.find((x) => x.team.abbreviation === d.team.abbreviation) || c[0], them = c.find((x) => x !== us);
+      return { tm, e: fresh, us, them, color: d.team.color ? `#${d.team.color}` : "", alt: d.team.alternateColor ? `#${d.team.alternateColor}` : "" };
+    }).filter(Boolean);
+    document.documentElement.classList.toggle("gamenight", !!games.length);
+    el.hidden = !games.length;
+    if (!games.length) return;
+    const g = games[0];
+    // the darker team color is the band, the other its stripe; dark text if even the darker one is light
+    const lum = (h) => { const n = parseInt(h.slice(1), 16), f = (v) => (v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; return 0.2126 * f(n >> 16) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255); };
+    const [bg, stripe] = [g.color, g.alt || g.color].filter(Boolean).sort((a, b) => lum(a) - lum(b)).concat("");
+    el.style.cssText = bg ? `--gn1:${bg};--gn2:${stripe || bg};color:${lum(bg) > 0.18 ? "#111" : "#fff"}` : "";
+    const tick = () => {
+      const st = g.e.competitions[0].status.type, live = st.state === "in";
+      const left = (new Date(g.e.date) - now()) / 60e3;
+      el.innerHTML = `<span class="gn-tag">${live ? "Live" : "Game night"}</span><b>${esc(g.tm.name)}</b> ${g.us.homeAway === "home" ? "vs" : "@"} ${esc(g.them.team.shortDisplayName || g.them.team.abbreviation)}
+        <span class="gn-when">${live ? `${esc(st.shortDetail)} · ${esc(g.us.score?.displayValue ?? g.us.score ?? 0)}–${esc(g.them.score?.displayValue ?? g.them.score ?? 0)}` : `${g.tm.league === "nba" ? "Tip-off" : "Kickoff"} ${esc(gameTime(g.e.date))}${left > 0 ? ` · <span class="gn-cd">${clock(left)}</span>` : ""}`}</span>`;
+    };
+    tick();
+    gnTimer = setInterval(tick, 1000);
+  }
+
+  // ---------- command bar: press / to add homework by typing, or to jump somewhere ----------
+  const cmdDlg = $("#cmd");
+  const CLASS_WORDS = { latin: "Latin", lat: "Latin", english: "English", eng: "English", odyssey: "English", msi: "MSI", math: "MSI", mathsci: "MSI", "math-sci": "MSI", sci: "MSI",
+    french: "French", fr: "French", francais: "French", forces: "Forces", fgc: "Forces", history: "Forces", hist: "Forces", art: "Arts", arts: "Arts", glee: "Glee", choir: "Glee", health: "Health" };
+  const DOW = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  function cmdDate(words) {
+    const t = today(), w = words.map((x) => x.toLowerCase());
+    for (let i = 0; i < w.length; i++) {
+      const x = w[i].replace(/[.,]$/, ""), next = w[i - 1] === "next";
+      if (x === "today" || x === "tonight") return [t, i];
+      if (x === "tomorrow" || x === "tmrw" || x === "tmr") return [addDays(t, 1), i];
+      const di = DOW.findIndex((d) => x.startsWith(d) && x.length <= 9);
+      // "next fri" on a Tuesday is the Friday after this one; "next mon" on a Thursday is just the coming Monday
+      if (di >= 0) { let d = addDays(t, 1); while (parse(d).getDay() !== di) d = addDays(d, 1); return [next && di > parse(t).getDay() ? addDays(d, 7) : d, i]; }
+      const md = /^(\d{1,2})\/(\d{1,2})$/.exec(x);
+      if (md) { const y = now().getFullYear(), d = iso(new Date(y, +md[1] - 1, +md[2])); return [d < t ? iso(new Date(y + 1, +md[1] - 1, +md[2])) : d, i]; }
+      const mon = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].findIndex((m) => x.startsWith(m));
+      if (mon >= 0 && /^\d{1,2}$/.test(w[i + 1] || "")) { const y = now().getFullYear(), d = iso(new Date(y, mon, +w[i + 1])); return [d < t ? iso(new Date(y + 1, mon, +w[i + 1])) : d, i, 2]; }
+    }
+    return [null, -1];
+  }
+  function cmdParse(text) {
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    const ci = words.findIndex((x) => CLASS_WORDS[x.toLowerCase().replace(/[.,:]$/, "")]);
+    if (ci < 0 || words.length < 2) return null;
+    const klass = CLASS_WORDS[words[ci].toLowerCase().replace(/[.,:]$/, "")];
+    const rest = words.filter((_, i) => i !== ci);
+    let [due, di, len = 1] = cmdDate(rest);
+    // drop the date words, with a "next" or "due" in front of them
+    let from = di;
+    if (from > 0 && rest[from - 1].toLowerCase() === "next") from--;
+    if (from > 0 && rest[from - 1].toLowerCase() === "due") from--;
+    const body = di < 0 ? rest.filter((x, i) => !(i === rest.length - 1 && x.toLowerCase() === "due")) : [...rest.slice(0, from), ...rest.slice(di + len)];
+    if (!body.length) return null;
+    if (!due) due = nextMeeting(klass)?.date || nextSchoolDay(today());
+    const type = ["test", "quiz", "essay", "project"].find((k) => body.some((x) => x.toLowerCase().startsWith(k))) || "homework";
+    let title = body.join(" ").replace(/\bp(\d+)/gi, "p. $1").replace(/\bex\.?\s*([a-z])\b/gi, (_, l) => `Ex. ${l.toUpperCase()}`).replace(/\s+due$/i, "");
+    if (!/^p\. /.test(title)) title = title[0].toUpperCase() + title.slice(1);
+    return { class: klass, title, due, type, details: "" };
+  }
+  const JUMPS = [
+    ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", () => $(".p-hw")], ["Today's schedule", "schedule today bell", () => $(".p-sched")],
+    ["Tests & quizzes", "tests quizzes", () => $(".p-big")], ["Rotation", "rotation week letters", () => $(".p-week")], ["Music", "music spotify", () => $(".p-music")],
+    ["Voyage to Ithaca", "voyage odyssey ithaca", () => $('[data-x="voyage"]')], ["Player card", "player card stats", () => $('[data-x="card"]')], ["Countdowns", "countdowns", () => $('[data-x="count"]')],
+    ["Warriors & 49ers", "warriors 49ers teams", () => $('[data-x="teams"]')], ["Scores", "scores nba nfl", () => $('[data-x="scores"]')], ["News", "news", () => $('[data-x="news"]')],
+    ["Fantasy", "fantasy lineup", () => $('[data-x="fantasy"]')], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
+    ...Object.entries(SKINS).map(([k, v]) => [`Theme: ${v}`, `theme ${k} ${v.toLowerCase()}`, () => { setSkin(k); document.querySelectorAll(".skin-select").forEach((o) => { o.value = k; }); }]),
+  ];
+  let cmdSel = 0, cmdItems = [];
+  function cmdRender() {
+    const v = $("#cmd-in").value.trim(), add = cmdParse(v), lw = v.toLowerCase();
+    cmdItems = [];
+    if (add) cmdItems.push({ html: `<b>Add</b> ${esc(add.class)} · ${esc(add.title)} <small>${add.title.toLowerCase().includes(add.type) ? "" : `${esc(add.type)} · `}due ${esc(fmt(add.due, { weekday: "long", month: "short", day: "numeric" }))}</small>`, run: () => {
+      state.manual.push({ uid: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: new Date().toISOString(), ...add });
+      save(); renderHomework(); renderBig(); toast(`Added: ${add.title}`);
+    } });
+    if (lw) JUMPS.filter(([label, keys]) => keys.split(" ").some((k) => k.startsWith(lw.split(" ")[0])) || label.toLowerCase().includes(lw)).slice(0, 6)
+      .forEach(([label, , go]) => cmdItems.push({ html: `<b>Go</b> ${esc(label)}`, run: () => { const el = go(); if (el instanceof Element) { if (el.matches("details")) el.open = true; el.scrollIntoView({ block: "start", behavior: reduced() ? "auto" : "smooth" }); } } }));
+    cmdSel = Math.min(cmdSel, Math.max(0, cmdItems.length - 1));
+    $("#cmd-list").innerHTML = cmdItems.map((c, i) => `<li role="option" aria-selected="${i === cmdSel}" data-i="${i}">${c.html}</li>`).join("") || (v ? `<li class="cmd-none">Start with a class (latin, eng, msi, fr, fgc, art…) to add homework, or a section name to jump.</li>` : "");
+  }
+  function cmdRun(i) { const c = cmdItems[i]; if (!c) return; cmdDlg.close(); c.run(); }
+  function openCmd() { $("#cmd-in").value = ""; cmdSel = 0; cmdRender(); cmdDlg.showModal(); $("#cmd-in").focus(); }
+  $("#cmd-in").addEventListener("input", () => { cmdSel = 0; cmdRender(); });
+  $("#cmd-in").addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); cmdSel = (cmdSel + (e.key === "ArrowDown" ? 1 : -1) + cmdItems.length) % Math.max(1, cmdItems.length); cmdRender(); }
+  });
+  $("#cmd-form").addEventListener("submit", (e) => { e.preventDefault(); cmdRun(cmdSel); });
+  $("#cmd-list").addEventListener("click", (e) => { const li = e.target.closest("[data-i]"); if (li) cmdRun(+li.dataset.i); });
+  cmdDlg.addEventListener("click", (e) => { if (e.target === cmdDlg) cmdDlg.close(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey || st.open || document.querySelector("dialog[open]")) return;
+    if (e.target.closest?.("input, textarea, select, [contenteditable]")) return;
+    e.preventDefault();
+    openCmd();
+  });
+
   // ---------- boot ----------
   async function getJSON(path) {
     const r = await fetch(path, { cache: "no-cache" });
@@ -1560,6 +1777,8 @@
       loadBoards();
       loadSportsNews();
       setInterval(loadSportsNews, 15 * 60_000);
+      loadSnow();
+      setInterval(loadSnow, 3 * 3600_000);
       setInterval(() => { renderBar(); renderSchedule(); }, 15_000);
       // tick just after each second turns over; a plain 1s interval drifts and skips a second now and then
       const tickLoop = () => { tickNow(); setTimeout(tickLoop, 1000 - (now().getTime() % 1000) + 15); };

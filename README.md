@@ -4,7 +4,18 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 
 - `schedule.json`: `owner` (first name shown in the page title), classes, blocks, day-letter rotations (B, E, G marked unconfirmed).
 - `homework.json`: latest assignments (`assignments`), optional day letters (`days`, `"YYYY-MM-DD": "H"`), and `updated_at`. The daily update only touches this file.
-- Check-offs and added assignments live in the browser's localStorage (they stay on the device you used).
+- Check-offs and added assignments live in the browser's localStorage (they stay on the device you used). So do the season record, the voyage and the player card, which are computed from those check-offs; nothing personal is in the repo.
+
+## On the page
+
+- **Study mode** (headphones button): full screen. Counts down the current block (passing time and the next class in between), or runs a 25/5 or 50/10 focus timer outside school hours. Shows tonight's top item with a big checkbox, the rest as a queue, a subject helper drawn from the item (Odyssey lines, Ohm's law, ut clauses…), session time and break nudges, over a scene for the subject. Keeps the screen awake where the browser allows.
+- **Scoreboard clock** (top of Today): classes are quarters, passing is a timeout, lunch is halftime, the whole day on one bar.
+- **Season** (top of Homework): every day with homework due is a W if it all got done, an L if not; tonight's work as points scored vs projected. Resets after `marking_period.ends` in `schedule.json`.
+- **Voyage to Ithaca** and **Player card** (side boxes): each W sails one stop; the card's frame upgrades with the stats.
+- **Snow day odds**: appears only when Open-Meteo forecasts snow for West Roxbury on a school day. `?snow=15` previews it with 15 cm.
+- **Game night**: a band in the team's colors on Warriors and 49ers game days, with the tip-off or kickoff countdown.
+- **Command bar**: press `/`, then type `latin p245 ex c due fri` to add homework, or a section name to jump there.
+- **Music**: Spotify's embed player; paste any playlist, album or song link.
 
 Preview locally:
 

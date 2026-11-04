@@ -32,6 +32,7 @@
     {"slot": 7, "start": "2:00", "end": "2:45"}
   ],
   "bells_note": "Start times are from the rotation. 45-minute blocks with 5 minutes of passing time between them; the 4th block is 25 + 15 minutes, then a separate 25-minute lunch. Homeroom is 8:20-8:25 every day.",
+  "marking_period": {"name": "MP2", "ends": "2026-12-09", "note": "last day of MP2 per Muse; the season record and the voyage reset after it"},
   "passing": 5,
   "hall": {"weekday": 2, "start": "8:30", "end": "9:15", "note": "Tuesdays only; fills the first block when it is free"},
   "rotations": {

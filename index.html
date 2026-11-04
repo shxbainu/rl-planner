@@ -43,7 +43,7 @@
   <div class="bar-status" id="updated" role="status"></div>
   <div class="bar-actions">
     <button class="icon-btn study-btn" id="study-btn" type="button" aria-label="Study mode" title="Study mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><path d="M4 15a2 2 0 0 1 2-2h1v7H6a2 2 0 0 1-2-2zM20 15a2 2 0 0 0-2-2h-1v7h1a2 2 0 0 0 2-2z"/></svg><span>Study</span></button>
-    <button class="btn primary" id="add-btn" type="button">+ Add</button>
+    <button class="btn primary" id="add-btn" type="button" aria-label="Add homework">+<span> Add</span></button>
     <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch light or dark mode" title="Light / dark"></button>
   </div>
   <label class="skin-pick" title="Theme">
@@ -52,10 +52,13 @@
   </label>
 </header>
 
+<div class="gn" id="gn" hidden></div>
+
 <main class="dash">
   <div class="col col-a">
     <section class="panel p-sched" aria-labelledby="sched-h">
       <div class="panel-h"><h2 id="sched-h">Schedule</h2><span class="panel-meta" id="sched-meta"></span></div>
+      <div class="sbc" id="sbc" hidden></div>
       <div class="now-card" id="now-card"></div>
       <ol class="tl" id="timeline"></ol>
       <p class="after" id="after"></p>
@@ -64,6 +67,13 @@
       <div class="panel-h"><h2 id="big-h">Tests &amp; quizzes</h2><span class="panel-meta" id="big-meta"></span></div>
       <ul class="big" id="big"></ul>
     </section>
+    <nav class="dock" aria-label="Quick links">
+      <a href="https://roxburylatin.myschoolapp.com/app/student" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10 12 4l9 6M5 10v9h14v-9M9 19v-5h6v5"/></svg>Portal</a>
+      <a href="https://classroom.google.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4M7 9h6M7 12h4"/></svg>Classroom</a>
+      <a href="https://open.spotify.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>Spotify</a>
+      <a href="https://www.espn.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3.4 3 3.4 9.8 0 12.8M18.4 5.6c-3.4 3-3.4 9.8 0 12.8"/></svg>ESPN</a>
+      <a href="https://lichess.org" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20h10M8 20l1-4h6l1 4M9 16c-1-3 0-5 2-7l-3-1 2-4 5 3c2 1.5 3 4 2 6.5L16 16"/></svg>Lichess</a>
+    </nav>
   </div>
 
   <section class="panel p-hw" aria-labelledby="hw-h">
@@ -75,6 +85,7 @@
         <button class="icon-btn sm" type="button" data-cal="1" aria-label="Later weeks">›</button>
       </div>
     </div>
+    <div class="season" id="season"></div>
     <div id="overdue-bar"></div>
     <div class="cal" id="cal" role="grid" aria-label="Homework calendar"></div>
     <div class="agenda">
@@ -119,6 +130,21 @@
             <p class="sp-note">Plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise. <button class="link" id="sp-reset" type="button" hidden>Back to lofi beats</button></p>
           </div>
         </div>
+      </details>
+
+      <details class="extra p-snow" data-x="snow" id="snow-box" hidden>
+        <summary><span class="x-name">Snow day odds</span><span class="x-tease" id="t-snow"></span></summary>
+        <div class="x-body"><div class="snow" id="snow"></div></div>
+      </details>
+
+      <details class="extra" data-x="voyage">
+        <summary><span class="x-name">Voyage to Ithaca</span><span class="x-tease" id="t-voyage"></span></summary>
+        <div class="x-body"><div class="voyage" id="voyage"></div></div>
+      </details>
+
+      <details class="extra" data-x="card">
+        <summary><span class="x-name">Player card</span><span class="x-tease" id="t-card"></span></summary>
+        <div class="x-body"><div class="pcard-wrap" id="pcard"></div></div>
       </details>
 
       <details class="extra" data-x="count">
@@ -256,6 +282,14 @@
   </div>
   <p class="st-nudge" id="st-nudge" role="status" hidden></p>
 </div>
+
+<dialog class="cmd" id="cmd" aria-label="Command bar">
+  <form method="dialog" id="cmd-form" autocomplete="off">
+    <input id="cmd-in" placeholder="latin p245 ex c due fri · or jump: music, study, rotation…" aria-label="Command" spellcheck="false">
+  </form>
+  <ul class="cmd-list" id="cmd-list" role="listbox"></ul>
+  <p class="cmd-hint">Type a class and the work to add it (due defaults to the next class). Enter to run · ↑↓ to choose · Esc to close.</p>
+</dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

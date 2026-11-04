@@ -182,3 +182,13 @@ html[data-skin="departure"]{
   .st-card{border-radius:4px}
   .st-k{font-family:var(--sign);font-weight:600;letter-spacing:.14em}
 }
+
+/* the scoreboard clock on a board tile */
+html[data-skin="departure"]{
+  .sbc{background:var(--tile);color:var(--tile-fg);border-color:var(--split)}
+  .sbc-q{background:var(--amber);color:#141414}
+  .sbc-n{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+  .sbc-t{color:var(--amber)}
+  .sbc-bar i{box-shadow:inset -1.5px 0 0 var(--tile)}
+  .sbc-mk{background:var(--amber);box-shadow:0 0 0 2px var(--tile)}
+}
