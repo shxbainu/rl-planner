@@ -1848,6 +1848,34 @@
     gnTimer = setInterval(tick, 1000);
   }
 
+  // ---------- the morning briefing: an AI summary of today's headlines, written by tools/summarize_news.py ----------
+  let brief = null;
+  function renderBrief() {
+    const el = $("#brief"), peek = $("#brief-peek");
+    if (!brief?.stories?.length) {
+      el.innerHTML = `<p class="brief-none">Each morning a short AI summary of the day's headlines shows up here. It starts once it's set up (the README has the steps).</p>`;
+      peek.hidden = true;
+      return;
+    }
+    const isToday = brief.date === today(), at = new Date(brief.generated_at);
+    const label = isToday ? "Today's briefing" : `Briefing from ${fmt(brief.date, { weekday: "long" })}`;
+    const when = isNaN(at) ? "" : at.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    const link = (x) => /^https?:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener" title="${esc(x.title || "")}">${esc(x.source || "Source")}</a>` : "";
+    el.innerHTML = `<div class="brief-h"><span class="brief-k">${esc(label)}</span>${when ? `<span class="brief-when">written ${esc(when)}</span>` : ""}</div>
+      <p class="brief-day">${esc(brief.day)}</p>
+      <ol class="brief-list">${brief.stories.map((s) => `<li><b class="brief-hl">${esc(s.headline)}</b><p>${esc(s.summary)}</p><p class="brief-why"><span>Why it matters</span>${esc(s.why)}</p>
+        <div class="brief-src">${(s.sources || []).map(link).join("")}</div></li>`).join("")}</ol>
+      <p class="brief-note">AI summary of today's headlines, may contain mistakes. The sources open the original stories.</p>`;
+    peek.hidden = false;
+    peek.innerHTML = `<span class="brief-k">${esc(label)}</span><span class="brief-peek-day">${esc(brief.day)}</span><span class="brief-go">Read the briefing →</span>`;
+  }
+  $("#brief-peek").onclick = () => {
+    showPane("news");
+    showTab("more");
+    $('.pane[data-pane="news"]').scrollTop = 0;
+    $(".p-more").scrollIntoView({ block: "start", behavior: reduced() ? "auto" : "smooth" });
+  };
+
   // ---------- command bar: press / to add homework by typing, or to jump somewhere ----------
   const cmdDlg = $("#cmd");
   const CLASS_WORDS = { latin: "Latin", lat: "Latin", english: "English", eng: "English", odyssey: "English", msi: "MSI", math: "MSI", mathsci: "MSI", "math-sci": "MSI", sci: "MSI",
@@ -1892,7 +1920,7 @@
   const JUMPS = [
     ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", go("homework")], ["Today's schedule", "schedule today bell", go("today")],
     ["Tests & quizzes", "tests quizzes", () => { showTab("today"); return $(".p-big"); }], ["Music", "music spotify lofi", go("music")], ["Rotation", "rotation week letters", go("more", "week")],
-    ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")],
+    ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")], ["Today's briefing", "briefing summary ai news today", () => { $("#brief-peek").click(); }],
     ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
     ...Object.entries(SKINS).map(([k, v]) => [`Theme: ${v}`, `theme ${k} ${v.toLowerCase()}`, () => { setSkin(k); document.querySelectorAll(".skin-select").forEach((o) => { o.value = k; }); }]),
   ];
@@ -1931,14 +1959,16 @@
     if (!r.ok) throw new Error(`${path}: ${r.status}`);
     return r.json();
   }
-  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null)])
-    .then(([s, h, f, n]) => {
+  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null), getJSON("news_summary.json").catch(() => null)])
+    .then(([s, h, f, n, b]) => {
       news = n;
+      brief = b;
       schedule = s;
       homework = h;
       fantasy = f;
       document.title = s.owner ? `${s.owner}'s RL Planner` : "RL Planner";
       render();
+      renderBrief();
       loadTeams();
       loadBoards();
       loadSportsNews();

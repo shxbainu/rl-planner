@@ -63,6 +63,7 @@
       <ol class="tl" id="timeline"></ol>
       <p class="after" id="after"></p>
     </section>
+    <button class="brief-peek" id="brief-peek" type="button" hidden></button>
     <section class="panel p-snow" id="snow-box" aria-labelledby="snow-h" hidden>
       <div class="panel-h"><h2 id="snow-h">Snow day odds</h2><span class="panel-meta" id="t-snow"></span></div>
       <div class="snow" id="snow"></div>
@@ -182,6 +183,7 @@
       </div>
 
       <div class="pane" data-pane="news" role="tabpanel" data-xhome data-xname="News" hidden>
+        <section class="brief" id="brief" aria-label="Today's briefing"></section>
         <div class="x-tools"><div role="group" aria-label="News section" id="news-tabs"></div><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
         <div class="x-body">
           <ul class="news" id="news"></ul>

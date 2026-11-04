@@ -6,7 +6,14 @@ on:
     branches: [main]
   schedule:
     - cron: "17 * * * *"
+    # the morning briefing: 6:35am EST (7:35 EDT); the hourly runs retry it if this one misses
+    - cron: "35 10 * * *"
   workflow_dispatch:
+    inputs:
+      briefing:
+        description: "Rewrite today's AI briefing now"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -30,6 +37,14 @@ jobs:
           python-version: "3.12"
       - name: Fetch headlines
         run: python tools/fetch_news.py news.json
+      # once a day: an AI summary of those headlines (needs the ANTHROPIC_API_KEY secret; skips itself without it)
+      - name: Morning briefing
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ]; then pip install -q anthropic; fi
+          python tools/summarize_news.py news.json news_summary.json ${{ inputs.briefing && '--force' || '' }} || true
       - name: Pull latest homework and fantasy from Crosswalk
         env:
           CROSSWALK_KEY: ${{ secrets.CROSSWALK_KEY }}
@@ -38,6 +53,7 @@ jobs:
         run: |
           mkdir _site
           cp index.html style.css app.js schedule.json homework.json fantasy.json news.json _site/
+          if [ -f news_summary.json ]; then cp news_summary.json _site/; fi
           cp -r themes _site/themes
           # version the asset links so browsers don't keep a stale script after a deploy
           v="${GITHUB_SHA::7}"

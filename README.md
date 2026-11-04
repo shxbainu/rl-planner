@@ -15,7 +15,17 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 - **Game night**: a band in the team's colors on Warriors and 49ers game days, with the tip-off or kickoff countdown.
 - **Command bar**: press `/`, then type `latin p245 ex c due fri` to add homework, or a section name to jump there.
 - **Music** (always open on laptops, its own tab on phones): switch between **Spotify** and **Lofi Girl**. Spotify plays through its embed (paste any playlist, album or song link), and once you connect your account it shows what you're playing on any device, with play, pause and skip on Premium. Lofi Girl is the 24/7 "lofi hip hop radio" YouTube stream; Lofi Girl restarts its streams now and then (the 2022 one ended in May 2026), so if the video says it's unavailable, put the current id from youtube.com/@LofiGirl/streams in `LOFI.id` in `app.js`. `?npdemo` previews the now-playing card.
+- **Today's briefing** (top of More → News, with a "Read the briefing" link on Today): each morning an AI summary of the day's headlines: one sentence for the day, then the 5 to 7 biggest stories with why each matters and links to the outlets that covered it. Written by `tools/summarize_news.py` in the deploy workflow (one Claude API call a day, first run after 6:30am Eastern). The model may only use the headlines it's given, every story has to cite them, and the script drops any story whose citations don't match. Labeled on the page as an AI summary that may contain mistakes. Needs the API key below; without it the card says so and nothing else changes.
 - **Layout**: Today, Homework and Music stay open; Week, Sports, News, Fantasy and Countdowns share one tab strip. On phones a bottom bar switches between Today, Homework, Music and More.
+
+## Turning on the daily briefing (once)
+
+1. Go to https://console.anthropic.com, sign in or make an account, and add a payment method under **Billing**. It's pay as you go.
+2. Under **API Keys**, press **Create Key**, name it something like `rl-planner`, and copy the key (it starts with `sk-ant-`). You only see it once.
+3. On GitHub, open the repo **shxbainu/rl-planner → Settings → Secrets and variables → Actions → New repository secret**. Name it exactly `ANTHROPIC_API_KEY`, paste the key, and save.
+4. To get a briefing right away instead of waiting for the next morning: **Actions → Deploy site → Run workflow**, tick **Rewrite today's AI briefing now**, and run it.
+
+Cost: one call a day to Claude Sonnet 5.5 with about 14,000 tokens of headlines in and roughly 3,000 to 5,000 out (the briefing plus the model's thinking) comes to about 6 to 8 cents a day, around $2 to $2.50 a month. Hourly deploys don't call it again once the day's briefing exists. You can set a monthly spending limit in the Console under **Limits**. The key lives only in GitHub's encrypted secrets, never in the repo.
 
 ## Connecting Spotify (once, about two minutes)
 
