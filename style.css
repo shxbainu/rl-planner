@@ -696,6 +696,7 @@ html.studying .sp-note{display:none}
 .st-dot{grid-row:span 2;width:9px;height:9px;border-radius:50%;background:var(--cc)}
 .st-qt{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st-queue small{font-size:12px;color:var(--muted)}
+.st-more{margin:6px 2px 0;font-size:12px;color:var(--muted)}
 .st-nudge{position:fixed;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:62;margin:0;display:flex;gap:14px;align-items:center;
   padding:10px 16px;border-radius:999px;background:var(--fg);color:var(--bg);font-size:14px;font-weight:600;width:max-content;max-width:calc(100% - 32px)}
 .st-nudge .link{color:inherit}

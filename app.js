@@ -118,6 +118,8 @@
   const studied = (it) => isTest(it) && isDone(it);
   const finished = (it) => isDone(it) && !isTest(it);
   const STUDIED = `<span class="studied-mk">Studied ✓</span>`;
+  // a test day is over after the school day (3:30); until then a test or quiz is still ahead
+  const stillAhead = (it) => { const t = today(), n = now(); return it.due > t || (it.due === t && n.getHours() * 60 + n.getMinutes() < 15 * 60 + 30); };
   const pad4 = (id) => String(parseInt(hash(id), 36) % 10000).padStart(4, "0");
 
   // ---------- rendering ----------
@@ -1050,9 +1052,8 @@
 
   // ---------- tests & quizzes (from homework) ----------
   function renderBig() {
-    const t = today(), until = addDays(t, 28), n0 = now();
-    const dayOver = n0.getHours() * 60 + n0.getMinutes() >= 15 * 60 + 30; // today's drop off after the school day
-    const list = allItems().filter((i) => MAJOR.has(i.type) && (i.due > t || (i.due === t && !dayOver)) && i.due <= until);
+    const t = today(), until = addDays(t, 28);
+    const list = allItems().filter((i) => MAJOR.has(i.type) && stillAhead(i) && i.due <= until);
     $("#big-meta").textContent = list.length ? "next 4 weeks" : "";
     $("#big").innerHTML = list.length ? list.map((i) => {
       const n = daysBetween(t, i.due), done = finished(i);
@@ -1310,15 +1311,18 @@
   const st = { open: false, t0: 0, done: 0, pick: null, key: "", lock: null, nudged: 0, musicWasOpen: false,
     focus: { preset: (() => { try { return localStorage.getItem("rlp-focus") || "25/5"; } catch { return "25/5"; } })(), phase: "focus", endsAt: 0, left: 25 * 60e3, round: 1 } };
 
-  // tonight's list: what's due on the next school day (today's, during school), tests and projects first,
-  // then anything left over from before; if that's all done, the next few coming up
+  // tonight's list: what's due on the next school day (today's, during school), tests and projects first, then
+  // anything left over from before; if that's all done, the next few coming up. A studied test or quiz stays on
+  // the list until its day is over, after the unfinished work.
   function stQueue() {
     const t = today(), by = isSchoolDay(t) && now().getHours() < 15 ? t : nextSchoolDay(t);
-    const open = allItems().filter((i) => !isDone(i));
-    const main = open.filter((i) => i.due === by).sort((a, b) => MAJOR.has(b.type) - MAJOR.has(a.type));
-    const late = open.filter((i) => i.due < by).sort((a, b) => b.due.localeCompare(a.due));
-    const q = [...main, ...late];
-    return q.length ? q : open.filter((i) => i.due > by).slice(0, 4);
+    const keep = (i) => !isDone(i) || (studied(i) && stillAhead(i));
+    const order = (a, b) => studied(a) - studied(b) || MAJOR.has(b.type) - MAJOR.has(a.type);
+    const all = allItems().filter(keep);
+    const main = all.filter((i) => i.due === by).sort(order);
+    const late = all.filter((i) => i.due < by && !isDone(i)).sort((a, b) => b.due.localeCompare(a.due));
+    const q = [...main.filter((i) => !studied(i)), ...late, ...main.filter(studied)];
+    return q.some((i) => !studied(i)) ? q : [...q, ...all.filter((i) => i.due > by && !isDone(i)).slice(0, 4)].sort((a, b) => studied(a) - studied(b));
   }
   const stCurrent = (q) => q.find((i) => i.id === st.pick) || q[0];
 
@@ -1480,25 +1484,27 @@
       $("#st-where").textContent = sc.label || "Study mode";
     }
     $("#st-work").innerHTML = it ? `<div class="st-k">Now working on</div>
-      <label class="st-now" style="${cc(it.class)}"><input type="checkbox" class="st-check" data-id="${esc(it.id)}"><span class="st-title">${esc(it.title)}</span></label>
-      <div class="meta"><span class="chip" style="${cc(it.class)}">${esc(it.class)}</span>${MAJOR.has(it.type) ? `<span class="tag" style="${cc(it.class)}">${esc(it.type)}</span>` : ""}${it.unconfirmed ? `<span class="tag unsure">Unconfirmed</span>` : ""}<span>due ${esc(relDay(it.due).toLowerCase())}</span></div>
+      <label class="st-now" style="${cc(it.class)}"><input type="checkbox" class="st-check" data-id="${esc(it.id)}"${studied(it) ? " checked" : ""} aria-label="${isTest(it) ? "Studied" : "Done"}"><span class="st-title">${esc(it.title)}</span></label>
+      <div class="meta"><span class="chip" style="${cc(it.class)}">${esc(it.class)}</span>${MAJOR.has(it.type) ? `<span class="tag" style="${cc(it.class)}">${esc(it.type)}</span>` : ""}${studied(it) ? STUDIED : ""}${it.unconfirmed ? `<span class="tag unsure">Unconfirmed</span>` : ""}<span>due ${esc(relDay(it.due).toLowerCase())}</span></div>
       ${it.details ? `<p class="st-det">${esc(it.details)}</p>` : ""}`
       : `<div class="st-k">Now working on</div><p class="st-empty">Nothing left for tonight. Pick a test from the dashboard to get ahead on, or call it a night.</p>`;
     const help = stHelp(it);
     $("#st-help").hidden = !help;
     $("#st-help").innerHTML = help ? `<div class="st-k">${esc(it.class)} helper</div>${help}` : "";
     const rest = q.filter((i) => i !== it);
-    $("#st-queue").innerHTML = `<div class="st-k">Up next${rest.length ? ` · ${rest.length}` : ""}</div>${rest.length ? `<ul>${rest.slice(0, 6).map((i) => `<li style="${cc(i.class)}"><button type="button" data-pick="${esc(i.id)}"><span class="st-dot"></span><span class="st-qt">${esc(i.title)}</span><small>${esc(i.class)} · ${esc(relDay(i.due))}</small></button></li>`).join("")}</ul>` : `<p class="st-empty">That's the last one.</p>`}`;
+    $("#st-queue").innerHTML = `<div class="st-k">Up next${rest.length ? ` · ${rest.length}` : ""}</div>${rest.length ? `<ul>${rest.slice(0, 6).map((i) => `<li style="${cc(i.class)}"><button type="button" data-pick="${esc(i.id)}"><span class="st-dot"></span><span class="st-qt">${esc(i.title)}</span><small>${esc(i.class)} · ${esc(relDay(i.due))}${studied(i) ? ` ${STUDIED}` : ""}</small></button></li>`).join("")}</ul>${rest.length > 6 ? `<p class="st-more">+ ${rest.length - 6} more${rest.slice(6).some(studied) ? `, including ${rest.slice(6).filter(studied).length} studied` : ""}</p>` : ""}` : `<p class="st-empty">That's the last one.</p>`}`;
   }
   study.addEventListener("change", (e) => {
     if (!e.target.matches(".st-check")) return;
-    const id = e.target.dataset.id;
-    setDone(id, true);
+    const id = e.target.dataset.id, on = e.target.checked, it = allItems().find((i) => i.id === id), test = it && isTest(it);
+    const redraw = () => { stRenderWork(); stRenderStats(); renderHomework(); renderBig(); };
+    setDone(id, on);
+    if (!on) { redraw(); return; } // un-marking a studied test
     st.done++;
-    st.pick = null;
-    e.target.closest(".st-now").classList.add("done");
-    setTimeout(() => { stRenderWork(); stRenderStats(); renderHomework(); renderBig(); }, 450);
-    toast("Done. Next one up.", () => { setDone(id, false); st.done--; stRenderWork(); stRenderStats(); renderHomework(); renderBig(); });
+    st.pick = null; // the next unfinished item comes up; a studied test stays further down the queue
+    if (!test) e.target.closest(".st-now").classList.add("done");
+    setTimeout(redraw, 450);
+    toast(test ? "Studied. Next one up." : "Done. Next one up.", () => { setDone(id, false); st.done--; redraw(); });
   });
   study.addEventListener("click", (e) => {
     const p = e.target.closest("[data-pick]");
