@@ -80,7 +80,7 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
     flex:1;min-height:0;max-width:none}
   /* the dashboard fills whatever the top bar leaves, whatever its height in a skin */
   body{height:100dvh;display:flex;flex-direction:column}
-  .col-c{display:flex}
+  .col-c{display:flex;align-items:stretch} /* the cards fill the column */
   .col,.p-hw{overflow:auto;scrollbar-width:thin}
   .col > .panel{flex:none}
   /* music keeps its size; the tabbed panel takes the rest of the column and scrolls inside */
@@ -89,6 +89,21 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
   .p-week .rot-scroll{flex:1;display:flex}
   .p-week .rot{height:100%}
 }
+/* tests: one dense row each (days left, class and type, title, date), and a slim "Next up" line in Today */
+.tq{list-style:none;margin:0 0 4px;padding:0;display:grid;gap:3px}
+.tq li{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 8px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--cc);font-size:13px}
+.tq-n{min-width:38px;padding:1px 6px;border-radius:999px;text-align:center;font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--fg);background:color-mix(in srgb,var(--cc) 16%,var(--surface))}
+.tq li.today .tq-n{background:var(--cc);color:var(--surface)}
+.tq-c{font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.tq-t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tq-d{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+#tq > .sub-h:first-child{margin-top:0}
+.nextup{display:flex;align-items:center;gap:6px;flex:none;width:100%;padding:7px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;text-align:left;cursor:pointer;overflow-x:auto;scrollbar-width:none}
+.nextup::-webkit-scrollbar{display:none}
+.nextup:hover{border-color:var(--muted)}
+.nu-k{flex:none;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.nu{flex:none;padding:2px 8px;border-radius:999px;font-size:12px;white-space:nowrap;color:var(--fg);background:color-mix(in srgb,var(--cc) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--cc) 40%,var(--line))}
+.nu b{font-weight:700}
 /* lunch: SAGE's menu, station labels on the left, dishes inline */
 .lunch-nav{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
 .lunch-nav span{min-width:86px;text-align:center}
@@ -127,7 +142,7 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .brief-go{font-size:12px;font-weight:600;color:var(--accent)}
 /* the tab strip: Week | Sports | News | Fantasy | Countdowns */
 .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin-top:-4px}
-.tabs button{flex:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;padding:6px 10px 8px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.tabs button{flex:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;padding:6px 8px 8px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
 .tabs button:hover{color:var(--fg)}
 .tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
 .pane{display:grid;gap:8px;align-content:start}

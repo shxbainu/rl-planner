@@ -63,6 +63,7 @@
       <ol class="tl" id="timeline"></ol>
       <p class="after" id="after"></p>
     </section>
+    <button type="button" class="nextup" id="nextup" aria-label="Upcoming tests and quizzes: open the Tests tab" hidden></button>
     <section class="panel p-lunch" aria-labelledby="lunch-h">
       <div class="panel-h"><h2 id="lunch-h">Lunch</h2>
         <div class="lunch-nav">
@@ -150,6 +151,7 @@
     <section class="panel p-more" aria-label="More">
       <div class="tabs" role="tablist" aria-label="More">
         <button type="button" role="tab" data-tab-pane="week" aria-selected="true">Week</button>
+        <button type="button" role="tab" data-tab-pane="tests" aria-selected="false">Tests</button>
         <button type="button" role="tab" data-tab-pane="sports" aria-selected="false">Sports</button>
         <button type="button" role="tab" data-tab-pane="news" aria-selected="false">News</button>
         <button type="button" role="tab" data-tab-pane="fantasy" aria-selected="false">Fantasy</button>
@@ -165,6 +167,11 @@
         </div>
         <div class="rot-scroll"><table class="rot" id="rot"></table></div>
         <p class="panel-foot" id="rot-note"></p>
+      </div>
+
+      <div class="pane p-tests" data-pane="tests" role="tabpanel" hidden>
+        <div class="x-tools"><span class="panel-meta">Tests, quizzes, essays and projects · next 4 weeks</span></div>
+        <div id="tq"></div>
       </div>
 
       <div class="pane" data-pane="sports" role="tabpanel" hidden>

@@ -463,7 +463,48 @@
     $("#done-count").dataset.stage = Math.min(4, doneToday);
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
     renderSeasonal();
+    renderTests();
   }
+
+  // ---------- tests: tests, quizzes, essays and projects for the next 4 weeks ----------
+  // One dense row each in the Tests tab, grouped by week, and the next three as a slim line in Today. Checked off is
+  // done, as in the homework list, so it leaves both.
+  const tqLeft = (n) => (n === 0 ? "Today" : `${n}d`);
+  const tqDay = (d, n) => (n === 0 ? "Today" : n === 1 ? "Tmrw" : n < 7 ? fmt(d, { weekday: "short" }) : fmt(d, { month: "short", day: "numeric" }));
+  const tqTag = (i) => `${esc(cls(i.class).short || i.class)} ${esc(i.type)}`;
+  function renderTests() {
+    const t = today(), list = allItems().filter((i) => MAJOR.has(i.type) && !isDone(i) && i.due >= t && i.due <= addDays(t, 28));
+    const nu = $("#nextup");
+    nu.hidden = !list.length;
+    nu.innerHTML = `<span class="nu-k">Next up</span>${list.slice(0, 3).map((i) => {
+      const n = daysBetween(t, i.due);
+      return `<span class="nu" style="${cc(i.class)}" title="${esc(i.title)}"><b>${tqTag(i)}</b> · ${esc(tqDay(i.due, n))}${n > 1 ? ` · ${n}d` : ""}</span>`;
+    }).join("")}`;
+    nuFit();
+    const monday = (d) => addDays(d, -((parse(d).getDay() + 6) % 7)), wk0 = monday(t), weeks = new Map();
+    for (const i of list) { const w = monday(i.due); if (!weeks.has(w)) weeks.set(w, []); weeks.get(w).push(i); }
+    const wkName = (w) => (w === wk0 ? "This week" : w === addDays(wk0, 7) ? "Next week" : `Week of ${fmt(w, { month: "short", day: "numeric" })}`);
+    $("#tq").innerHTML = list.length ? [...weeks].map(([w, items]) => `<div class="sub-h">${wkName(w)}</div><ul class="tq">${items.map((i) => {
+      const n = daysBetween(t, i.due);
+      return `<li style="${cc(i.class)}"${n === 0 ? ' class="today"' : ""}><span class="tq-n">${tqLeft(n)}</span><span class="tq-c">${tqTag(i)}</span><span class="tq-t" title="${esc(i.title)}">${esc(i.title)}</span><span class="tq-d">${esc(fmt(i.due, { weekday: "short", month: "numeric", day: "numeric" }))}</span></li>`;
+    }).join("")}</ul>`).join("")
+      : `<p class="empty-state">No tests, quizzes, essays or projects in the next 4 weeks.</p>`;
+  }
+  // as many chips as fit on the one line (at least one)
+  function nuFit() {
+    const nu = $("#nextup");
+    if (nu.hidden || !nu.clientWidth) return;
+    const chips = nu.querySelectorAll(".nu");
+    chips.forEach((c) => { c.hidden = false; });
+    for (let k = chips.length - 1; k > 0 && nu.scrollWidth > nu.clientWidth; k--) chips[k].hidden = true;
+  }
+  addEventListener("resize", () => requestAnimationFrame(nuFit));
+  $("#nextup").addEventListener("click", () => {
+    showPane("tests");
+    showTab("more");
+    if (matchMedia("(min-width:760px)").matches) $(".p-more").scrollIntoView({ block: "nearest" });
+    else window.scrollTo({ top: 0, behavior: "auto" });
+  });
   $("#cal").addEventListener("click", (e) => {
     const c = e.target.closest("[data-day]");
     if (c) { selDay = c.dataset.day; showOverdue = false; renderHomework(); }
@@ -1292,7 +1333,7 @@
   });
 
   // ---------- tabs: one strip for the secondary panes; on phones a bottom bar picks the section ----------
-  const PANES = ["week", "sports", "news", "fantasy", "count"], TABS = ["today", "homework", "music", "more"];
+  const PANES = ["week", "tests", "sports", "news", "fantasy", "count"], TABS = ["today", "homework", "music", "more"];
   function showPane(name) {
     if (!PANES.includes(name)) name = "week";
     document.querySelectorAll("[data-tab-pane]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tabPane === name)));
@@ -1305,6 +1346,7 @@
     document.documentElement.dataset.tab = name;
     document.querySelectorAll("#tabbar [data-tab]").forEach((b) => b.toggleAttribute("aria-current", b.dataset.tab === name));
     if (name === "music") spRender(true);
+    if (name === "today") requestAnimationFrame(nuFit);
     if (name === "more") wake($(".pane:not([hidden])"));
     if (state.tab !== name) { state.tab = name; save(); }
   }
@@ -1966,7 +2008,7 @@
     ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", go("homework")], ["Today's schedule", "schedule today bell", go("today")],
     ["Music", "music spotify lofi", go("music")], ["Rotation", "rotation week letters", go("more", "week")],
     ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")], ["Lunch menu", "lunch menu food sage", () => { showTab("today"); return $(".p-lunch"); }], ["Today's briefing", "briefing summary ai news today", () => { $("#brief-peek").click(); }],
-    ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
+    ["Tests", "tests quizzes essays projects", go("more", "tests")], ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
     ...Object.entries(SKINS).map(([k, v]) => [`Theme: ${v}`, `theme ${k} ${v.toLowerCase()}`, () => { setSkin(k); document.querySelectorAll(".skin-select").forEach((o) => { o.value = k; }); }]),
   ];
   let cmdSel = 0, cmdItems = [];
