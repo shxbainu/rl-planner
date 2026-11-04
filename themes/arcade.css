@@ -154,11 +154,6 @@ html[data-skin="arcade"]{
   .ss-form i{border-radius:0;font-family:var(--pixel);font-size:7px}
 }
 
-/* a studied test or quiz */
-html[data-skin="arcade"]{
-  .studied-mk{border-radius:0;font-family:var(--pixel);font-weight:400;font-size:7.5px;padding:3px 5px 2px;line-height:1}
-}
-
 /* the tab strip (and phone tab bar) in this theme */
 html[data-skin="arcade"]{
   .tabs button{font-family:var(--pixel);font-weight:400;font-size:8.5px;letter-spacing:0;text-transform:uppercase;padding:9px 9px 10px}

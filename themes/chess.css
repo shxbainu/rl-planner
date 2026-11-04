@@ -136,11 +136,6 @@ html[data-skin="chess"]{
   .st-check{border-radius:3px}
 }
 
-/* a studied test or quiz */
-html[data-skin="chess"]{
-  .studied-mk{border-radius:2px;background:var(--ebony);color:var(--ivory);box-shadow:none;font-family:var(--mono);font-weight:500}
-}
-
 /* the tab strip (and phone tab bar) in this theme */
 html[data-skin="chess"]{
   .p-music .panel-h h2::before{content:"\2657\FE0E"}

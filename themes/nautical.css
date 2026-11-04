@@ -152,11 +152,6 @@ html[data-skin="nautical"]{
   .st-check{border-radius:50%}
 }
 
-/* a studied test or quiz */
-html[data-skin="nautical"]{
-  .studied-mk{border-radius:2px;font-family:var(--mono);font-weight:500}
-}
-
 /* the tab strip (and phone tab bar) in this theme */
 html[data-skin="nautical"]{
   .tabs button{font-family:var(--head);font-style:italic;font-weight:400;text-transform:uppercase;letter-spacing:.12em;font-size:12px}
