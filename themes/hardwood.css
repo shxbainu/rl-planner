@@ -47,7 +47,7 @@ html[data-skin="hardwood"]{
   .bar-status span.pill{background:rgb(255 255 255 / .12);border-color:transparent;color:#fff}
   .bar .btn,.bar .icon-btn,.bar .skin-pick{background:rgb(255 255 255 / .12);border-color:transparent;color:#fff}
   .bar .btn.primary{background:var(--gold);color:#13213b;font-weight:700}
-  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:6px}
+  .btn,.icon-btn,.skin-pick,.x-expand{border-radius:6px}
   .btn{font-weight:600}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
   .link{color:var(--royal)}
@@ -127,19 +127,12 @@ html[data-skin="hardwood"]{
   &[data-mode="dark"] .counts .n{color:var(--gold)}
   dialog{border-radius:12px;border-top:5px solid var(--stripe)}
 
-  /* music: the jumbotron, a basketball for the record */
-  .sp{border-radius:10px;border:1.5px solid var(--led-line);color:var(--led-fg);background:var(--led)}
+  /* music: the jumbotron */
+  .sp{--sp-hi:var(--gold);--sp-hi-fg:#13213b;border-radius:10px;border:1.5px solid var(--led-line);color:var(--led-fg);background:var(--led)}
   .sp-k{color:var(--led-k);font-family:var(--mono);font-size:12px;letter-spacing:.16em}
-  #sp-title{font-family:var(--head);font-weight:400;font-size:15px;color:var(--led-fg)}
-  .sp-disc{background:var(--ballsvg) center/100% no-repeat;box-shadow:0 2px 6px rgb(0 0 0 / .5)}
-  .sp-disc img{inset:28%;width:44%;height:44%;box-shadow:0 0 0 2px #2b1404}
-  .sp-disc::after{display:none}
-  .sp-size{background:transparent;color:var(--led-k);border-color:color-mix(in srgb,var(--led-k) 55%,transparent)}
   .sp-frame{border-radius:8px}
   .sp-form input{background:var(--surface);border-color:var(--led-line);color:var(--fg)}
   .sp-form input::placeholder{color:var(--muted)}
-  .sp-note{color:var(--led-muted)}
-  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--led-k)}
   .sp-err{color:var(--bad)}
 }
 @keyframes hw-swish{from{transform:rotate(-6deg) scale(0)}to{transform:rotate(-6deg) scale(1)}}

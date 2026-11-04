@@ -165,15 +165,10 @@ html[data-skin="departure"]{
 /* music: a platform sign, now boarding */
 html[data-skin="departure"]{
   --sp-embed:dark; --sp-k:"Platform M · Now boarding";
-  .sp{border-radius:4px;background:var(--tile);border:1px solid var(--split);color:var(--tile-fg)}
+  .sp{--sp-hi:var(--amber);--sp-hi-fg:#141414;border-radius:4px;background:var(--tile);border:1px solid var(--split);color:var(--tile-fg)}
   .sp-k{font-family:var(--sign);font-weight:600;letter-spacing:.14em;font-size:11.5px;color:var(--amber)}
-  #sp-title{font-family:var(--sign);font-weight:500;text-transform:uppercase;letter-spacing:.06em;font-size:16px;color:var(--tile-fg)}
-  .sp-disc::after{background:var(--tile)}
-  .sp-size{background:transparent;color:var(--amber);border-color:color-mix(in srgb,var(--amber) 50%,transparent)}
   .sp-frame{border-radius:3px}
   .sp-form input{background:var(--tile-2);border-color:rgb(255 255 255 / .14);color:var(--tile-fg)}
-  .sp-note{color:#b5ad9c}
-  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--amber)}
   .sp-err{color:#f08a78}
 }
 

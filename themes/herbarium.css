@@ -133,7 +133,7 @@ html[data-skin="herbarium"]{
 }
 @keyframes hb-stamp{from{opacity:0;transform:rotate(calc(var(--rnd,0) * 8deg)) scale(1.5)}to{opacity:1;transform:rotate(calc(var(--rnd,0) * 8deg)) scale(1)}}
 
-/* music: a mounted specimen, the cover pinned with photo corners */
+/* music: a mounted specimen with photo corners */
 html[data-skin="herbarium"]{
   --sp-k:"Specimen no. 780 · Musica";
   .sp{border-radius:2px;background:
@@ -142,10 +142,6 @@ html[data-skin="herbarium"]{
       linear-gradient(45deg,var(--line) 0 9px,transparent 9px) bottom left/16px 16px no-repeat,
       linear-gradient(315deg,var(--line) 0 9px,transparent 9px) bottom right/16px 16px no-repeat,var(--surface)}
   .sp-k{font-family:var(--mono);font-weight:400;text-transform:none;letter-spacing:.02em;font-size:11.5px;color:var(--accent-ink)}
-  #sp-title{font-family:var(--head);font-style:italic;font-weight:500;font-size:16px}
-  .sp-disc{border-radius:1px;background:var(--surface-2);box-shadow:0 0 0 1px var(--line),0 1px 2px rgb(0 0 0 / .12)}
-  .sp-disc img{inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);border-radius:0}
-  .sp-disc::after{display:none}
   .sp-frame{border-radius:4px}
 }
 

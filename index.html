@@ -124,34 +124,25 @@
         </div>
       </div>
       <div class="sp" id="sp">
-        <div class="sp-head">
-          <span class="sp-disc" aria-hidden="true"><img id="sp-art" alt=""></span>
-          <span class="sp-now"><span class="sp-k"></span><b id="sp-title"></b></span>
-          <button class="sp-size" id="sp-size" type="button" aria-pressed="false">Taller</button>
-        </div>
-        <div class="sp-np" id="sp-np" hidden>
-          <img class="np-art" id="np-art" alt="">
-          <div class="np-main">
-            <span class="sp-k np-k" id="np-k"></span>
-            <b class="np-track" id="np-track"></b>
-            <span class="np-artist" id="np-artist"></span>
-            <div class="np-ctl" id="np-ctl">
-              <button type="button" data-np="prev" aria-label="Previous track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
-              <button type="button" data-np="toggle" class="np-play" aria-label="Play or pause"><svg viewBox="0 0 24 24" aria-hidden="true" id="np-icon"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
-              <button type="button" data-np="next" aria-label="Next track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+        <div class="sp-stage">
+          <div class="sp-empty" id="sp-empty" hidden></div>
+          <div class="sp-np" id="sp-np" hidden>
+            <img class="np-art" id="np-art" alt="">
+            <div class="np-main">
+              <b class="np-track" id="np-track"></b>
+              <span class="np-artist" id="np-artist"></span>
+              <div class="np-ctl" id="np-ctl">
+                <button type="button" data-np="prev" aria-label="Previous track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+                <button type="button" data-np="toggle" class="np-play" aria-label="Play or pause"><svg viewBox="0 0 24 24" aria-hidden="true" id="np-icon"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
+                <button type="button" data-np="next" aria-label="Next track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+              </div>
             </div>
+            <div class="np-prog"><div class="np-bar"><i id="np-bar"></i></div><span id="np-t0">0:00</span><span id="np-t1">0:00</span></div>
           </div>
-          <div class="np-prog"><div class="np-bar"><i id="np-bar"></i></div><span id="np-t0">0:00</span><span id="np-t1">0:00</span></div>
+          <div class="sp-frame" id="sp-embed" hidden><iframe id="sp-frame" title="Spotify player" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe></div>
+          <div class="sp-frame sp-yt" id="sp-yt" hidden><iframe id="yt-frame" title="Lofi Girl: lofi hip hop radio, live" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><span class="yt-cap">Lofi Girl · live</span></div>
         </div>
-        <div class="sp-frame" id="sp-embed"><iframe id="sp-frame" title="Spotify player" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe></div>
-        <div class="sp-frame sp-yt" id="sp-yt" hidden><iframe id="yt-frame" title="Lofi Girl: lofi hip hop radio, live" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><span class="yt-cap">Lofi Girl · live</span></div>
-        <form class="sp-form" id="sp-form" autocomplete="off">
-          <input id="sp-url" inputmode="url" placeholder="Paste a Spotify playlist, album or song link" aria-label="Spotify link">
-          <button class="btn" type="submit">Play</button>
-        </form>
-        <p class="sp-err" id="sp-err" hidden>That isn't a Spotify link. In Spotify, tap Share, then Copy link.</p>
-        <div class="sp-acct" id="sp-acct"></div>
-        <p class="sp-note" id="sp-note"></p>
+        <div class="sp-bar" id="sp-bar"></div>
       </div>
     </section>
 

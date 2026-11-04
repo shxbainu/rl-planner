@@ -39,7 +39,7 @@ html[data-skin="arcade"]{
   .bar-sub{font-size:12.5px}
   .letter-pick select{border-radius:0;clip-path:var(--notch);background:var(--accent);color:var(--accent-fg);font-family:var(--pixel);font-size:17px}
   .bar-status span.pill{border-radius:0;border:2px solid var(--line);background:var(--surface-2)}
-  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:0;clip-path:var(--notch);border:2px solid var(--line);background:var(--surface-2)}
+  .btn,.icon-btn,.skin-pick,.x-expand{border-radius:0;clip-path:var(--notch);border:2px solid var(--line);background:var(--surface-2)}
   .btn{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:13px}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
   .link{color:var(--accent)}
@@ -121,19 +121,13 @@ html[data-skin="arcade"]{
   .count-form input,.sp-form input{border-radius:0;border-width:2px}
   dialog{border-radius:0;border:3px solid var(--neon)}
 
-  /* music: a sound-test screen, the cover as a cartridge label */
-  .sp{border-radius:0;clip-path:var(--notch);background:var(--screen);border:3px solid var(--accent);color:var(--screen-fg)}
+  /* music: a sound-test screen */
+  .sp{--sp-hi:var(--coin);--sp-hi-fg:var(--bg);border-radius:0;clip-path:var(--notch);background:var(--screen);border:3px solid var(--accent);color:var(--screen-fg)}
   .sp-k{font-family:var(--pixel);font-weight:400;font-size:8px;letter-spacing:0;color:var(--neon);margin-bottom:3px}
-  #sp-title{font-family:var(--digits);font-weight:400;font-size:24px;line-height:1;color:var(--coin)}
-  .sp-disc{border-radius:0;width:44px;height:48px;background:var(--edge);clip-path:polygon(0 0,75% 0,100% 18%,100% 100%,0 100%);box-shadow:none}
-  .sp-disc img{inset:6px 6px 10px;width:calc(100% - 12px);height:calc(100% - 16px);border-radius:0}
-  .sp-disc::after{display:none}
-  .sp-size{background:transparent;color:var(--screen-fg);border-color:color-mix(in srgb,var(--screen-fg) 40%,transparent);font-family:var(--pixel);font-size:8px;padding:6px 8px}
   .sp-frame{border-radius:0}
   .sp-form input{background:var(--surface);color:var(--fg);border-color:var(--line)}
-  .sp-note{color:color-mix(in srgb,var(--screen-fg) 75%,var(--screen))}
-  :is(.sp-note,.sp-row,.sp-paused) .link{color:var(--coin)}
   .sp-err{color:#ff8a8a}
+  .sp .btn:not(.primary){background:transparent;color:var(--screen-fg);border-color:color-mix(in srgb,var(--screen-fg) 40%,transparent)}
 
   @media (max-width:759px){
     .bar .bar-date{font-size:10px;letter-spacing:0}

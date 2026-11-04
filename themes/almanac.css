@@ -51,7 +51,7 @@ html[data-skin="almanac"]{
   .bar-status span.pill{border-radius:999px;background:rgb(255 255 255 / .1);border-color:transparent;color:var(--mast-fg)}
   .bar .btn,.bar .icon-btn,.bar .skin-pick{background:rgb(255 255 255 / .1);border-color:transparent;color:var(--mast-fg)}
   .bar .btn.primary{background:var(--mustard);color:#2a2a10}
-  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:6px;background:var(--surface-2)}
+  .btn,.icon-btn,.skin-pick,.x-expand{border-radius:6px;background:var(--surface-2)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
   .link{color:var(--accent)}
 
@@ -149,15 +149,11 @@ html[data-skin="almanac"]{
   .count-form input{border-radius:5px}
   dialog{border-radius:8px}
 
-  /* music: a seed packet for the record, the cover at the heart of a sunflower */
+  /* music: a seed packet with a scalloped edge */
   .sp{border:0;border-top:6px solid var(--mustard);border-radius:6px 6px 0 0;background:var(--surface);padding-bottom:18px;
     -webkit-mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat;
     mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat}
   .sp-k{font-variant:small-caps;text-transform:lowercase;letter-spacing:.08em;font-size:12.5px;color:var(--leaf-ink)}
-  #sp-title{font-family:var(--head);font-weight:400;font-size:18px;line-height:1.15}
-  .sp-disc{width:52px;height:52px;background:radial-gradient(circle,#6b4423 0 34%,transparent 35%),repeating-conic-gradient(from 6deg,var(--mustard) 0 15deg,transparent 15deg 22.5deg);box-shadow:none}
-  .sp-disc img{inset:32%;width:36%;height:36%}
-  .sp-disc::after{display:none}
   .sp-frame{border-radius:8px}
 
   @media (max-width:600px){

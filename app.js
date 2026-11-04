@@ -630,11 +630,12 @@
   }
 
   // ---------- music: Spotify or Lofi Girl ----------
-  // Spotify plays through its embed (no login needed; full songs when signed in to Spotify in this browser), or,
-  // once connected to Brian's account, shows what he's playing anywhere. Lofi Girl is the 24/7 YouTube stream.
-  // Each skin dresses the card; --sp-embed (dark | art) picks the embed's own look.
+  // One card, the same height for either source: a 16:9 stage over a slim bar. Spotify's stage is what Brian is
+  // playing on his account (once connected), else the link he pasted, else an empty state; nothing plays until he
+  // picks something. Lofi Girl is the 24/7 YouTube stream. Each skin dresses the card; --sp-embed (dark | art)
+  // picks the embed's own look.
   const SP = "rlp-spotify", SRC = "rlp-music-src", SPA = "rlp-sp-auth";
-  const SP_DEFAULT = { type: "playlist", id: "37i9dQZF1DWWQRwui0ExPn", title: "lofi beats", art: "" };
+  const SP_OLD_DEFAULT = "37i9dQZF1DWWQRwui0ExPn"; // the playlist the card used to start on; saved copies of it load as nothing picked
   // "lofi hip hop radio 📚 beats to relax/study to", live since Aug 19 2026 (checked Nov 3; the 2022 stream ended in May).
   // Lofi Girl runs several streams at once and the channel's live link currently points at the Christmas one, so
   // the stream is pinned by id; if it restarts again, put the new id here (youtube.com/@LofiGirl/streams).
@@ -645,10 +646,10 @@
   };
   const jget = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
   const jset = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-  let sp = (() => { const v = jget(SP, null); return v && spParse(`spotify:${v.type}:${v.id}`) ? { ...SP_DEFAULT, ...v } : { ...SP_DEFAULT }; })();
+  let sp = (() => { const v = jget(SP, null); return v && v.id !== SP_OLD_DEFAULT && spParse(`spotify:${v.type}:${v.id}`) ? { type: v.type, id: v.id } : null; })();
   let musicSrc = jget(SRC, "spotify") === "lofi" ? "lofi" : "spotify";
   let spA = jget(SPA, {}); // { client, access, refresh, exp, noControl } — this browser only, never in the repo
-  let np = null, npAt = 0, spMsg = "", spSetup = false;
+  let np = null, npAt = 0, spMsg = "", spSetup = false, spPasting = false, spBad = false;
   const spSave = () => jset(SP, sp);
   // ?npdemo previews the now-playing card with a made-up track, no account needed
   const NP_DEMO = new URLSearchParams(location.search).has("npdemo");
@@ -661,56 +662,82 @@
     const f = $("#sp-frame");
     if (!f) return;
     const de = document.documentElement, v = getComputedStyle(de).getPropertyValue("--sp-embed").trim();
-    const src = `https://open.spotify.com/embed/${sp.type}/${sp.id}?utm_source=generator${(v ? v === "dark" : de.dataset.mode === "dark") ? "&theme=0" : ""}`;
-    const lofi = musicSrc === "lofi", live = npShown();
+    const lofi = musicSrc === "lofi", live = npShown(), embed = !lofi && !live && !!sp, empty = !lofi && !live && !sp;
     document.querySelectorAll("[data-src]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.src === musicSrc)));
-    $("#sp").classList.toggle("tall", !!sp.tall && !lofi && !live);
-    $("#sp").classList.toggle("np", live);
-    $("#sp").classList.toggle("lofi", lofi);
-    $("#sp-title").textContent = lofi ? LOFI.title : sp.title || "Spotify";
-    $("#sp-art").src = lofi ? `https://i.ytimg.com/vi/${LOFI.id}/hqdefault.jpg` : sp.art || "";
-    $("#sp-size").hidden = lofi || live;
-    $("#sp-size").setAttribute("aria-pressed", String(!!sp.tall));
-    $("#sp-size").textContent = sp.tall ? "Shorter" : "Taller";
-    $("#sp-form").hidden = lofi || live;
-    $("#sp-err").hidden = $("#sp-err").hidden || lofi;
+    const card = $("#sp");
+    card.classList.toggle("np", live);
+    card.classList.toggle("lofi", lofi);
+    card.classList.toggle("empty", empty);
+    card.classList.toggle("setup", empty && spSetup);
     $("#sp-np").hidden = !live;
-    $("#sp-embed").hidden = lofi || live;
+    $("#sp-embed").hidden = !embed;
     $("#sp-yt").hidden = !lofi;
-    // only one player makes sound: the hidden one is unloaded
+    $("#sp-empty").hidden = !empty;
+    // only one player makes sound: the hidden one is unloaded (the Spotify one stays loaded under now playing,
+    // since what it plays may be what now playing shows)
     const yt = $("#yt-frame"), ytSrc = `https://www.youtube-nocookie.com/embed/${LOFI.id}?rel=0&playsinline=1&modestbranding=1`;
     if (lofi) { if (load && yt.src !== ytSrc) yt.src = ytSrc; if (f.src) f.removeAttribute("src"); }
-    else { if (yt.src) yt.removeAttribute("src"); if ((load || f.src) && f.src !== src) f.src = src; }
-    spRenderAcct();
+    else {
+      if (yt.src) yt.removeAttribute("src");
+      const src = sp && `https://open.spotify.com/embed/${sp.type}/${sp.id}?utm_source=generator${(v ? v === "dark" : de.dataset.mode === "dark") ? "&theme=0" : ""}`;
+      if (!src) { if (f.src) f.removeAttribute("src"); }
+      else if ((load || f.src) && f.src !== src) f.src = src;
+    }
+    spRenderEmpty(empty);
+    spRenderBar(lofi, live, embed);
     spRenderNP();
   }
-  // title and cover from Spotify's oEmbed, which allows requests from other sites
-  async function spMeta() {
-    try {
-      const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(`https://open.spotify.com/${sp.type}/${sp.id}`)}`);
-      if (!r.ok) return;
-      const d = await r.json();
-      sp = { ...sp, title: d.title || sp.title, art: d.thumbnail_url || "" };
-      spSave();
-      spRender();
-    } catch {}
+  const spForm = () => `<form class="sp-form" data-sp-paste><input id="sp-url" inputmode="url" placeholder="Paste a Spotify link" aria-label="Spotify playlist, album or song link" spellcheck="false" autocomplete="off"><button class="btn primary" type="submit">Play</button></form>`;
+  function spFocusPaste() { requestAnimationFrame(() => $("#sp-url")?.focus()); }
+  // nothing picked: connect, or paste a link (the box opens only when he asks for it)
+  function spRenderEmpty(empty) {
+    const el = $("#sp-empty");
+    if (!empty) { el.innerHTML = ""; return; }
+    const err = spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : "";
+    if (spSetup && !spConnected()) { el.innerHTML = spSetupHTML() + err; return; }
+    const icon = `<span class="sp-empty-i" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 17.5a3 3 0 1 1-2-2.83V5l11-2v11.5a3 3 0 1 1-2-2.83V7.4l-7 1.27z"/></svg></span>`;
+    if (spPasting) {
+      el.innerHTML = `${icon}<b>Paste a link</b>${spForm()}
+        <p class="${spBad ? "sp-err" : "sp-hint"}">${spBad ? "That isn't a Spotify link. " : ""}In Spotify, tap Share, then Copy link.</p>
+        <button class="link" type="button" data-sp="cancel">Cancel</button>`;
+      return;
+    }
+    el.innerHTML = spConnected()
+      ? `${icon}<b>Nothing playing on Spotify</b><p>Start something on any device and it shows up here.</p>
+        <div class="sp-acts"><button class="btn" type="button" data-sp="paste">Paste a link</button></div>
+        <button class="link" type="button" data-sp="disconnect">Disconnect</button>${err}`
+      : `${icon}<b>Nothing playing</b><p>Connect to see what you're playing, or paste a playlist, album or song.</p>
+        <div class="sp-acts"><button class="btn primary" type="button" data-sp="connect">Connect Spotify</button><button class="btn" type="button" data-sp="paste">Paste a link</button></div>${err}`;
   }
-  $("#sp-form").addEventListener("submit", (e) => {
+  // the slim bar under the player: what it is on the left, a couple of quiet controls on the right
+  function spRenderBar(lofi, live, embed) {
+    const el = $("#sp-bar"), dis = spConnected() ? `<button type="button" data-sp="disconnect">Disconnect</button>` : "";
+    el.classList.toggle("pasting", embed && spPasting);
+    if (embed && spPasting) { el.innerHTML = `${spForm()}<button class="sp-x" type="button" data-sp="cancel" aria-label="Cancel">✕</button>`; return; }
+    const k = lofi ? `<span class="sp-k own">${LOFI.sub}</span>` : live ? `<span class="sp-k own" id="np-k"></span>`
+      : spMsg ? `<span class="sp-k own sp-err" title="${esc(spMsg)}">${esc(spMsg)}</span>` : `<span class="sp-k"></span>`;
+    const acts = lofi ? "" : live ? dis : `<button type="button" data-sp="paste">Change</button><button type="button" data-sp="clear">Clear</button>${dis}`;
+    el.innerHTML = `${k}<span class="sp-bar-acts">${acts}</span>`;
+  }
+  document.addEventListener("submit", (e) => {
+    if (!e.target.matches("[data-sp-paste]")) return;
     e.preventDefault();
     const got = spParse($("#sp-url").value.trim());
-    $("#sp-err").hidden = !!got;
-    if (!got) return;
-    sp = { ...got, title: "", art: "", tall: sp.tall };
-    $("#sp-url").value = "";
+    if (!got) {
+      if (sp) toast("That isn't a Spotify link. In Spotify, tap Share, then Copy link.");
+      else { spBad = true; spRenderEmpty(true); spFocusPaste(); }
+      return;
+    }
+    sp = got;
+    spPasting = spBad = false;
     spSave();
     spRender(true);
-    spMeta();
   });
-  $("#sp-size").onclick = () => { sp.tall = !sp.tall; spSave(); spRender(); };
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-src]");
     if (!b || b.dataset.src === musicSrc) return;
     musicSrc = b.dataset.src;
+    spPasting = spBad = false;
     jset(SRC, musicSrc);
     spRender(true);
     if (musicSrc === "spotify") spPoll();
@@ -824,42 +851,38 @@
   }
   document.addEventListener("click", (e) => { const b = e.target.closest("[data-np]"); if (b) spControl(b.dataset.np); });
 
-  function spRenderAcct() {
-    const el = $("#sp-acct"), note = $("#sp-note"), lofi = musicSrc === "lofi";
-    note.textContent = "";
-    if (lofi) { el.innerHTML = ""; return; }
-    const reset = sp.id !== SP_DEFAULT.id ? `<button class="link" type="button" data-sp="reset">Back to lofi beats</button>` : "";
-    if (spConnected()) {
-      el.innerHTML = `<div class="sp-row"><span class="sp-ok">Connected to Spotify${npShown() ? "" : " · nothing playing right now"}</span>${npShown() ? "" : reset}<button class="link" type="button" data-sp="disconnect">Disconnect</button></div>${spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : ""}`;
-      return;
-    }
-    el.innerHTML = `<div class="sp-row"><button class="link" type="button" data-sp="setup" aria-expanded="${spSetup}">${spSetup ? "Hide setup" : "Connect your Spotify account"}</button>${reset}</div>${spMsg ? `<p class="sp-err">${esc(spMsg)}</p>` : ""}
-      ${spSetup ? `<div class="sp-setup">
-        <p>Shows what you're playing on any device. You make a free Spotify app once (it takes about two minutes):</p>
-        <ol><li>Go to <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a>, log in, and press <b>Create app</b>.</li>
-          <li>Any name and description. Under <b>Redirect URIs</b> add exactly <code>${esc(spRedirect())}</code> <button class="link" type="button" data-sp="copy">Copy</button>. Tick <b>Web API</b>, agree, and save.</li>
-          <li>In the app's <b>Settings → User Management</b>, add your name and your Spotify account's email.</li>
-          <li>Copy the app's <b>Client ID</b> into the box and press Connect. Spotify asks you to agree, then sends you back here.</li></ol>
-        <form class="sp-form" data-sp-form><input id="sp-client" value="${esc(spA.client || "")}" placeholder="Client ID" aria-label="Spotify Client ID" spellcheck="false" autocomplete="off"><button class="btn primary" type="submit">Connect</button></form>
-        <p class="sp-note">Play, pause and skip need Spotify Premium; without it you still see what's playing. The Client ID and sign-in stay in this browser. (Without connecting, the player plays full songs when you're logged in to Spotify in this browser, 30-second previews otherwise.)</p></div>` : ""}`;
-  }
+  // connecting takes a Spotify app of his own, once; the steps replace the empty state until he's done
+  const spSetupHTML = () => `<div class="sp-setup">
+      <p><b>Connect Spotify</b> to see what you're playing on any device. Make a free Spotify app once (about two minutes):</p>
+      <ol><li>Go to <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a>, log in, and press <b>Create app</b>.</li>
+        <li>Any name and description. Under <b>Redirect URIs</b> add exactly <code>${esc(spRedirect())}</code> <button class="link" type="button" data-sp="copy">Copy</button>. Tick <b>Web API</b>, agree, and save.</li>
+        <li>In the app's <b>Settings → User Management</b>, add your name and your Spotify account's email.</li>
+        <li>Paste the app's <b>Client ID</b> here and press Connect.</li></ol>
+      <form class="sp-form" data-sp-form><input id="sp-client" value="${esc(spA.client || "")}" placeholder="Client ID" aria-label="Spotify Client ID" spellcheck="false" autocomplete="off"><button class="btn primary" type="submit">Connect</button></form>
+      <p class="sp-hint">Play, pause and skip need Premium. The Client ID and sign-in stay in this browser.</p>
+      <button class="link" type="button" data-sp="back">Back</button></div>`;
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-sp]");
     if (!b) return;
-    if (b.dataset.sp === "setup") { spSetup = !spSetup; spRenderAcct(); }
-    if (b.dataset.sp === "disconnect") spDisconnect();
-    if (b.dataset.sp === "reset") { sp = { ...SP_DEFAULT, tall: sp.tall }; spSave(); spRender(true); spMeta(); }
-    if (b.dataset.sp === "copy") navigator.clipboard?.writeText(spRedirect()).then(() => toast("Redirect URI copied"));
+    const a = b.dataset.sp;
+    // a Client ID from before goes straight to Spotify; otherwise the setup steps
+    if (a === "connect") { if (/^[0-9a-f]{32}$/i.test(spA.client || "")) return spConnect(spA.client); spSetup = true; spMsg = ""; spRender(); }
+    if (a === "back") { spSetup = false; spMsg = ""; spRender(); }
+    if (a === "paste") { spPasting = true; spBad = false; spRender(); spFocusPaste(); }
+    if (a === "cancel") { spPasting = spBad = false; spRender(); }
+    if (a === "clear") { sp = null; spPasting = false; spSave(); spRender(); }
+    if (a === "disconnect") spDisconnect();
+    if (a === "copy") navigator.clipboard?.writeText(spRedirect()).then(() => toast("Redirect URI copied"));
   });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && spPasting && e.target.closest?.("#sp")) { spPasting = spBad = false; spRender(); } });
   document.addEventListener("submit", (e) => {
     if (!e.target.matches("[data-sp-form]")) return;
     e.preventDefault();
     const id = $("#sp-client").value.trim();
-    if (!/^[0-9a-f]{32}$/i.test(id)) { spMsg = "That doesn't look like a Client ID (32 letters and numbers)."; spRenderAcct(); return; }
+    if (!/^[0-9a-f]{32}$/i.test(id)) { spMsg = "That doesn't look like a Client ID (32 letters and numbers)."; spRender(); return; }
     spConnect(id);
   });
   spRender();
-  if (!sp.art) spMeta();
   // the embed loads once the card is on screen, not on every page load
   new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { spRender(true); io.disconnect(); } }).observe($("#sp"));
 

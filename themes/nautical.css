@@ -37,7 +37,7 @@ html[data-skin="nautical"]{
   .letter-pick select{border-radius:50%;background:var(--magenta);color:#fff;font-family:var(--head);font-weight:700;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--magenta)}
   &[data-mode="dark"] .letter-pick select{color:var(--accent-fg)}
   .bar-status span.pill{border-radius:2px;background:var(--surface-2);border-color:var(--line);font-family:var(--mono);font-size:11.5px}
-  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:2px}
+  .btn,.icon-btn,.skin-pick,.x-expand{border-radius:2px}
   .btn.primary{background:var(--magenta);border-color:var(--magenta);color:var(--accent-fg)}
   .link{color:var(--magenta)}
   .dash{padding-top:16px}
@@ -129,13 +129,9 @@ html[data-skin="nautical"]{
   .count-form input,.sp-form input{border-radius:2px}
   dialog{border-radius:3px;border:1.5px solid var(--coast)}
 
-  /* music: a radio beacon, the cover inside a compass rose */
+  /* music: a radio beacon */
   .sp{border-radius:0;background:var(--surface-2);border:1px solid var(--line);border-left:4px solid var(--magenta)}
   .sp-k{font-family:var(--mono);font-weight:500;letter-spacing:.14em;color:var(--magenta)}
-  #sp-title{font-family:var(--head);font-style:italic;font-weight:400;font-size:16px}
-  .sp-disc{background:radial-gradient(circle,transparent 0 60%,var(--surface-2) 60%),repeating-conic-gradient(var(--fg) 0 2deg,transparent 2deg 15deg);border:1.5px solid var(--fg);box-shadow:none}
-  .sp-disc img{inset:20%;width:60%;height:60%}
-  .sp-disc::after{display:none}
   .sp-frame{border-radius:4px}
 
   @media (max-width:759px){

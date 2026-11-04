@@ -33,7 +33,7 @@ html[data-skin="chess"]{
   .bar-date{font-family:var(--head);font-weight:700;font-size:19px}
   .letter-pick select{border-radius:3px;background:var(--ebony);color:var(--ivory);font-family:var(--head)}
   .bar-status span.pill{border-radius:3px}
-  .btn,.icon-btn,.skin-pick,.x-expand,.sp-size{border-radius:3px}
+  .btn,.icon-btn,.skin-pick,.x-expand{border-radius:3px}
   .btn.primary{background:var(--ebony);border-color:var(--ebony);color:var(--ivory)}
   .link{color:var(--fg)}
   .dash{padding-top:18px}
@@ -119,14 +119,9 @@ html[data-skin="chess"]{
   .counts .n{font-family:var(--mono);color:var(--fg)}
   dialog{border-radius:6px}
 
-  /* music: a checkered record under a clock-black band */
-  .sp{border-radius:4px;background:var(--surface);overflow:hidden}
-  .sp-head{background:var(--ebony);color:var(--ivory);margin:-10px -10px 0;padding:9px 10px}
+  /* music: a plain card, the one bright control in clock black */
+  .sp{--sp-hi:var(--ebony);--sp-hi-fg:var(--ivory);border-radius:4px;background:var(--surface);overflow:hidden}
   .sp-k{color:var(--flag);font-family:var(--mono);font-weight:500}
-  #sp-title{font-family:var(--head);font-weight:700;font-size:16px}
-  .sp-disc{background:repeating-conic-gradient(var(--ivory) 0 25%,color-mix(in srgb,var(--ivory) 70%,var(--ebony)) 0 50%) 50% 50%/12px 12px;box-shadow:0 0 0 2px var(--ivory)}
-  .sp-disc::after{background:var(--ebony)}
-  .sp-size{background:transparent;color:var(--ivory);border-color:color-mix(in srgb,var(--ivory) 45%,transparent)}
   .sp-frame{border-radius:6px}
 
   @media (max-width:600px){

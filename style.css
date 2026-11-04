@@ -315,35 +315,56 @@ details .list{margin-top:6px}
 .count-form input{font-size:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-height:36px;min-width:0;color:var(--fg)}
 .count-form .btn{min-height:36px;padding:6px 12px}
 
-/* music: Spotify's player in a card each skin dresses (label text in --sp-k, the player's own look in --sp-embed) */
-.sp{display:grid;gap:8px;padding:10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
-.sp-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
-.sp-disc{position:relative;width:46px;height:46px;border-radius:50%;flex:none;
-  background:radial-gradient(circle,transparent 0 31%,#0000 31%),repeating-radial-gradient(circle,#161616 0 1.4px,#272727 1.4px 2.8px);box-shadow:0 1px 3px rgb(0 0 0 / .3)}
-.sp-disc img{position:absolute;inset:30%;width:40%;height:40%;border-radius:50%;object-fit:cover}
-.sp-disc img[src=""],.sp-disc img:not([src]){display:none}
-.sp-disc::after{content:"";position:absolute;inset:calc(50% - 2px);border-radius:50%;background:var(--surface-2)}
-.sp-now{min-width:0;line-height:1.25}
+/* music: one card, the same height for Spotify and Lofi Girl: a 16:9 stage (the player, now playing, or the empty
+   state) over a slim bar. Each skin dresses it: label text in --sp-k, the player's own look in --sp-embed, the one
+   bright control in --sp-hi. Everything else fades from the card's own text color, so the dark cards work too */
+.sp{--sp-bar:32px;--sp-hi:var(--accent);--sp-hi-fg:var(--accent-fg);container-type:inline-size;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+/* 16:9, but never shorter than Spotify's compact player (152px) */
+.sp-stage{position:relative;display:grid;grid-template-columns:minmax(0,1fr);min-height:max(152px,100cqw * 9 / 16)}
+.sp.empty .sp-stage{min-height:calc(max(152px,100cqw * 9 / 16) + var(--sp-bar) + 4px)}
+.sp.empty .sp-bar{display:none}
+.sp-frame{position:absolute;inset:0;border-radius:10px;overflow:hidden;background:color-mix(in srgb,currentColor 7%,transparent)}
+.sp-frame iframe{display:block;width:100%;height:100%;border:0}
+/* Spotify's player only fills itself at 152px (or 352px), so it sits at 152 in the middle of the stage */
+#sp-embed{display:flex;align-items:center;background:none}
+#sp-embed iframe{height:152px;border-radius:12px}
+.yt-cap{display:none}
 .sp-k{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.sp-k::before{content:var(--sp-k,"Now playing")}
-#sp-title{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sp-size{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:7px;padding:3px 9px;font-size:12px;font-weight:600;cursor:pointer}
-.sp-frame{border-radius:12px;overflow:hidden;line-height:0;background:#181818}
-.sp-frame iframe{display:block;width:100%;height:152px;border:0}
-.sp.tall .sp-frame iframe{height:352px}
-.sp-form{display:grid;grid-template-columns:1fr auto;gap:6px}
-.sp-form input{font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-height:36px;min-width:0;color:var(--fg)}
-.sp-form .btn{min-height:36px;padding:6px 12px;color:var(--fg)} /* the card may set a light text color for a dark frame */
+.sp-k:not(.own)::before{content:var(--sp-k,"Now playing")}
 .sp-err{margin:0;font-size:12px;color:var(--bad)}
-/* now playing on Brian's Spotify account: cover, title, quiet controls, a slim bar. Secondary text and the
-   controls fade from the card's own text color, so the dark cards some themes use work too */
-.sp.np .sp-head{display:none}
-.sp-np{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 14px;align-items:center}
-.np-art{width:104px;height:104px;border-radius:10px;object-fit:cover;background:color-mix(in srgb,currentColor 8%,transparent);box-shadow:0 6px 18px rgb(0 0 0 / .2);transition:filter .3s}
+.sp-hint{margin:0;font-size:12px;opacity:.7}
+.sp .btn{min-height:34px;padding:6px 14px;background:transparent;color:inherit;border:1.5px solid color-mix(in srgb,currentColor 30%,transparent)}
+.sp .btn:hover{border-color:color-mix(in srgb,currentColor 55%,transparent)}
+.sp .btn.primary{background:var(--sp-hi);border-color:var(--sp-hi);color:var(--sp-hi-fg)}
+.sp .link{color:inherit;opacity:.75;font-size:12.5px}
+.sp .link:hover{opacity:1}
+.sp-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}
+.sp-form input{font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 9px;min-height:34px;min-width:0;color:var(--fg)}
+.sp-form input::placeholder{color:var(--muted)}
+/* nothing picked yet */
+.sp-empty{display:grid;grid-template-columns:minmax(0,1fr);align-content:center;justify-items:center;gap:6px;padding:10px 6px;text-align:center}
+.sp-empty-i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;margin-bottom:2px;color:var(--sp-hi);background:color-mix(in srgb,var(--sp-hi) 14%,transparent)}
+.sp-empty-i svg{width:17px;height:17px;fill:currentColor}
+.sp-empty > b{font-size:15.5px;line-height:1.25}
+.sp-empty > p{margin:0;max-width:32ch;font-size:12.5px;line-height:1.4;opacity:.72}
+.sp-empty > .sp-form{width:min(100%,320px);margin-top:4px}
+.sp-acts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:6px 0 2px}
+.sp.setup .sp-empty{justify-items:stretch;text-align:left;padding:0}
+@container (max-width:280px){ .sp-empty-i,.sp-bar > .sp-k:not(.own){display:none} .sp-empty{gap:4px;padding:4px 2px} .sp-acts{margin:4px 0 0} .sp-acts{flex-direction:column;justify-self:stretch;padding:0 8px} .sp-bar-acts{margin-left:auto} }
+/* the slim bar */
+.sp-bar{display:flex;align-items:center;gap:8px;min-height:var(--sp-bar);margin-bottom:-4px}
+.sp-bar > .sp-k{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-bar > .sp-err{text-transform:none;letter-spacing:0;font-weight:600}
+.sp-bar-acts{display:flex;flex:none;margin-right:-6px}
+.sp-bar-acts button,.sp-x{min-height:30px;padding:4px 8px;border:0;border-radius:7px;background:transparent;color:inherit;font:inherit;font-size:12.5px;font-weight:600;opacity:.72;cursor:pointer}
+.sp-bar-acts button:hover,.sp-x:hover{opacity:1;background:color-mix(in srgb,currentColor 9%,transparent)}
+.sp-bar.pasting .sp-form{flex:1}
+.sp-bar.pasting .sp-form input,.sp-bar.pasting .sp-form .btn{min-height:32px;padding-block:4px}
+/* now playing on Brian's Spotify account: cover, title, quiet controls, a slim bar */
+.sp-np{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 14px;align-content:center;align-items:center;padding:0 2px}
+.np-art{width:clamp(84px,30cqw,124px);aspect-ratio:1;height:auto;border-radius:10px;object-fit:cover;background:color-mix(in srgb,currentColor 8%,transparent);box-shadow:0 6px 18px rgb(0 0 0 / .2);transition:filter .3s}
 .sp-np.paused .np-art{filter:saturate(.55) brightness(.94)}
 .np-main{min-width:0;display:flex;flex-direction:column;gap:2px}
-.sp-k.np-k::before{content:none}
-.np-k{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
 .np-track{font-size:17px;font-weight:700;line-height:1.22;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .np-artist{font-size:13.5px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np-ctl{display:flex;align-items:center;gap:2px;margin:8px 0 0 -7px}
@@ -360,26 +381,16 @@ details .list{margin-top:6px}
 .np-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:inherit;background:var(--accent)}
 .np-bar i::after{content:"";position:absolute;right:-4px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:inherit}
 .sp-np.paused .np-bar i{opacity:.55}
-.sp.np .sp-acct{font-size:11.5px;justify-items:end}
-.sp.np .sp-row{gap:4px 10px}
-/* Lofi Girl: YouTube's player at 16:9 */
-.sp .sp-yt iframe{height:auto;aspect-ratio:16 / 9}
-.yt-cap{display:none}
-.sp.lofi .sp-k::before{content:"Lofi Girl · live"}
 /* connecting a Spotify account */
-.sp-acct{display:grid;gap:6px;font-size:12.5px}
-.sp-acct:empty{display:none}
-.sp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}
-.sp-ok,.sp-paused{opacity:.78}
-.sp-setup{display:grid;gap:8px;padding:10px 12px;border-radius:10px;background:var(--surface);color:var(--fg);border:1px solid var(--line);font-size:13px;line-height:1.45}
+.sp-setup{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px 12px;overflow-wrap:anywhere;border-radius:10px;background:var(--surface);color:var(--fg);border:1px solid var(--line);font-size:13px;line-height:1.45}
 .sp-setup p{margin:0}
 .sp-setup ol{margin:0;padding-left:20px;display:grid;gap:6px}
 .sp-setup code{font-family:var(--mono);font-size:12px;padding:1px 5px;border-radius:4px;background:var(--surface-2);word-break:break-all}
-.sp-setup a,.sp-setup .link{color:var(--accent)}
-.sp-setup .sp-note{color:var(--muted)}
-.sp-note{margin:0;font-size:11.5px;color:var(--muted)}
-.sp-note:empty{display:none}
-.sp-note .link{font-size:11.5px}
+.sp-setup a,.sp-setup .link{color:var(--accent);opacity:1}
+.sp-setup .btn{color:var(--fg)}
+.sp-setup .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.sp-setup .sp-hint{color:var(--muted);opacity:1}
+.sp-setup > .link{justify-self:start}
 
 /* fantasy */
 .ff-match{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface-2);text-align:center}
@@ -743,10 +754,8 @@ html.studying body{overflow:hidden}
 .st-music{flex:none;min-height:80px}
 /* the Music card pinned over its slot */
 html.studying .p-music{position:fixed;z-index:61;margin:0}
-html.studying .sp-note{display:none}
-/* in study mode the video stays a sensible size so the clock keeps its room */
-html.studying:not(.st-dock) .sp .sp-yt iframe{max-height:min(30vh,260px)}
-html.studying:not(.st-dock) .sp-acct{display:none}
+/* in study mode the player stays a sensible size so the clock keeps its room */
+html.studying:not(.st-dock) .sp-stage{min-height:max(152px,min(30vh,260px,100cqw * 9 / 16))}
 /* now working on: one task, one big box */
 .st-now{display:flex;gap:14px;align-items:flex-start;font-size:clamp(19px,1.7vw,24px);font-weight:700;line-height:1.25;cursor:pointer;margin-top:8px}
 .st-check{appearance:none;-webkit-appearance:none;width:34px;height:34px;flex:none;margin:-2px 0 0;border:2.5px solid var(--cc);border-radius:9px;background:var(--surface);display:grid;place-items:center;cursor:pointer}
@@ -776,19 +785,22 @@ html.studying:not(.st-dock) .sp-acct{display:none}
 /* phones, and phones held sideways: one scrolling column (or two short ones), Spotify's slim player docked at the bottom */
 html.st-dock .p-music{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));top:auto;width:auto}
 html.st-dock .p-music{padding:8px}
-html.st-dock .p-music .panel-h,html.st-dock .sp-head,html.st-dock .sp-form,html.st-dock .sp-acct,html.st-dock .sp-note{display:none}
+html.st-dock .p-music .panel-h,html.st-dock .sp-bar,html.st-dock .sp-empty-i,html.st-dock .sp-empty > p,html.st-dock .sp-empty .link{display:none}
 html.st-dock .sp{padding:6px 8px}
+html.st-dock .sp-stage,html.st-dock .sp.empty .sp-stage{min-height:80px}
+html.st-dock #sp-embed iframe{height:80px}
+html.st-dock .sp-empty{grid-auto-flow:column;justify-content:space-between;align-items:center;padding:0 4px;text-align:left}
+html.st-dock .sp-empty .sp-acts{margin:0;flex-wrap:nowrap}
 html.st-dock .sp-np{grid-template-columns:52px minmax(0,1fr);gap:8px 12px}
 html.st-dock .np-art{width:52px;height:52px;border-radius:7px}
 html.st-dock .np-main{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t c" "a c";column-gap:8px}
 html.st-dock .np-track{grid-area:t;-webkit-line-clamp:1;font-size:15px}
 html.st-dock .np-artist{grid-area:a}
 html.st-dock .np-ctl{grid-area:c;margin:0}
-html.st-dock .np-k,html.st-dock .np-prog,html.st-dock .np-ctl button:not(.np-play){display:none}
-html.st-dock .sp-yt{display:flex;align-items:center;gap:12px}
-html.st-dock .sp-yt iframe{flex:none;width:142px;aspect-ratio:auto}
+html.st-dock .np-prog,html.st-dock .np-ctl button:not(.np-play){display:none}
+html.st-dock .sp-yt{display:flex;align-items:center;gap:12px;background:none}
+html.st-dock .sp-yt iframe{flex:none;width:142px;border-radius:8px}
 html.st-dock .yt-cap{display:block;font-weight:600}
-html.st-dock .sp .sp-frame iframe{height:80px}
 html.st-dock .study{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 html.st-dock .st-music{display:none}
 @media (max-width:759px){
