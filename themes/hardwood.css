@@ -105,9 +105,6 @@ html[data-skin="hardwood"]{
   &[data-mode="dark"] .count{background:var(--gold);color:#0b1324}
 
   /* tests & quizzes: scoreboard dates */
-  .big li{border-radius:8px;border-left:4px solid var(--cc)}
-  .big .d{background:var(--led);color:var(--royal);box-shadow:inset 0 0 0 1.5px var(--led-line);border-radius:5px;padding:4px 6px;font-family:var(--mono);font-size:21px}
-  .big .d small{color:var(--led-muted)}
 
   /* rotation */
   .seg{border-radius:6px}
@@ -153,7 +150,7 @@ html[data-skin="hardwood"]{
   .sbc-t{color:var(--shot);font-family:var(--mono);font-weight:700;font-size:18px}
   .sbc-bar i{box-shadow:inset -1.5px 0 0 var(--surface)}
   .sbc-mk{background:var(--fg);box-shadow:0 0 0 2px var(--surface)}
-  .dock a{border-radius:8px;border:0;box-shadow:0 2px 0 rgb(0 0 0 / .14)}
+  .dock-main a{border-radius:8px;border:0;box-shadow:0 2px 0 rgb(0 0 0 / .14)}
 }
 
 /* the tab strip (and phone tab bar) in this theme */

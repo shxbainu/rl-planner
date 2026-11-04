@@ -16,6 +16,7 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 - **Command bar**: press `/`, then type `latin p245 ex c due fri` to add homework, or a section name to jump there.
 - **Music** (always open on laptops, its own tab on phones): switch between **Spotify** and **Lofi Girl**. Spotify starts empty, with **Connect Spotify** and **Paste a link**: once connected it shows what you're playing on any device, with play, pause and skip on Premium; a pasted playlist, album or song plays in Spotify's embed (**Change** and **Clear** under it). Both tabs keep the card the same height. Lofi Girl is the 24/7 "lofi hip hop radio" YouTube stream; Lofi Girl restarts its streams now and then (the 2022 one ended in May 2026), so if the video says it's unavailable, put the current id from youtube.com/@LofiGirl/streams in `LOFI.id` in `app.js`. `?npdemo` previews the now-playing card.
 - **Today's briefing** (top of More → News, with a "Read the briefing" link on Today): each morning an AI summary of the day's headlines: one sentence for the day, then the 5 to 7 biggest stories with why each matters and links to the outlets that covered it. Written by `tools/summarize_news.py` in the deploy workflow (one Claude API call a day, first run after 6:30am Eastern). The model may only use the headlines it's given, every story has to cite them, and the script drops any story whose citations don't match. Labeled on the page as an AI summary that may contain mistakes. Needs the API key below; without it the card says so and nothing else changes.
+- **Quick links** (under Today): Portal, Classroom, Gmail, Drive, Membean, Chess.com and Spotify in one row (it scrolls sideways on phones), and under them a chip for each class that opens its Blackbaud Topics page. The class chips come from `links.json` (`{"class_links":[{"class":"Latin","topics":"<url>","bulletin":"<url>"}]}`, class names as in `schedule.json`), which Muse posts; only roxburylatin.myschoolapp.com addresses are used, and a class without one is left out.
 - **Layout**: Today, Homework and Music stay open; Week, Sports, News, Fantasy and Countdowns share one tab strip. On phones a bottom bar switches between Today, Homework, Music and More.
 
 ## Turning on the daily briefing (once)
@@ -62,6 +63,6 @@ Countdowns are added on the page and saved in the browser.
 
 ## Daily homework, hands-off
 
-Muse saves the site-format JSON to the brianrlsite Crosswalk files at `site/homework.json` (and `site/fantasy.json`).
-The `Deploy site` workflow pulls both every hour with a read-only Crosswalk key stored as the `CROSSWALK_KEY` repo secret,
+Muse saves the site-format JSON to the brianrlsite Crosswalk files at `site/homework.json` (and `site/fantasy.json`, `site/links.json`).
+The `Deploy site` workflow pulls them every hour with a read-only Crosswalk key stored as the `CROSSWALK_KEY` repo secret,
 checks their shape, and falls back to the repo copies if anything is missing or malformed.

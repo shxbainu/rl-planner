@@ -102,10 +102,6 @@ html[data-skin="herbarium"]{
     background:color-mix(in srgb,var(--surface) 70%,transparent);transform:rotate(calc(var(--rnd,0) * 8deg));animation:hb-stamp .22s ease-out;pointer-events:none}
 
   /* tests & quizzes: inked numerals in a narrow ruled column */
-  .big li{border-radius:2px;background:transparent;border-left:0;border-bottom:1px solid var(--line);padding:6px 4px}
-  .big .d{color:var(--fg);font-family:var(--head);font-variation-settings:"SOFT" 100,"WONK" 1;font-weight:500;font-size:22px;border-right:1px solid var(--line);padding-right:10px}
-  .big .d small{font-family:var(--mono);font-weight:400;letter-spacing:.06em}
-  .big .w b{font-weight:600}
 
   /* rotation: pressed-flower swatches, today outlined in rust */
   .seg{border-radius:3px;background:var(--surface-2)}

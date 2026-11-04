@@ -45,7 +45,6 @@ html[data-skin="chess"]{
   .panel-h h2{font-family:var(--head);font-weight:700;font-size:17px;letter-spacing:0;text-transform:none}
   .panel-h h2::before{content:"\2654\FE0E";width:auto;height:auto;border-radius:0;background:none;font-family:var(--glyph);font-size:19px;line-height:1;font-weight:400}
   .p-hw .panel-h h2::before{content:"\2655\FE0E"}
-  .p-big .panel-h h2::before{content:"\2656\FE0E"}
   .p-week .panel-h h2::before{content:"\2658\FE0E"}
   .x-name{font-family:var(--head);font-weight:700;font-size:14px;letter-spacing:0;text-transform:none}
 
@@ -100,9 +99,6 @@ html[data-skin="chess"]{
   .count{border-radius:2px;background:var(--ebony);color:var(--ivory)}
 
   /* tests & quizzes: the date as a clock face */
-  .big li{border-radius:3px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--cc)}
-  .big .d{background:var(--ebony);color:var(--ivory);border-radius:3px;padding:4px 6px;font-family:var(--mono);font-size:16px}
-  .big .d small{color:color-mix(in srgb,var(--ivory) 70%,var(--ebony))}
 
   /* rotation */
   .seg{border-radius:3px}

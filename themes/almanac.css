@@ -61,7 +61,6 @@ html[data-skin="almanac"]{
     mask:radial-gradient(circle at 7px 100%,transparent 4.5px,#000 5px) 0 100%/14px 8px repeat-x,linear-gradient(#000 0 0) 0 0/100% calc(100% - 7.5px) no-repeat}
   .p-hw{--band:var(--tomato)}
   .p-sched{--band:var(--mustard)}
-  .p-big{--band:var(--sky)}
   .p-week{--band:var(--leaf)}
   details.extra{border-radius:6px;border:1px solid var(--line);background:var(--surface)}
   .panel-h h2,.x-name{font-family:var(--head);font-weight:400;text-transform:none;letter-spacing:.01em;font-size:19px}
@@ -71,7 +70,6 @@ html[data-skin="almanac"]{
   .p-hw{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M12.5 6.5 4 17.5c-.6.7.2 1.4.9.9L15.5 9z' fill='%23d98632'/%3E%3Cpath d='M13 7c.5-2.5 1.8-4.6 3.6-5.4-.3 1.6-.9 3.2-2 4.6 1.6-.6 3.3-.6 4.4 0-1.7 1-3.5 1.6-5.3 1.6z' fill='%235e8c4a'/%3E%3C/svg%3E")}
   .p-sched{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='%23e2a93b'%3E%3Cellipse cx='10' cy='3.2' rx='1.8' ry='3'/%3E%3Cellipse cx='10' cy='16.8' rx='1.8' ry='3'/%3E%3Cellipse cx='3.2' cy='10' rx='3' ry='1.8'/%3E%3Cellipse cx='16.8' cy='10' rx='3' ry='1.8'/%3E%3Cellipse cx='5.2' cy='5.2' rx='1.7' ry='2.8' transform='rotate(-45 5.2 5.2)'/%3E%3Cellipse cx='14.8' cy='14.8' rx='1.7' ry='2.8' transform='rotate(-45 14.8 14.8)'/%3E%3Cellipse cx='14.8' cy='5.2' rx='1.7' ry='2.8' transform='rotate(45 14.8 5.2)'/%3E%3Cellipse cx='5.2' cy='14.8' rx='1.7' ry='2.8' transform='rotate(45 5.2 14.8)'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='3.6' fill='%235a3a22'/%3E%3C/svg%3E")}
   /* cornflower: blue petals round a dark eye */
-  .p-big{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='%234f86bd'%3E%3Cellipse cx='10' cy='3.6' rx='2' ry='3.4'/%3E%3Cellipse cx='10' cy='16.4' rx='2' ry='3.4'/%3E%3Cellipse cx='3.6' cy='10' rx='3.4' ry='2'/%3E%3Cellipse cx='16.4' cy='10' rx='3.4' ry='2'/%3E%3Cellipse cx='5.5' cy='5.5' rx='1.8' ry='3' transform='rotate(-45 5.5 5.5)'/%3E%3Cellipse cx='14.5' cy='14.5' rx='1.8' ry='3' transform='rotate(-45 14.5 14.5)'/%3E%3Cellipse cx='14.5' cy='5.5' rx='1.8' ry='3' transform='rotate(45 14.5 5.5)'/%3E%3Cellipse cx='5.5' cy='14.5' rx='1.8' ry='3' transform='rotate(45 5.5 14.5)'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='3' fill='%23243f5c'/%3E%3C/svg%3E")}
   .p-week,.p-music{--pkt:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M2.5 15C5 8 11 4.5 17.5 4.5 16 11 10.5 16 2.5 15z' fill='%235e8c4a'/%3E%3Cg fill='%239cc47e'%3E%3Ccircle cx='7' cy='12.2' r='1.7'/%3E%3Ccircle cx='10.2' cy='10' r='1.7'/%3E%3Ccircle cx='13.4' cy='7.6' r='1.7'/%3E%3C/g%3E%3C/svg%3E")}
   .panel-meta,.x-tease,.panel-foot{font-size:11.5px}
 
@@ -126,9 +124,6 @@ html[data-skin="almanac"]{
   .hw-note,.empty-state,.overdue-strip{border-radius:5px}
 
   /* tests & quizzes: germination-time labels */
-  .big li{border-radius:5px;background:var(--surface-2);border-left:4px solid var(--cc)}
-  .big .d{color:var(--fg);border:1.5px solid var(--leaf);border-radius:4px;padding:3px 5px;font-family:var(--head);font-weight:400;font-size:20px;background:var(--surface)}
-  .big .d small{color:var(--leaf-ink);font-family:var(--sans);font-variant:small-caps;text-transform:lowercase;letter-spacing:.06em;font-size:11px}
 
   /* rotation: a planting chart with a light ruled grid */
   .seg{border-radius:6px;background:var(--surface-2)}

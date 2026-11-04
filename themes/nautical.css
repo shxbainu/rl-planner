@@ -105,10 +105,6 @@ html[data-skin="nautical"]{
   .count{border-radius:2px;background:var(--magenta);color:var(--accent-fg);font-family:var(--mono)}
 
   /* tests & quizzes: lights along the route, soundings for dates */
-  .big li{grid-template-columns:12px minmax(44px,auto) 1fr;border-radius:0;background:transparent;border-left:0;border-bottom:1px solid var(--line)}
-  .big li::before{content:"";width:8px;height:13px;border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;background:var(--magenta);transform:rotate(28deg)}
-  .big .d{color:var(--fg);font-family:var(--mono);font-style:italic;font-weight:400;font-size:20px}
-  .big .d small{font-style:normal;font-family:var(--mono);font-weight:400}
 
   /* rotation: a chart grid */
   .seg{border-radius:2px;background:var(--surface-2)}

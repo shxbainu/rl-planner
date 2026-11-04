@@ -98,9 +98,6 @@ html[data-skin="catalog"]{
   .count{border-radius:3px;background:var(--stamp);color:var(--surface)}
 
   /* tests & quizzes: a stamped date */
-  .big li{border-radius:2px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--cc)}
-  .big .d{color:var(--stamp);border:1.5px solid var(--stamp);border-radius:3px;padding:3px 4px;font-family:var(--mono);font-size:17px}
-  .big .d small{color:var(--stamp)}
 
   /* rotation: a borrower's card */
   .seg{border-radius:4px}

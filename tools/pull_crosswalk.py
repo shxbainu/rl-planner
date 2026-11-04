@@ -1,4 +1,4 @@
-"""Pulls the latest homework.json / fantasy.json that Muse saves in the brianrlsite Crosswalk files.
+"""Pulls the latest homework.json / fantasy.json / links.json that Muse saves in the brianrlsite Crosswalk files.
 
 Runs in the deploy workflow with a read-only key in CROSSWALK_KEY. Anything missing or malformed is
 skipped, so the site keeps the copy in the repo instead of breaking.
@@ -21,7 +21,12 @@ def fantasy_ok(d):
     return isinstance(d, dict) and isinstance(d.get("lineup", []), list) and isinstance(d.get("moves", []), list)
 
 
-CHECKS = {"homework.json": homework_ok, "fantasy.json": fantasy_ok}
+def links_ok(d):
+    return isinstance(d, dict) and isinstance(d.get("class_links"), list) and all(
+        isinstance(c, dict) and c.get("class") for c in d["class_links"])
+
+
+CHECKS = {"homework.json": homework_ok, "fantasy.json": fantasy_ok, "links.json": links_ok}
 
 
 def older_than_repo(name, data):
@@ -72,7 +77,7 @@ def main():
             data = keep_claude_moves(data)
         with open(name, "w") as f:
             json.dump(data, f, ensure_ascii=False, indent=1)
-        print(f"{name}: pulled (updated_at {data.get('updated_at')}, {len(data.get('assignments', data.get('lineup', [])))} rows)")
+        print(f"{name}: pulled (updated_at {data.get('updated_at')}, {len(data.get('assignments', data.get('lineup', data.get('class_links', []))))} rows)")
 
 
 if __name__ == "__main__":

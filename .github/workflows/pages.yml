@@ -55,7 +55,7 @@ jobs:
       - name: Collect site files
         run: |
           mkdir _site
-          cp index.html style.css app.js schedule.json homework.json fantasy.json news.json _site/
+          cp index.html style.css app.js schedule.json homework.json fantasy.json links.json news.json _site/
           if [ -f news_summary.json ]; then cp news_summary.json _site/; fi
           if [ -f menu.json ]; then cp menu.json _site/; fi
           cp -r themes _site/themes

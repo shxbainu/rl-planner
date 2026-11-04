@@ -45,10 +45,9 @@ html[data-skin="blueprint"]{
   .panel,details.extra{border-radius:0;background:var(--surface);border:1px solid var(--sheet-line);box-shadow:inset 0 0 0 4px var(--surface),inset 0 0 0 5px var(--line)}
   .panel{padding:14px 16px 10px}
   .panel::after{align-self:flex-end;margin-top:auto;flex:none;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--muted);border:1px solid var(--line);padding:2px 7px}
-  .p-hw::after{content:"HOMEWORK — SHEET 1 OF 4"}
-  .p-sched::after{content:"SCHEDULE — SHEET 2 OF 4"}
-  .p-big::after{content:"TESTS & QUIZZES — SHEET 3 OF 4"}
-  .p-week::after{content:"ROTATION — SHEET 4 OF 4"}
+  .p-hw::after{content:"HOMEWORK — SHEET 1 OF 3"}
+  .p-sched::after{content:"SCHEDULE — SHEET 2 OF 3"}
+  .p-week::after{content:"ROTATION — SHEET 3 OF 3"}
   .panel-h h2,.x-name{font-family:var(--head);font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:13px}
   .panel-h h2::before{width:9px;height:9px;border-radius:50%;background:transparent;border:1.2px solid var(--fg)}
   .panel-meta,.x-tease,.panel-foot{font-size:10.5px}
@@ -111,11 +110,6 @@ html[data-skin="blueprint"]{
   .count{border-radius:0;background:var(--hi);color:var(--hi-ink)}
 
   /* tests & quizzes: day counts as measurements ("6 D") */
-  .big li{border-radius:0;background:transparent;border:1px solid var(--line);border-left:3px solid var(--cc)}
-  .big li.today{background:var(--accent-soft)}
-  .big .d{color:var(--fg);font-family:var(--mono);font-weight:600;font-size:16px;white-space:nowrap}
-  .big .d small{display:inline;font-size:0}
-  .big .d small::after{content:"D";font-size:12px;margin-left:3px;color:var(--muted)}
 
   /* rotation: precise cells, today as a highlighted section cut */
   .seg{border-radius:0;background:transparent;border-color:var(--sheet-line)}

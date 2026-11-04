@@ -83,7 +83,6 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
   .col-c{display:flex}
   .col,.p-hw{overflow:auto;scrollbar-width:thin}
   .col > .panel{flex:none}
-  .p-big{flex:1 0 auto}
   /* music keeps its size; the tabbed panel takes the rest of the column and scrolls inside */
   .col-c > .p-more{flex:1 0 340px;min-height:0}
   .p-more .pane:not([hidden]){flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
@@ -155,13 +154,6 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 html.studying .tabbar{display:none}
 html.studying .p-music{display:flex!important}
 /* tests & quizzes */
-.big{list-style:none;margin:0;padding:0;display:grid;gap:4px}
-.big li{display:grid;grid-template-columns:minmax(44px,auto) 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--cc)}
-.big .d{text-align:center;font-weight:700;font-size:18px;line-height:1;color:var(--cc)}
-.big .d small{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
-.big .w{min-width:0;line-height:1.3}
-.big .w b{font-weight:600}
-.big .w small{display:block;font-size:12px;color:var(--muted)}
 
 .x-body{padding:0 0 12px;display:grid;gap:8px;max-height:62vh;overflow:auto;scrollbar-width:thin}
 .x-tools{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -641,7 +633,7 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
   .bar{flex-wrap:wrap;gap:10px 12px}
   .bar-day{flex:1}
   .bar-status{order:3;flex-basis:100%;justify-content:flex-start}
-  .dash{padding:10px 12px;gap:10px}
+  .dash{padding:10px 12px calc(84px + env(safe-area-inset-bottom,0px));gap:10px} /* the bottom clears the tab bar */
 }
 
 /* theme picker (top bar, beside light/dark); skins live in themes/ */
@@ -684,10 +676,20 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 .ss-bar{width:56px;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
 .ss-bar i{display:block;height:100%;background:var(--accent)}
 /* quick links */
-.dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;flex:none}
-.dock a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--fg);text-decoration:none;font-size:11.5px;font-weight:600}
-.dock a svg{width:20px;height:20px;color:var(--accent)}
-.dock a:hover{border-color:var(--muted)}
+/* quick links: the daily sites in one row (it scrolls sideways on phones), each class's Topics page under them */
+.dock{display:grid;gap:6px;flex:none}
+/* each tile is at least as wide as its label; spare room is shared out, and a row too long for its column scrolls */
+.dock-main{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+.dock-main::-webkit-scrollbar{display:none}
+.dock-main a{flex:1 0 auto;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 3px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--fg);text-decoration:none;font-size:11px;font-weight:600;white-space:nowrap}
+.dock-main a svg{width:19px;height:19px;color:var(--accent)}
+.dock-main a:hover{border-color:var(--muted)}
+.dock-classes{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.dock-classes::-webkit-scrollbar{display:none}
+.dock-classes a{flex:1 0 auto;padding:4px 6px;white-space:nowrap;border-radius:999px;text-align:center;text-decoration:none;font-size:12px;font-weight:700;color:var(--fg);
+  background:color-mix(in srgb,var(--cc) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--cc) 45%,var(--line))}
+.dock-classes a:hover{background:color-mix(in srgb,var(--cc) 22%,var(--surface))}
+@media (max-width:759px){ .dock-main a{min-width:62px} }
 /* snow day odds */
 .vy-note{margin:6px 0 0;font-size:12px;color:var(--muted)}
 .snow-day{font-weight:600}

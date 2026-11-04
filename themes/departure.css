@@ -122,10 +122,6 @@ html[data-skin="departure"]{
   .count{border-radius:3px;background:var(--tile);color:var(--amber)}
 
   /* tests & quizzes: amber tiles; due today gets a slow amber dot */
-  .big li{border-radius:3px;background:var(--surface-2);border-left:0}
-  .big .d{position:relative;background:var(--tile);color:var(--amber);border-radius:3px;padding:5px 6px;font-family:var(--mono);font-size:16px}
-  .big .d small{color:#b9b2a3;font-size:9.5px}
-  .big li.today .d::before{content:"";position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 2px var(--surface);animation:db-blink 2.4s ease-in-out infinite}
 
   /* rotation: a timetable board, today's column lit a little brighter */
   .seg{border-radius:3px}

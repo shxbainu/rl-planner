@@ -1227,26 +1227,12 @@
     wake($("#snews"));
   }
 
-  // ---------- tests & quizzes (from homework) ----------
-  function renderBig() {
-    const t = today(), until = addDays(t, 28);
-    // checked off is done, the same as homework: it leaves this list too
-    const ahead = allItems().filter((i) => MAJOR.has(i.type) && i.due >= t && i.due <= until), list = ahead.filter((i) => !isDone(i));
-    $("#big-meta").textContent = list.length ? "next 4 weeks" : "";
-    $("#big").innerHTML = list.length ? list.map((i) => {
-      const n = daysBetween(t, i.due);
-      return `<li class="${n === 0 ? "today" : ""}" style="${cc(i.class)}"><span class="d">${n === 0 ? "Today" : n}${n ? `<small>day${n === 1 ? "" : "s"}</small>` : ""}</span>
-        <span class="w"><b>${esc(i.title)}</b><small>${esc(cls(i.class).short || i.class)} · ${esc(i.type)} · ${esc(fmt(i.due))}</small></span></li>`;
-    }).join("") : `<li class="empty-state" style="display:block;border:0">${ahead.length ? "All done for the next 4 weeks." : "No tests or quizzes in the next 4 weeks."}</li>`;
-  }
-
   const tease = (id, html) => { const el = $("#" + id); if (el) el.innerHTML = html; };
 
   function render() {
     renderBar();
     renderSchedule();
     renderHomework();
-    renderBig();
     renderRotation();
     renderCounts();
     renderFantasy();
@@ -1280,9 +1266,9 @@
       setDone(id, on);
       li.style.setProperty("--rnd", (Math.random() * 2 - 1).toFixed(2));
       li.classList.add("leaving");
-      setTimeout(() => { renderHomework(); renderBig(); }, leaveMs());
+      setTimeout(renderHomework, leaveMs());
       if (on) {
-        toast("Moved to Done", () => { setDone(id, false); renderHomework(); renderBig(); });
+        toast("Moved to Done", () => { setDone(id, false); renderHomework(); });
         // finished everything due that day? celebrate a little
         const day = allItems().find((i) => i.id === id)?.due;
         const left = allItems().filter((i) => i.due === day && !isDone(i)).length;
@@ -1677,7 +1663,7 @@
       <label class="st-now" style="${cc(it.class)}"><input type="checkbox" class="st-check" data-id="${esc(it.id)}"><span class="st-title">${esc(it.title)}</span></label>
       <div class="meta"><span class="chip" style="${cc(it.class)}">${esc(it.class)}</span>${MAJOR.has(it.type) ? `<span class="tag" style="${cc(it.class)}">${esc(it.type)}</span>` : ""}${it.unconfirmed ? `<span class="tag unsure">Unconfirmed</span>` : ""}<span>due ${esc(relDay(it.due).toLowerCase())}</span></div>
       ${it.details ? `<p class="st-det">${esc(it.details)}</p>` : ""}`
-      : `<div class="st-k">Now working on</div><p class="st-empty">Nothing left for tonight. Pick a test from the dashboard to get ahead on, or call it a night.</p>`;
+      : `<div class="st-k">Now working on</div><p class="st-empty">Nothing left for tonight. Pick something from Homework to get ahead on, or call it a night.</p>`;
     const help = stHelp(it);
     $("#st-help").hidden = !help;
     $("#st-help").innerHTML = help ? `<div class="st-k">${esc(it.class)} helper</div>${help}` : "";
@@ -1687,7 +1673,7 @@
   study.addEventListener("change", (e) => {
     if (!e.target.matches(".st-check")) return;
     const id = e.target.dataset.id;
-    const redraw = () => { stRenderWork(); stRenderStats(); renderHomework(); renderBig(); };
+    const redraw = () => { stRenderWork(); stRenderStats(); renderHomework(); };
     setDone(id, true);
     st.done++;
     st.pick = null;
@@ -1853,6 +1839,16 @@
     gnTimer = setInterval(tick, 1000);
   }
 
+  // ---------- quick links: a row of chips for each class's Topics page (links.json, from Muse) ----------
+  // Only links Muse posted are shown; a class without one is left out, never guessed. Only school-site addresses.
+  function renderClassLinks(data) {
+    const el = $("#dock-classes"), ok = (u) => typeof u === "string" && /^https:\/\/roxburylatin\.myschoolapp\.com\//.test(u);
+    const rows = (data?.class_links || []).map((c) => ({ c: c.class, url: ok(c.topics) ? c.topics : ok(c.bulletin) ? c.bulletin : "" }))
+      .filter((r) => r.url && schedule.classes[r.c]);
+    el.hidden = !rows.length;
+    el.innerHTML = rows.map((r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="${cc(r.c)}" title="${esc(cls(r.c).name || r.c)}: Topics">${esc(cls(r.c).short || r.c)}</a>`).join("");
+  }
+
   // ---------- lunch: SAGE Dining's menu (menu.json, fetched on every deploy by tools/fetch_menu.py) ----------
   // Shows today's lunch until lunch is over, then the next school day's; the arrows step through the posted days.
   let menu = null, lunchPick = null;
@@ -1968,7 +1964,7 @@
   const go = (tab, pane) => () => { if (pane) showPane(pane); showTab(tab); return pane ? $(".p-more") : { today: $(".p-sched"), homework: $(".p-hw"), music: $(".p-music") }[tab]; };
   const JUMPS = [
     ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", go("homework")], ["Today's schedule", "schedule today bell", go("today")],
-    ["Tests & quizzes", "tests quizzes", () => { showTab("today"); return $(".p-big"); }], ["Music", "music spotify lofi", go("music")], ["Rotation", "rotation week letters", go("more", "week")],
+    ["Music", "music spotify lofi", go("music")], ["Rotation", "rotation week letters", go("more", "week")],
     ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")], ["Lunch menu", "lunch menu food sage", () => { showTab("today"); return $(".p-lunch"); }], ["Today's briefing", "briefing summary ai news today", () => { $("#brief-peek").click(); }],
     ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
     ...Object.entries(SKINS).map(([k, v]) => [`Theme: ${v}`, `theme ${k} ${v.toLowerCase()}`, () => { setSkin(k); document.querySelectorAll(".skin-select").forEach((o) => { o.value = k; }); }]),
@@ -1979,7 +1975,7 @@
     cmdItems = [];
     if (add) cmdItems.push({ html: `<b>Add</b> ${esc(add.class)} · ${esc(add.title)} <small>${add.title.toLowerCase().includes(add.type) ? "" : `${esc(add.type)} · `}due ${esc(fmt(add.due, { weekday: "long", month: "short", day: "numeric" }))}</small>`, run: () => {
       state.manual.push({ uid: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: new Date().toISOString(), ...add });
-      save(); renderHomework(); renderBig(); toast(`Added: ${add.title}`);
+      save(); renderHomework(); toast(`Added: ${add.title}`);
     } });
     if (lw) JUMPS.filter(([label, keys]) => keys.split(" ").some((k) => k.startsWith(lw.split(" ")[0])) || label.toLowerCase().includes(lw)).slice(0, 6)
       .forEach(([label, , jump]) => cmdItems.push({ html: `<b>Go</b> ${esc(label)}`, run: () => { const el = jump(); if (el instanceof Element) el.scrollIntoView({ block: "start", behavior: reduced() ? "auto" : "smooth" }); } }));
@@ -2008,8 +2004,8 @@
     if (!r.ok) throw new Error(`${path}: ${r.status}`);
     return r.json();
   }
-  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null), getJSON("news_summary.json").catch(() => null), getJSON("menu.json").catch(() => null)])
-    .then(([s, h, f, n, b, mn]) => {
+  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null), getJSON("news_summary.json").catch(() => null), getJSON("menu.json").catch(() => null), getJSON("links.json").catch(() => null)])
+    .then(([s, h, f, n, b, mn, ln]) => {
       news = n;
       brief = b;
       menu = mn;
@@ -2020,6 +2016,7 @@
       render();
       renderBrief();
       renderLunch();
+      renderClassLinks(ln);
       loadTeams();
       loadBoards();
       loadSportsNews();
