@@ -1,4 +1,54 @@
 {
- "updated_at": null,
- "class_links": []
+ "updated_at": "2026-11-04T23:34:00Z",
+ "source": "Muse, Blackbaud portal check Wed Nov 4 (Crosswalk post erkvfr)",
+ "class_links": [
+  {
+   "class": "Latin",
+   "topics": null,
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068611/undefined/bulletinboard",
+   "syllabus": "https://docs.google.com/document/d/1Q6nEU1al962fEExWwTFXgCK3TxktN_eiYml3SHtLNoM/edit"
+  },
+  {
+   "class": "English",
+   "topics": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068690/undefined/topics",
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068690/undefined/bulletinboard",
+   "syllabus": "https://docs.google.com/document/d/1TIdgh3nAyNgB_Ci86AhjGnl4YvggHNDp/edit"
+  },
+  {
+   "class": "MSI",
+   "topics": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068733/undefined/topics",
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068733/undefined/bulletinboard",
+   "syllabus": null
+  },
+  {
+   "class": "French",
+   "topics": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068712/undefined/topics",
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068712/undefined/bulletinboard",
+   "syllabus": null
+  },
+  {
+   "class": "Forces",
+   "topics": null,
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068717/undefined/bulletinboard",
+   "syllabus": "https://docs.google.com/document/d/14q6tZy0zNU76M-BOJDYbcwdDndGS66-17UHK7w1JF2U/edit"
+  },
+  {
+   "class": "Arts",
+   "topics": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068709/undefined/topics",
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068709/undefined/bulletinboard",
+   "syllabus": "https://roxburylatin.myschoolapp.com/ftpimages/695/download/download_12045499.pdf"
+  },
+  {
+   "class": "Health",
+   "topics": null,
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99068741/undefined/bulletinboard",
+   "syllabus": null
+  },
+  {
+   "class": "Glee",
+   "topics": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99077005/undefined/topics",
+   "bulletin": "https://roxburylatin.myschoolapp.com/app/student?svcid=edu#academicclass/99077005/undefined/bulletinboard",
+   "syllabus": null
+  }
+ ]
 }

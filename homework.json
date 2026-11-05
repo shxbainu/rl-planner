@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-11-03T22:55:00Z",
- "source": "Muse, Blackbaud portal recheck Tue Nov 3, 5:46-5:55 PM (Crosswalk post lr1l4m)",
+ "updated_at": "2026-11-04T23:12:00Z",
+ "source": "Muse, Blackbaud portal recheck Wed Nov 4 (Crosswalk post l4u49b)",
  "days": {
   "2026-11-03": "H",
   "2026-11-04": "F",
@@ -19,14 +19,23 @@
   "2026-11-27": "Thanksgiving break"
  },
  "special": {
-  "2026-11-12": "D-35 special schedule, times differ; Glee Club 8:30 AM in the Hall",
+  "2026-11-12": "D-35 special schedule: French 9:10, FGC 10:00, Arts 10:50, Glee 1:00, Latin 1:50, English 2:40",
+  "2026-11-19": "D special schedule",
+  "2026-11-20": "C-20 schedule",
   "2026-11-24": "H special schedule",
-  "2026-12-09": "F-20 schedule, last day of MP2"
+  "2026-12-09": "F-20 schedule, last day of MP2",
+  "2026-12-10": "D special schedule",
+  "2026-12-11": "C special schedule",
+  "2026-12-14": "Mid-year exams",
+  "2026-12-15": "Mid-year exams",
+  "2026-12-16": "Mid-year exams",
+  "2026-12-17": "Mid-year exams",
+  "2026-12-18": "Mid-year exams"
  },
  "notes": [
-  "Nov 6 English reading (Odyssey XIV.278-end) is unconfirmed: that syllabus row was blank on the Nov 3 recheck.",
-  "French homework for the week of Nov 9 isn't posted yet; only the Nov 9 Unit 2 test is confirmed.",
-  "Latin, Arts and Health class assignment tabs showed nothing, so small assignments there could be missing."
+  "Nov 6 English reading (Odyssey XIV.278-end) is unconfirmed: that syllabus row was still blank on the Nov 4 recheck.",
+  "French homework for the week of Nov 9 isn't posted yet, and the Unit 2 test's point value isn't shown.",
+  "Forces syllabus rows for Nov 16-20 (including a possible test) were only partly read, so they may change."
  ],
  "assignments": [
   {
@@ -107,7 +116,7 @@
    "assigned": null,
    "due": "2026-11-06",
    "type": "reading",
-   "details": "Unconfirmed: the Nov 3 recheck found the Nov 6 English syllabus row blank, so this may no longer be due",
+   "details": "Unconfirmed: the Nov 6 English syllabus row was still blank on the Nov 4 recheck, so this may not be due",
    "unconfirmed": true
   },
   {
@@ -116,7 +125,7 @@
    "assigned": "2026-11-04",
    "due": "2026-11-06",
    "type": "homework",
-   "details": "Complete Ohm's Law Worksheet; prepare for Mini-Quiz 3"
+   "details": "Complete Ohm's Law Worksheet (review loops, Ohm's law, arrays); prepare for Mini-Quiz 3"
   },
   {
    "class": "MSI",
@@ -124,7 +133,7 @@
    "assigned": "2026-11-06",
    "due": "2026-11-06",
    "type": "quiz",
-   "details": "In class"
+   "details": "In class. Homework: practice building and coding circuits with the challenge on the topic page"
   },
   {
    "class": "French",
@@ -180,7 +189,7 @@
    "assigned": "2026-11-09",
    "due": "2026-11-09",
    "type": "test",
-   "details": "11:00 AM, 100 pts"
+   "details": "11:00 AM; point value not shown in the portal"
   },
   {
    "class": "Forces",
@@ -340,7 +349,7 @@
    "assigned": "2026-11-18",
    "due": "2026-11-18",
    "type": "test",
-   "details": "8:30 AM, 100 pts; vocab, forms, identifying clauses, Second Punic War"
+   "details": "11:00 AM, 100 pts; vocab, forms, identifying clauses, Second Punic War"
   },
   {
    "class": "English",
@@ -404,7 +413,7 @@
    "assigned": "2026-12-02",
    "due": "2026-12-02",
    "type": "essay",
-   "details": "11:59 PM, 100 pts"
+   "details": "1:05 PM, 100 pts"
   },
   {
    "class": "Arts",
@@ -412,7 +421,7 @@
    "assigned": "2026-12-02",
    "due": "2026-12-02",
    "type": "project",
-   "details": "11:59 PM, 30 pts"
+   "details": "3:00 PM, 30 pts"
   },
   {
    "class": "Latin",
@@ -460,7 +469,7 @@
    "assigned": "2026-12-09",
    "due": "2026-12-09",
    "type": "project",
-   "details": "Self-assessment and reflection questions, 11:59 PM, 50 pts"
+   "details": "Self-assessment and reflection questions, 3:00 PM, 50 pts"
   }
  ]
 }

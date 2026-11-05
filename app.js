@@ -2023,10 +2023,12 @@
   // Only links Muse posted are shown; a class without one is left out, never guessed. Only school-site addresses.
   function renderClassLinks(data) {
     const el = $("#dock-classes"), ok = (u) => typeof u === "string" && /^https:\/\/roxburylatin\.myschoolapp\.com\//.test(u);
-    const rows = (data?.class_links || []).map((c) => ({ c: c.class, url: ok(c.topics) ? c.topics : ok(c.bulletin) ? c.bulletin : "" }))
-      .filter((r) => r.url && schedule.classes[r.c]);
+    const order = Object.keys(schedule.classes), alias = { "Math-Sci": "MSI", FGC: "Forces", Art: "Arts" };
+    const rows = (data?.class_links || []).map((c) => ({ c: alias[c.class] || c.class, topics: ok(c.topics), url: ok(c.topics) ? c.topics : ok(c.bulletin) ? c.bulletin : "" }))
+      .filter((r) => r.url && schedule.classes[r.c]).sort((a, b) => order.indexOf(a.c) - order.indexOf(b.c));
     el.hidden = !rows.length;
-    el.innerHTML = rows.map((r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="${cc(r.c)}" title="${esc(cls(r.c).name || r.c)}: Topics">${esc(cls(r.c).short || r.c)}</a>`).join("");
+    // a class with no Topics tab (Latin, Forces, Health) opens its bulletin board instead
+    el.innerHTML = rows.map((r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="${cc(r.c)}" title="${esc(cls(r.c).name || r.c)}: ${r.topics ? "Topics" : "bulletin board"}">${esc(cls(r.c).short || r.c)}</a>`).join("");
   }
 
   // ---------- lunch: SAGE Dining's menu (menu.json, fetched on every deploy by tools/fetch_menu.py) ----------
