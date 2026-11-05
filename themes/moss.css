@@ -1,0 +1,113 @@
+/* MOSS: a quiet walk in the woods. Stone and linen, moss-green accent, bark-brown type, soft river-stone shapes.
+   Calm on purpose: no textures to read through, one accent, class colors drawn from the forest (fills and edges, never body text). */
+@import url("https://fonts.googleapis.com/css2?family=Alegreya:wght@500;600;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono:wght@400;500&display=swap");
+
+html[data-skin="moss"]:root{
+  --bg:#ecefe6; --surface:#fbfbf7; --surface-2:#f2f4ec; --fg:#2e3a2f; --muted:#5f6b5c; --line:#d6dbcd;
+  --accent:#4a6b35; --accent-ink:#42612f; --accent-fg:#fbfbf4; --accent-soft:#e3ead6; --done:#8b9386;
+  --warn:#83561a; --warn-soft:#f1e7cf; --bad:#a1452e; --bad-soft:#f4e1d9;
+  --c-latin:#a07a2c; --c-eng:#4f7290; --c-msi:#5b8a4e; --c-fr:#8a76a0; --c-fgc:#b0603a; --c-arts:#a8656f;
+  --c-glee:#4f8a85; --c-health:#7a8740; --c-other:#8a8a7a;
+  --sans:"Alegreya Sans",system-ui,sans-serif; --head:"Alegreya",Georgia,serif; --mono:"DM Mono",ui-monospace,monospace;
+  --stone:0 1px 2px rgb(46 58 47 / .06),0 4px 14px -6px rgb(46 58 47 / .16);
+  color-scheme:light;
+}
+html[data-skin="moss"][data-mode="dark"]:root{
+  --bg:#151a15; --surface:#1e241e; --surface-2:#1a1f1a; --fg:#e5eadd; --muted:#a6b09c; --line:#323b31;
+  --accent:#9cc07a; --accent-ink:#a9cb88; --accent-fg:#142012; --accent-soft:#283322; --done:#7d8676;
+  --warn:#e0b86a; --warn-soft:#352d1c; --bad:#e8907a; --bad-soft:#3a241e;
+  --c-latin:#cfa75a; --c-eng:#86a9c8; --c-msi:#8fbd7f; --c-fr:#b3a1cb; --c-fgc:#dc8f66; --c-arts:#d3929b;
+  --c-glee:#7fbab4; --c-health:#aebb6c; --c-other:#a3a395;
+  --stone:0 1px 2px rgb(0 0 0 / .35);
+  color-scheme:dark;
+}
+
+html[data-skin="moss"]{
+  --sp-k:"Birdsong";
+  /* a little morning light at the top of the page, nothing to read through */
+  body{font-size:15px;background:radial-gradient(1100px 520px at 12% -12%,rgb(255 255 250 / .7),transparent 70%),var(--bg) fixed}
+  &[data-mode="dark"] body{background:radial-gradient(1100px 520px at 12% -12%,rgb(156 192 122 / .07),transparent 70%),var(--bg) fixed}
+
+  /* top bar */
+  .bar{background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .bar-date{font-family:var(--head);font-weight:600;font-size:20px}
+  .bar-sub{font-style:italic}
+  .letter-pick select{border-radius:50%;font-family:var(--head);font-weight:700;background:var(--accent);color:var(--accent-fg);box-shadow:0 0 0 3px var(--accent-soft)}
+  .bar-status span.pill{border-radius:999px}
+  .btn,.icon-btn,.skin-pick{border-radius:999px}
+  .link{color:var(--accent-ink)}
+
+  /* panels: river stones, soft and rounded */
+  .panel,details.extra{border-radius:16px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--stone)}
+  .panel-h h2,.x-name{font-family:var(--head);font-weight:600;text-transform:none;letter-spacing:0;font-size:18px}
+  .x-name{font-size:15.5px}
+  .panel-h h2::before{width:13px;height:13px;border-radius:0;background:var(--accent);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 14C2 7 6.5 2 14 2c0 7.5-5 12-12 12z'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 14C2 7 6.5 2 14 2c0 7.5-5 12-12 12z'/%3E%3C/svg%3E") center/contain no-repeat}
+  .panel-meta,.x-tease,.panel-foot{font-size:12px}
+
+  /* countdown: a clearing in soft green */
+  .now-card{border-radius:14px;border:0;background:linear-gradient(160deg,var(--accent-soft),color-mix(in srgb,var(--accent-soft) 40%,var(--surface)))}
+  .now-card .num{font-family:var(--head);font-weight:700;font-size:40px;color:var(--fg)}
+  .now-card .lbl{font-style:italic}
+  .prog{height:4px;border-radius:999px;background:color-mix(in srgb,var(--accent) 16%,var(--surface))}
+  .prog i{border-radius:999px}
+
+  /* schedule */
+  .tl li{border-radius:10px}
+  .tl .blk{border-radius:50%;font-family:var(--head);font-weight:700}
+  .tl .cn{font-weight:700}
+  .tl .tm,.tl .split{font-family:var(--mono);font-size:12px}
+  .tl li.now{background:var(--accent-soft)}
+  .tl li.now .tm{color:var(--accent-ink)}
+  .tl li.ev{background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);border-radius:0}
+  .after{font-style:italic}
+
+  /* homework */
+  .cal .dow{letter-spacing:.08em}
+  .cell{border-radius:12px;background:var(--surface-2);border:1px solid transparent}
+  .cell .top b{font-family:var(--head);font-weight:600;font-size:15px}
+  .cell.today .top b{background:var(--accent);color:var(--accent-fg);border-radius:999px;padding:0 6px}
+  .cell.sel{border-color:var(--accent);background:var(--surface)}
+  .cell.off{background:transparent;border:1px dashed var(--line)}
+  .chip2{border-radius:6px;border-left:3px solid var(--cc);background:var(--surface)}
+  .chip2.major{background:color-mix(in srgb,var(--cc) 14%,var(--surface));font-weight:700}
+  .item{border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--cc);background:var(--surface)}
+  .item.major{background:color-mix(in srgb,var(--cc) 8%,var(--surface))}
+  .check{border-radius:50%;border-width:1.5px}
+  .title{font-weight:500;font-size:15.5px}
+  .tag{border-radius:999px;background:transparent;color:var(--fg);border:1px solid color-mix(in srgb,var(--cc) 70%,transparent);font-weight:500}
+  .tag.bad{color:var(--bad);border-color:var(--bad)}
+  .hw-note,.empty-state{border-radius:12px}
+  .count{border-radius:999px}
+  dialog{border-radius:18px}
+
+  /* week, tabs and the rest */
+  .seg{border-radius:999px;background:var(--surface-2)}
+  .seg button{border-radius:999px}
+  .rot th.cur{background:var(--accent);color:var(--accent-fg);border-radius:8px}
+  .rot td{border-radius:8px;background:color-mix(in srgb,var(--cc) 20%,var(--surface));color:var(--fg);font-weight:500}
+  .rot td.cur{outline:1.5px solid var(--accent);outline-offset:-1.5px}
+  .rot td.ev{background:transparent;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);border-radius:0}
+  .tabs button{font-family:var(--head);font-weight:600;font-size:14.5px}
+  :is(.team,.counts li,.sb li,.moves li,.ff-match,.news li a){border-radius:12px}
+  .counts .n{font-family:var(--head);color:var(--accent-ink)}
+  .count-form input,.sp-form input{border-radius:10px}
+
+  /* tests, next up, weather, quick links: pebbles */
+  .tq li{border-radius:10px}
+  :is(.nextup,.wx){border-radius:14px;box-shadow:var(--stone)}
+  .dock-main a{border-radius:14px;box-shadow:var(--stone)}
+  .lunch-mains li::before{width:8px;height:8px;top:.45em;border-radius:0;background:var(--accent);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 14C2 7 6.5 2 14 2c0 7.5-5 12-12 12z'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 14C2 7 6.5 2 14 2c0 7.5-5 12-12 12z'/%3E%3C/svg%3E") center/contain no-repeat}
+
+  /* music and study mode */
+  .sp{border-radius:14px;background:var(--surface-2)}
+  .sp-k{font-family:var(--head);font-style:italic;font-weight:500;text-transform:none;letter-spacing:0;font-size:13px;color:var(--accent-ink)}
+  .np-art{border-radius:12px}
+  .np-track{font-family:var(--head);font-weight:700;font-size:18px}
+  .rd-name{font-family:var(--head)}
+  .st-card{border-radius:18px}
+  .st-k{color:var(--accent-ink)}
+}

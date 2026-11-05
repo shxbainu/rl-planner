@@ -18,7 +18,7 @@
     try {
       var s = new URLSearchParams(location.search).get("theme") || localStorage.getItem("rlp-skin");
       // keep in step with SKINS in app.js; anything else (a retired skin) is dropped
-      if (s && "herbarium departure blueprint catalog nautical almanac arcade chess hardwood".split(" ").indexOf(s) > -1) {
+      if (s && "herbarium moss departure blueprint catalog nautical almanac arcade chess hardwood".split(" ").indexOf(s) > -1) {
         r.dataset.skin = s;
         document.write('<link rel="stylesheet" id="skin-css" href="themes/' + s + '.css?v=__V__">');
       }

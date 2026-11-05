@@ -1518,7 +1518,7 @@
 
   // ---------- skins: optional looks from themes/, picked in the top bar (index.html applies the saved one before paint) ----------
   const SKIN = "rlp-skin";
-  const SKINS = { original: "Original", herbarium: "Herbarium", departure: "Departure board", blueprint: "Blueprint", catalog: "Card catalog", nautical: "Nautical chart", almanac: "Seed almanac", arcade: "Arcade", chess: "Chess club", hardwood: "Hardwood" };
+  const SKINS = { original: "Original", herbarium: "Herbarium", moss: "Moss", departure: "Departure board", blueprint: "Blueprint", catalog: "Card catalog", nautical: "Nautical chart", almanac: "Seed almanac", arcade: "Arcade", chess: "Chess club", hardwood: "Hardwood" };
   const V = new URL(document.currentScript.src).searchParams.get("v") || "";
   const skinNow = () => root.dataset.skin || "original";
   function setSkin(name, remember = true) {
