@@ -11,6 +11,7 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 - **Study mode** (headphones button): full screen. Counts down the current block (passing time and the next class in between), or runs a 25/5 or 50/10 focus timer outside school hours. Shows tonight's top item with a big checkbox, the rest as a queue, a subject helper drawn from the item (Odyssey lines, Ohm's law, ut clauses…), session time and break nudges, over a scene for the subject. Keeps the screen awake where the browser allows.
 - **Scoreboard clock** (top of Today): classes are quarters, passing is a timeout, lunch is halftime, the whole day on one bar.
 - **Season** (top of Homework): every day with homework due is a W if it all got done, an L if not; tonight's work as points scored vs projected. Resets after `marking_period.ends` in `schedule.json`.
+- **Weather** (under Today's schedule): the temperature now and, during the school day, the after-school outlook (temperature, chance of rain or snow); after 3:30, tomorrow morning instead. From Open-Meteo, refreshed every 30 minutes; tapping it opens the National Weather Service forecast.
 - **Snow day odds**: appears only when Open-Meteo forecasts snow for West Roxbury on a school day. `?snow=15` previews it with 15 cm.
 - **Game night**: a band in the team's colors on Warriors and 49ers game days, with the tip-off or kickoff countdown.
 - **Command bar**: press `/`, then type `latin p245 ex c due fri` to add homework, or a section name to jump there.

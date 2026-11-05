@@ -1936,6 +1936,59 @@
     tease("t-snow", `${esc(relDay(best.date))} · ${odds}%`);
   }
 
+  // ---------- weather: a slim strip under the schedule (Open-Meteo, West Roxbury, °F) ----------
+  // During the school day it looks ahead to after school (practice); after 3:30, to tomorrow morning.
+  const WX_SVG = {
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+    moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+    part: '<path d="M8 3.5v1.2M3.3 8.5h1.2M4.8 5.3l.9.9M11.2 5.3l-.9.9"/><path d="M5.6 11a3 3 0 0 1 5.3-2.6"/><path d="M9 20h8a3.6 3.6 0 0 0 .5-7.2 5.2 5.2 0 0 0-9.9 1.4A2.9 2.9 0 0 0 9 20z"/>',
+    cloud: '<path d="M7 19h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 10.5 4.3 4.3 0 0 0 7 19z"/>',
+    fog: '<path d="M4 8h16M3 12h18M4 16h16M7 20h10"/>',
+    rain: '<path d="M7 15h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 6.5 4.3 4.3 0 0 0 7 15z"/><path d="m9 18-1 3M13 18l-1 3M17 18l-1 3"/>',
+    snow: '<path d="M7 15h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 6.5 4.3 4.3 0 0 0 7 15z"/><path d="M8 18.5h.01M12 19.5h.01M16 18.5h.01M10 22h.01M14 22h.01" stroke-width="2.6"/>',
+    storm: '<path d="M7 15h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 6.5 4.3 4.3 0 0 0 7 15z"/><path d="m12.5 15-2 3.5h3L11.5 22"/>',
+  };
+  // WMO weather codes, as Open-Meteo reports them
+  const wxKind = (c, day = 1) => c === 0 ? [day ? "sun" : "moon", "Clear"] : c <= 2 ? [day ? "part" : "moon", "Partly cloudy"] : c === 3 ? ["cloud", "Cloudy"]
+    : c <= 48 ? ["fog", "Fog"] : c <= 57 ? ["rain", "Drizzle"] : c <= 67 ? ["rain", "Rain"] : c <= 77 ? ["snow", "Snow"] : c <= 82 ? ["rain", "Showers"]
+    : c <= 86 ? ["snow", "Snow showers"] : ["storm", "Thunderstorms"];
+  const isSnowCode = (c) => (c >= 71 && c <= 77) || c === 85 || c === 86;
+  let wx = null;
+  async function loadWeather() {
+    try {
+      const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=42.2793&longitude=-71.1495&current=temperature_2m,weather_code,is_day&hourly=temperature_2m,precipitation_probability,weather_code&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=3");
+      if (r.ok) wx = await r.json();
+    } catch {}
+    renderWeather();
+  }
+  function renderWeather() {
+    const el = $("#wx");
+    if (!wx?.hourly || !wx.current) { el.hidden = true; return; }
+    const H = wx.hourly, D = wx.daily, n = now(), t = today();
+    const at = (d, h) => H.time.indexOf(`${d}T${pad(h)}:00`);
+    // the outlook for some hours of a day: temperature at the middle one, the worst chance of rain (or snow)
+    const span = (d, hours) => {
+      const ix = hours.map((h) => at(d, h)).filter((i) => i >= 0);
+      if (!ix.length) return null;
+      const p = Math.max(...ix.map((i) => H.precipitation_probability[i] ?? 0));
+      return { temp: Math.round(H.temperature_2m[ix[Math.floor(ix.length / 2)]]), p, what: ix.some((i) => isSnowCode(H.weather_code[i])) ? "snow" : "rain" };
+    };
+    const wet = (o) => (o.p >= 40 ? `<b class="wx-wet">${o.what} ${o.p}%</b>` : o.p >= 20 ? `${o.what} ${o.p}%` : "dry");
+    const day = (d) => { const i = D.time.indexOf(d); return i < 0 ? null : { hi: Math.round(D.temperature_2m_max[i]), lo: Math.round(D.temperature_2m_min[i]) }; };
+    const [icon, label] = wxKind(wx.current.weather_code, wx.current.is_day);
+    let text = "";
+    if (n.getHours() * 60 + n.getMinutes() < 15 * 60 + 30) {
+      const after = span(t, [15, 16, 17]), dd = day(t);
+      if (after && dd) text = `${label} · H ${dd.hi}° L ${dd.lo}° · <b>${schedule.after_school ? "After school" : "3–6 PM"}</b> ${after.temp}°, ${wet(after)}`;
+    } else {
+      const tm = addDays(t, 1), morning = span(tm, [7, 8]), dd = day(tm);
+      if (morning && dd) text = `${label} · <b>${esc(relDay(tm))}</b> ${morning.temp}° at 7, high ${dd.hi}°, ${wet(span(tm, [7, 8, 9, 10, 11, 12, 13, 14, 15]))}`;
+    }
+    el.hidden = !text;
+    el.title = "Forecast from Open-Meteo; opens the National Weather Service forecast";
+    el.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WX_SVG[icon]}</svg><b class="wx-t">${Math.round(wx.current.temperature_2m)}°</b><span class="wx-s">${text}</span>`;
+  }
+
   // ---------- game night: on a Warriors or 49ers game day, a band under the top bar with the matchup and the countdown ----------
   let gnTimer;
   function renderGameNight() {
@@ -2161,8 +2214,10 @@
       setInterval(loadSportsNews, 15 * 60_000);
       loadSnow();
       setInterval(loadSnow, 3 * 3600_000);
+      loadWeather();
+      setInterval(loadWeather, 30 * 60_000);
       spCallback().then(() => { spRender(matchMedia("(min-width:760px)").matches); spPoll(); }); // on laptops the card is always in view
-      setInterval(() => { renderBar(); renderSchedule(); if (!lunchPick) renderLunch(); }, 15_000);
+      setInterval(() => { renderBar(); renderSchedule(); renderWeather(); if (!lunchPick) renderLunch(); }, 15_000);
       // tick just after each second turns over; a plain 1s interval drifts and skips a second now and then
       const tickLoop = () => { tickNow(); setTimeout(tickLoop, 1000 - (now().getTime() % 1000) + 15); };
       tickLoop();

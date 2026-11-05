@@ -98,6 +98,14 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .tq-t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tq-d{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 #tq > .sub-h:first-child{margin-top:0}
+/* weather: icon, the temperature now, then the outlook that matters next (after school, or tomorrow morning) */
+.wx{display:flex;align-items:center;gap:8px;flex:none;min-width:0;padding:7px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;font-size:12.5px}
+.wx:hover{border-color:var(--muted)}
+.wx svg{width:20px;height:20px;flex:none;color:var(--accent)}
+.wx-t{flex:none;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.wx-s{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.wx-s b{color:var(--fg);font-weight:600}
+.wx-s .wx-wet{color:var(--accent);font-weight:700}
 .nextup{display:flex;align-items:center;gap:6px;flex:none;width:100%;padding:7px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;text-align:left;cursor:pointer;overflow-x:auto;scrollbar-width:none}
 .nextup::-webkit-scrollbar{display:none}
 .nextup:hover{border-color:var(--muted)}
