@@ -712,7 +712,9 @@
     }
     const at = f.updated_at ? new Date(f.updated_at) : null;
     $("#ff-meta").textContent = [f.week ? `Week ${f.week}` : "", f.record, at ? `updated ${at.toLocaleDateString(undefined, { weekday: "short" })}` : ""].filter(Boolean).join(" · ");
-    const m = f.matchup;
+    // a 0–0 score saved before any of the week's games kicked off is not a live score: show projections
+    const kicked = [...(f.lineup || []), ...(f.bench || [])].some((p) => p.kickoff && at && new Date(p.kickoff) <= at);
+    const m = f.matchup && (kicked || +f.matchup.my_score || +f.matchup.opp_score ? f.matchup : { ...f.matchup, my_score: null, opp_score: null });
     tease("t-ff", esc([f.week ? `Wk ${f.week}` : "", m ? `${m.my_score ?? m.my_proj}–${m.opp_score ?? m.opp_proj}${m.my_score != null ? "" : " proj"}` : "", f.moves?.length ? `${f.moves.length} moves` : ""].filter(Boolean).join(" · ")));
     const score = (a, b) => (a ?? b ?? "–");
     // your share of the combined score, for the bar under the matchup
