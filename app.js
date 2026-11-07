@@ -15,7 +15,7 @@
   let state = load();
 
   // ---------- storage ----------
-  // localStorage is the store; signing in (sync.js) mirrors it to the cloud. So two devices can merge, every change
+  // localStorage is the store; the sync further down mirrors it to one shared copy online. So two devices can merge, every change
   // carries a time: done[k] is when it was checked, undone[k] when unchecked, removed[id] when an item or countdown was
   // deleted, lettersAt[date] when a day letter was set or cleared, prefs[name] = { v, t }.
   function load() {
@@ -25,7 +25,7 @@
       return s ? { ...empty, ...s } : empty;
     } catch { return empty; }
   }
-  let onSave = null; // set by sync.js while signed in
+  let onSave = null; // set by the sync further down, on the live site
   function save() {
     try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
     onSave?.();
@@ -2237,33 +2237,71 @@
     openCmd();
   });
 
-  // ---------- cloud sync (sync.js, only once firebase-config.js has the project's config) ----------
-  // The page never waits on it: everything works from localStorage, and signed out nothing changes.
-  const sync = {
-    local: () => syncedPart(state),
-    merge: mergeState,
-    // take a merged copy from the cloud: save it here, redraw, and apply settings picked on the other device
-    apply(next) {
-      const before = state.prefs || {};
-      state = { ...state, ...next };
-      try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
-      const changed = (k) => state.prefs?.[k] && state.prefs[k].t !== before[k]?.t;
-      if (changed("skin") && SKINS[state.prefs.skin.v]) {
-        setSkin(state.prefs.skin.v, false);
-        try { localStorage.setItem(SKIN, state.prefs.skin.v); } catch {}
-        document.querySelectorAll(".skin-select").forEach((o) => { o.value = state.prefs.skin.v; });
+  // ---------- sync: one shared copy for every device that opens the site (the planner is Brian's alone) ----------
+  // A JSON blob on jsonblob.com holds the synced part of the state, no sign-in. Each visit merges it in; each change
+  // merges and writes it back a moment later; while the page is open it picks up the other device's changes every
+  // 20 seconds. localStorage stays the real store, so offline (or if the blob were ever gone) nothing is lost.
+  // Only the live site syncs, so a local preview's test check-offs never reach it.
+  const SYNC_URL = ""; // https://jsonblob.com/api/jsonBlob/<id>
+  const syncURL = (() => {
+    const q = new URLSearchParams(location.search).get("syncurl"); // a local stand-in, for testing the preview
+    if (q && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)) return q;
+    return location.hostname === "shxbainu.github.io" ? SYNC_URL : "";
+  })();
+  // a stable string for comparing two copies (key order doesn't matter)
+  const canon = (v) => JSON.stringify(v, (k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort()) : x));
+  // take a merged copy: save it here, redraw, and apply settings picked on the other device
+  function syncApply(next) {
+    const before = state.prefs || {};
+    state = { ...state, ...next };
+    try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
+    const changed = (k) => state.prefs?.[k] && state.prefs[k].t !== before[k]?.t;
+    if (changed("skin") && SKINS[state.prefs.skin.v]) {
+      setSkin(state.prefs.skin.v, false);
+      try { localStorage.setItem(SKIN, state.prefs.skin.v); } catch {}
+      document.querySelectorAll(".skin-select").forEach((o) => { o.value = state.prefs.skin.v; });
+    }
+    if (changed("theme")) { root.dataset.theme = state.prefs.theme.v; try { localStorage.setItem(THEME, state.prefs.theme.v); } catch {} paintThemeBtn(); spRender(); }
+    if (changed("focus") && ST_PRESETS[state.prefs.focus.v]) {
+      try { localStorage.setItem("rlp-focus", state.prefs.focus.v); } catch {}
+      if (!st.focus.endsAt) Object.assign(st.focus, { preset: state.prefs.focus.v, phase: "focus", left: ST_PRESETS[state.prefs.focus.v][0] * 60e3, round: 1 });
+    }
+    if (changed("spClient") && !spConnected()) { spA = { ...spA, client: state.prefs.spClient.v }; spSaveAuth(); }
+    if (schedule) render();
+  }
+  let syncTimer, syncBusy = false, syncAgain = false, lastCloud = null;
+  async function syncNow() {
+    clearTimeout(syncTimer);
+    if (!syncURL) return;
+    if (syncBusy) { syncAgain = true; return; }
+    syncBusy = true;
+    try {
+      const r = await fetch(syncURL, { cache: "no-store", headers: { Accept: "application/json" } });
+      if (!r.ok) throw new Error(`sync read ${r.status}`);
+      const got = await r.json(), remote = got && typeof got.done === "object" && Array.isArray(got.manual) ? got : null;
+      const local = syncedPart(state), merged = remote ? mergeState(local, remote) : local;
+      if (canon(merged) !== canon(local)) syncApply(merged);
+      if (!remote || canon(merged) !== canon(remote)) {
+        const w = await fetch(syncURL, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(merged) });
+        if (!w.ok) throw new Error(`sync write ${w.status}`);
       }
-      if (changed("theme")) { root.dataset.theme = state.prefs.theme.v; try { localStorage.setItem(THEME, state.prefs.theme.v); } catch {} paintThemeBtn(); spRender(); }
-      if (changed("focus") && ST_PRESETS[state.prefs.focus.v]) {
-        try { localStorage.setItem("rlp-focus", state.prefs.focus.v); } catch {}
-        if (!st.focus.endsAt) Object.assign(st.focus, { preset: state.prefs.focus.v, phase: "focus", left: ST_PRESETS[state.prefs.focus.v][0] * 60e3, round: 1 });
-      }
-      if (changed("spClient") && !spConnected()) { spA = { ...spA, client: state.prefs.spClient.v }; spSaveAuth(); }
-      if (schedule) render();
-    },
-    onSave(fn) { onSave = fn; },
-  };
-  if (window.RLP_FIREBASE?.apiKey) import(`./sync.js${V ? `?v=${V}` : ""}`).then((m) => m.start(window.RLP_FIREBASE, sync)).catch((e) => console.warn("sync didn't start", e));
+      lastCloud = merged;
+    } catch (e) { console.warn("sync: will try again", e.message); } // offline or the service is down
+    syncBusy = false;
+    if (syncAgain) { syncAgain = false; syncNow(); }
+  }
+  if (syncURL) {
+    onSave = () => { clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, 1200); };
+    syncNow();
+    setInterval(() => { if (!document.hidden) syncNow(); }, 20_000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) syncNow(); });
+    addEventListener("online", syncNow);
+    // closing the tab right after a change: send it on the way out (merged with the last copy seen)
+    addEventListener("pagehide", () => {
+      if (!syncTimer || !lastCloud) return;
+      try { fetch(syncURL, { method: "PUT", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(mergeState(syncedPart(state), lastCloud)) }); } catch {}
+    });
+  }
 
   // ---------- boot ----------
   async function getJSON(path) {

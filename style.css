@@ -98,24 +98,6 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .tq-t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tq-d{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 #tq > .sub-h:first-child{margin-top:0}
-/* account chip: sign in to sync (shown only once Firebase is set up) */
-.acct{position:relative}
-.acct-btn{display:flex;align-items:center;gap:7px;height:38px;padding:0 12px 0 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.acct-btn:hover{border-color:var(--muted)}
-.acct-btn svg{width:19px;height:19px;color:var(--accent)}
-.acct-btn.signed{padding:0 12px 0 4px}
-.acct-btn img,.acct-btn i{width:28px;height:28px;border-radius:50%;flex:none;object-fit:cover;font-style:normal;display:grid;place-items:center;background:var(--accent);color:var(--accent-fg)}
-.acct-btn span{display:grid;line-height:1.1;text-align:left}
-.acct-btn small{font-size:10.5px;font-weight:600;color:var(--muted)}
-.acct-btn.saving small{color:var(--accent)}
-.acct-btn.error small,.acct-btn.offline small{color:var(--warn)}
-.acct-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:240px;padding:12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:0 10px 30px rgb(0 0 0 / .18);display:grid;gap:10px}
-.acct-menu p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.4}
-@media (max-width:759px){
-  .acct-btn{width:38px;padding:0;justify-content:center}
-  .acct-btn span{display:none}
-  .acct-btn.signed{padding:0}
-}
 /* weather: icon, the temperature now, then the outlook that matters next (after school, or tomorrow morning) */
 .wx{display:flex;align-items:center;gap:8px;flex:none;min-width:0;padding:7px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;font-size:12.5px}
 .wx:hover{border-color:var(--muted)}

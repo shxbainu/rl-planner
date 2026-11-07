@@ -4,7 +4,7 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 
 - `schedule.json`: `owner` (first name shown in the page title), classes, blocks, day-letter rotations (B, E, G marked unconfirmed).
 - `homework.json`: latest assignments (`assignments`), optional day letters (`days`, `"YYYY-MM-DD": "H"`), and `updated_at`. The daily update only touches this file.
-- Check-offs and added assignments live in the browser's localStorage. Signed in (see Syncing between devices), they also sync to your own Firestore doc; nothing personal is in the repo. The season record is computed from the check-offs.
+- Check-offs and added assignments live in the browser's localStorage. They also sync between your devices (see Syncing between devices); nothing personal is in the repo. The season record is computed from the check-offs.
 
 ## On the page
 
@@ -30,17 +30,9 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 
 Cost: one call a day to Claude Sonnet 5.5 with about 14,000 tokens of headlines in and roughly 3,000 to 5,000 out (the briefing plus the model's thinking) comes to about 6 to 8 cents a day, around $2 to $2.50 a month. Hourly deploys don't call it again once the day's briefing exists. You can set a monthly spending limit in the Console under **Limits**. The key lives only in GitHub's encrypted secrets, never in the repo.
 
-## Syncing between devices (once, about five minutes)
+## Syncing between devices
 
-Check-offs, your own items, day letters, countdowns and your theme save in each browser. Signing in with Google keeps them the same on every device (phone, laptop, the home-screen app). It uses a free Firebase project that you make:
-
-1. Go to https://console.firebase.google.com, press **Create a project** (any name, like `rl-planner`), and turn **Google Analytics off**.
-2. On the project's home page press the **Web** button (`</>`), name it `rl-planner`, leave Hosting unticked, and register it. Copy the `firebaseConfig` it shows.
-3. **Build → Authentication → Get started → Sign-in method → Google**: enable it, pick your support email, save. Then **Settings → Authorized domains → Add domain**: `shxbainu.github.io` (and `127.0.0.1` for the local preview).
-4. **Build → Firestore Database → Create database**: pick a location near you (`nam5`), start in **production mode**. Open the **Rules** tab, replace everything with the contents of `firestore.rules`, and press **Publish**.
-5. Put the config in `firebase-config.js` as `window.RLP_FIREBASE = { apiKey: "…", authDomain: "…", projectId: "…", storageBucket: "…", messagingSenderId: "…", appId: "…" };` (or send it to Claude to do).
-
-Then a **Sign in to sync** button shows in the top bar. The config isn't a secret (Firebase web configs are public by design); `firestore.rules` is what keeps your doc readable and writable only by you. Signed out, nothing changes: everything stays in that browser. Spotify sign-in tokens never sync, only the Client ID.
+Every device that opens the live site shares one copy of your check-offs, your own items, day letters, countdowns and theme: no sign-in, since the planner is yours alone. The copy is a JSON blob on jsonblob.com (`SYNC_URL` in `app.js`). Each visit merges it in, each change is written back about a second later, and an open page picks up the other device's changes every 20 seconds; for each check-off, item, letter or setting the newer change wins, and unchecks and deletes carry over too. The browser's own storage stays the real store, so offline nothing is lost. Spotify sign-in tokens never sync, only the Client ID. A local preview doesn't sync (add `?syncurl=` with a local stand-in to test it).
 
 ## Connecting Spotify (once, about two minutes)
 
