@@ -340,7 +340,8 @@ details .list{margin-top:6px}
 .sp{--sp-bar:32px;--sp-hi:var(--accent);--sp-hi-fg:var(--accent-fg);container-type:inline-size;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
 /* 16:9, but never shorter than Spotify's compact player (152px) */
 .sp-stage{position:relative;display:grid;grid-template-columns:minmax(0,1fr);min-height:max(152px,100cqw * 9 / 16)}
-.sp.empty .sp-stage{min-height:calc(max(152px,100cqw * 9 / 16) + var(--sp-bar) + 4px)}
+/* nothing picked: a compact strip, not a big empty box; only a player takes real height */
+.sp.empty .sp-stage{min-height:0}
 .sp.empty .sp-bar{display:none}
 .sp-frame{position:absolute;inset:0;border-radius:10px;overflow:hidden;background:color-mix(in srgb,currentColor 7%,transparent)}
 .sp-frame iframe{display:block;width:100%;height:100%;border:0}
@@ -361,14 +362,18 @@ details .list{margin-top:6px}
 .sp-form input{font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 9px;min-height:34px;min-width:0;color:var(--fg)}
 .sp-form input::placeholder{color:var(--muted)}
 /* nothing picked yet */
-.sp-empty{display:grid;grid-template-columns:minmax(0,1fr);align-content:center;justify-items:center;gap:6px;padding:10px 6px;text-align:center}
-.sp-empty-i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;margin-bottom:2px;color:var(--sp-hi);background:color-mix(in srgb,var(--sp-hi) 14%,transparent)}
+.sp-empty{display:grid;grid-template-columns:auto minmax(0,1fr);align-content:center;align-items:center;gap:2px 12px;padding:4px 2px;text-align:left}
+.sp-empty > :not(.sp-empty-i){grid-column:2}
+.sp-empty-i{grid-row:1 / span 2}
+.sp-empty-i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--sp-hi);background:color-mix(in srgb,var(--sp-hi) 14%,transparent)}
 .sp-empty-i svg{width:17px;height:17px;fill:currentColor}
 .sp-empty > b{font-size:15.5px;line-height:1.25}
 .sp-empty > p{margin:0;max-width:32ch;font-size:12.5px;line-height:1.4;opacity:.72}
-.sp-empty > .sp-form{width:min(100%,320px);margin-top:4px}
-.sp-acts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:6px 0 2px}
-.sp.setup .sp-empty{justify-items:stretch;text-align:left;padding:0}
+.sp-empty > .sp-form{width:min(100%,340px);margin-top:4px}
+.sp-empty > .link{justify-self:start}
+.sp-acts{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
+.sp.setup .sp-empty{grid-template-columns:minmax(0,1fr);justify-items:stretch;text-align:left;padding:0}
+.sp.setup .sp-empty > *{grid-column:1 / -1}
 @container (max-width:280px){ .sp-empty-i,.sp-bar > .sp-k:not(.own){display:none} .sp-empty{gap:4px;padding:4px 2px} .sp-acts{margin:4px 0 0} .sp-acts{flex-direction:column;justify-self:stretch;padding:0 8px} .sp-bar-acts{margin-left:auto} }
 /* the slim bar */
 .sp-bar{display:flex;align-items:center;gap:8px;min-height:var(--sp-bar);margin-bottom:-4px}
@@ -496,6 +501,14 @@ details .list{margin-top:6px}
 .news li.lead .pic{aspect-ratio:16 / 9;max-height:210px;width:100%;border-radius:8px}
 .news li.lead .pic:not(:has(img))::after{font-size:26px}
 .news li.lead .hl{font-size:16px}
+/* inside the tab strip every story is one compact row, the first included, so many fit at once
+   (the expanded view keeps the big lead picture) */
+.pane .news li.lead a{grid-template-columns:76px minmax(0,1fr);gap:10px}
+.pane .news li.lead .pic{aspect-ratio:3 / 2;max-height:none;border-radius:6px}
+.pane .news li.lead .pic:not(:has(img))::after{font-size:15px}
+.pane .news li.lead .hl{font-size:13.5px}
+.pane .news li a{grid-template-columns:76px minmax(0,1fr);padding:5px 6px}
+.pane .news .sum{-webkit-line-clamp:1}
 /* news sections as colored pills that wrap; the open one is filled with its color */
 #news-tabs{display:flex;flex-wrap:wrap;gap:5px;flex:1;min-width:0}
 #news-tabs button{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font-family:var(--sans);font-size:12px;font-weight:600;padding:3px 10px 3px 8px;cursor:pointer}
@@ -832,7 +845,8 @@ html.st-dock .p-music .panel-h,html.st-dock .sp-bar,html.st-dock .sp-empty-i,htm
 html.st-dock .sp{padding:6px 8px}
 html.st-dock .sp-stage,html.st-dock .sp.empty .sp-stage{min-height:80px}
 html.st-dock #sp-embed iframe{height:80px}
-html.st-dock .sp-empty{grid-auto-flow:column;justify-content:space-between;align-items:center;padding:0 4px;text-align:left}
+html.st-dock .sp-empty > *{grid-column:auto;grid-row:auto}
+html.st-dock .sp-empty{grid-template-columns:none;grid-auto-flow:column;justify-content:space-between;align-items:center;padding:0 4px;text-align:left}
 html.st-dock .sp-empty .sp-acts{margin:0;flex-wrap:nowrap}
 html.st-dock .sp-np{grid-template-columns:52px minmax(0,1fr);gap:8px 12px}
 html.st-dock .np-art{width:52px;height:52px;border-radius:7px}

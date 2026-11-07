@@ -512,7 +512,9 @@
   const tqDay = (d, n) => (n === 0 ? "Today" : n === 1 ? "Tmrw" : n < 7 ? fmt(d, { weekday: "short" }) : fmt(d, { month: "short", day: "numeric" }));
   const tqTag = (i) => `${esc(cls(i.class).short || i.class)} ${esc(i.type)}`;
   function renderTests() {
-    const t = today(), list = allItems().filter((i) => MAJOR.has(i.type) && !isDone(i) && i.due >= t && i.due <= addDays(t, 28));
+    // today's are over once the planner has rolled on to the next school day (after 3:30)
+    const t = today(), from = schoolDay() === t ? t : addDays(t, 1);
+    const list = allItems().filter((i) => MAJOR.has(i.type) && !isDone(i) && i.due >= from && i.due <= addDays(t, 28));
     const nu = $("#nextup");
     nu.hidden = !list.length;
     nu.innerHTML = `<span class="nu-k">Next up</span>${list.slice(0, 3).map((i) => {
@@ -2137,10 +2139,13 @@
   function renderBrief() {
     const el = $("#brief"), peek = $("#brief-peek");
     if (!brief?.stories?.length) {
-      el.innerHTML = `<p class="brief-none">Each morning a short AI summary of the day's headlines shows up here. It starts once it's set up (the README has the steps).</p>`;
+      // not set up yet (the README has the steps): leave the room to the headlines
+      el.innerHTML = "";
+      el.hidden = true;
       peek.hidden = true;
       return;
     }
+    el.hidden = false;
     const isToday = brief.date === today(), at = new Date(brief.generated_at);
     const label = isToday ? "Today's briefing" : `Briefing from ${fmt(brief.date, { weekday: "long" })}`;
     const when = isNaN(at) ? "" : at.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });

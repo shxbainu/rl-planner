@@ -82,6 +82,7 @@ html[data-skin="herbarium"]{
   .item{position:relative;border-radius:2px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--cc)}
   .item.major{background:color-mix(in srgb,var(--cc) 9%,var(--surface))}
   .check{border-radius:50%;border-width:1.5px;background:var(--surface)}
+  .check:checked{background:var(--cc)}
   .check::after{border-color:#fffaf2}
   .title{font-weight:500;font-size:15px}
   .chip{color:var(--fg);display:inline-flex;align-items:center;gap:4px}
