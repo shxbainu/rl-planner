@@ -42,6 +42,7 @@
   </div>
   <div class="bar-status" id="updated" role="status"></div>
   <div class="bar-actions">
+    <div class="acct" id="acct" hidden></div>
     <button class="icon-btn study-btn" id="study-btn" type="button" aria-label="Study mode" title="Study mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><path d="M4 15a2 2 0 0 1 2-2h1v7H6a2 2 0 0 1-2-2zM20 15a2 2 0 0 0-2-2h-1v7h1a2 2 0 0 0 2-2z"/></svg><span>Study</span></button>
     <button class="btn primary" id="add-btn" type="button" aria-label="Add homework">+<span> Add</span></button>
     <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch light or dark mode" title="Light / dark"></button>
@@ -314,6 +315,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="firebase-config.js?v=__V__"></script>
 <script src="app.js"></script>
 </body>
 </html>

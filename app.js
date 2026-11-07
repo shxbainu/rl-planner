@@ -15,15 +15,54 @@
   let state = load();
 
   // ---------- storage ----------
+  // localStorage is the store; signing in (sync.js) mirrors it to the cloud. So two devices can merge, every change
+  // carries a time: done[k] is when it was checked, undone[k] when unchecked, removed[id] when an item or countdown was
+  // deleted, lettersAt[date] when a day letter was set or cleared, prefs[name] = { v, t }.
   function load() {
-    const empty = { done: {}, manual: [], letters: {}, countdowns: [] };
+    const empty = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {} };
     try {
       const s = JSON.parse(localStorage.getItem(STORE) || "null");
       return s ? { ...empty, ...s } : empty;
     } catch { return empty; }
   }
+  let onSave = null; // set by sync.js while signed in
   function save() {
     try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
+    onSave?.();
+  }
+  const stamp = () => new Date().toISOString();
+  function setPref(name, v) { state.prefs = { ...state.prefs, [name]: { v, t: stamp() } }; save(); }
+
+  // what syncs (the rest, like the open tab, stays per device), and how two copies merge: for each check-off, item,
+  // countdown, day letter and pref, the newer change wins; a delete or uncheck newer than the item undoes it
+  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs"];
+  const syncedPart = (s) => Object.fromEntries(SYNCED.map((k) => [k, s?.[k] ?? (Array.isArray(state[k]) ? [] : {})]));
+  function mergeState(a, b) {
+    const tm = (v) => (typeof v === "string" ? v : ""), max = (...xs) => xs.map(tm).sort().at(-1) || "";
+    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {} };
+    for (const k of new Set([a.done, b.done, a.undone, b.undone].flatMap((m) => Object.keys(m || {})))) {
+      const on = a.done?.[k] ?? b.done?.[k], onT = max(a.done?.[k], b.done?.[k]), offT = max(a.undone?.[k], b.undone?.[k]);
+      if (on != null && onT >= offT) out.done[k] = onT || on; // a check-off from before times were kept counts as oldest
+      else if (offT) out.undone[k] = offT;
+    }
+    for (const k of new Set([a.removed, b.removed].flatMap((m) => Object.keys(m || {})))) out.removed[k] = max(a.removed?.[k], b.removed?.[k]);
+    const list = (xa = [], xb = [], id) => {
+      const m = new Map(), t = (x) => tm(x.t) || tm(x.added);
+      for (const x of [...xa, ...xb]) { const cur = m.get(x[id]); if (!cur || t(x) > t(cur)) m.set(x[id], x); }
+      return [...m.values()].filter((x) => !(out.removed[x[id]] > t(x)));
+    };
+    out.manual = list(a.manual, b.manual, "uid");
+    out.countdowns = list(a.countdowns, b.countdowns, "id");
+    for (const d of new Set([a.letters, b.letters, a.lettersAt, b.lettersAt].flatMap((m) => Object.keys(m || {})))) {
+      const ta = tm(a.lettersAt?.[d]), tb = tm(b.lettersAt?.[d]), from = tb > ta ? b : ta > tb ? a : a.letters?.[d] ? a : b;
+      if (from.letters?.[d]) out.letters[d] = from.letters[d];
+      if (ta || tb) out.lettersAt[d] = max(ta, tb);
+    }
+    for (const k of new Set([a.prefs, b.prefs].flatMap((m) => Object.keys(m || {})))) {
+      const pa = a.prefs?.[k], pb = b.prefs?.[k];
+      out.prefs[k] = !pa ? pb : !pb ? pa : tm(pb.t) > tm(pa.t) ? pb : pa;
+    }
+    return out;
   }
 
   // ---------- dates (all local, as YYYY-MM-DD) ----------
@@ -608,7 +647,7 @@
     e.preventDefault();
     const title = $("#c-title").value.trim(), date = $("#c-date").value;
     if (!title || !date) return;
-    (state.countdowns ||= []).push({ id: "c" + Date.now().toString(36), title, date });
+    (state.countdowns ||= []).push({ id: "c" + Date.now().toString(36), title, date, t: stamp() });
     save();
     $("#c-title").value = "";
     $("#c-date").value = "";
@@ -619,9 +658,10 @@
     if (!b) return;
     const i = state.countdowns.findIndex((c) => c.id === b.dataset.count);
     const [gone] = state.countdowns.splice(i, 1);
+    state.removed[gone.id] = stamp();
     save();
     renderCounts();
-    toast("Removed", () => { state.countdowns.splice(i, 0, gone); save(); renderCounts(); });
+    toast("Removed", () => { state.countdowns.splice(i, 0, gone); delete state.removed[gone.id]; gone.t = stamp(); save(); renderCounts(); });
   });
 
   // ---------- fantasy (fantasy.json, posted by Muse; moves from Muse and Claude) ----------
@@ -873,6 +913,7 @@
     const nonce = b64url(crypto.getRandomValues(new Uint8Array(12)));
     sessionStorage.setItem("rlp-sp-pkce", JSON.stringify({ verifier, state: nonce, client, back: location.search }));
     spA = { ...spA, client };
+    setPref("spClient", client); // the Client ID only; the sign-in tokens never leave this browser
     spSaveAuth();
     location.href = `https://accounts.spotify.com/authorize?${new URLSearchParams({ response_type: "code", client_id: client, scope: SP_SCOPES, redirect_uri: spRedirect(), code_challenge_method: "S256", code_challenge: challenge, state: nonce })}`;
   }
@@ -1379,8 +1420,9 @@
   function setDone(id, on) {
     const it = allItems().find((i) => i.id === id);
     if (!it) return;
-    if (on) state.done[it.keys[0]] = new Date().toISOString();
-    else it.keys.forEach((k) => delete state.done[k]);
+    const t = stamp();
+    if (on) { state.done[it.keys[0]] = t; it.keys.forEach((k) => delete state.undone[k]); }
+    else it.keys.forEach((k) => { delete state.done[k]; state.undone[k] = t; });
     save();
   }
 
@@ -1404,6 +1446,7 @@
     if (e.target.id === "letter-select") {
       const d = e.target.dataset.date;
       if (e.target.value) state.letters[d] = e.target.value; else delete state.letters[d];
+      state.lettersAt[d] = stamp();
       save();
       render();
     }
@@ -1478,8 +1521,8 @@
       details: $("#f-details").value.trim(),
     };
     if (!data.title || !data.due) return;
-    if (editing) Object.assign(editing, data);
-    else state.manual.push({ uid: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: new Date().toISOString(), ...data });
+    if (editing) Object.assign(editing, data, { t: stamp() });
+    else state.manual.push({ uid: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), added: stamp(), ...data });
     save();
     dlg.close();
     renderHomework();
@@ -1490,10 +1533,11 @@
     const removed = editing, idx = state.manual.indexOf(removed);
     state.manual.splice(idx, 1);
     delete state.done[removed.uid];
+    state.removed[removed.uid] = stamp();
     save();
     dlg.close();
     renderHomework();
-    toast("Deleted", () => { state.manual.splice(idx, 0, removed); save(); renderHomework(); });
+    toast("Deleted", () => { state.manual.splice(idx, 0, removed); delete state.removed[removed.uid]; removed.t = stamp(); save(); renderHomework(); });
   };
 
   // light / dark
@@ -1510,6 +1554,7 @@
     const next = isDark() ? "light" : "dark";
     root.dataset.theme = next;
     try { localStorage.setItem(THEME, next); } catch {}
+    setPref("theme", next);
     paintThemeBtn();
     spRender();
   };
@@ -1534,7 +1579,7 @@
       document.head.append(l);
       root.dataset.skin = name;
     }
-    if (remember) try { localStorage.setItem(SKIN, name); } catch {}
+    if (remember) { try { localStorage.setItem(SKIN, name); } catch {} setPref("skin", name); }
     if (schedule) { renderBar(); renderSchedule(); }
     spRender();
   }
@@ -1760,6 +1805,7 @@
     if (b.dataset.preset) {
       f.preset = b.dataset.preset;
       try { localStorage.setItem("rlp-focus", f.preset); } catch {}
+      setPref("focus", f.preset);
       Object.assign(f, { phase: "focus", endsAt: 0, left: ST_PRESETS[f.preset][0] * 60e3, round: 1 });
     } else if (b.dataset.st === "go") {
       if (f.endsAt) { f.left = stFocusLeft(); f.endsAt = 0; } else f.endsAt = Date.now() + f.left;
@@ -2190,6 +2236,34 @@
     e.preventDefault();
     openCmd();
   });
+
+  // ---------- cloud sync (sync.js, only once firebase-config.js has the project's config) ----------
+  // The page never waits on it: everything works from localStorage, and signed out nothing changes.
+  const sync = {
+    local: () => syncedPart(state),
+    merge: mergeState,
+    // take a merged copy from the cloud: save it here, redraw, and apply settings picked on the other device
+    apply(next) {
+      const before = state.prefs || {};
+      state = { ...state, ...next };
+      try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
+      const changed = (k) => state.prefs?.[k] && state.prefs[k].t !== before[k]?.t;
+      if (changed("skin") && SKINS[state.prefs.skin.v]) {
+        setSkin(state.prefs.skin.v, false);
+        try { localStorage.setItem(SKIN, state.prefs.skin.v); } catch {}
+        document.querySelectorAll(".skin-select").forEach((o) => { o.value = state.prefs.skin.v; });
+      }
+      if (changed("theme")) { root.dataset.theme = state.prefs.theme.v; try { localStorage.setItem(THEME, state.prefs.theme.v); } catch {} paintThemeBtn(); spRender(); }
+      if (changed("focus") && ST_PRESETS[state.prefs.focus.v]) {
+        try { localStorage.setItem("rlp-focus", state.prefs.focus.v); } catch {}
+        if (!st.focus.endsAt) Object.assign(st.focus, { preset: state.prefs.focus.v, phase: "focus", left: ST_PRESETS[state.prefs.focus.v][0] * 60e3, round: 1 });
+      }
+      if (changed("spClient") && !spConnected()) { spA = { ...spA, client: state.prefs.spClient.v }; spSaveAuth(); }
+      if (schedule) render();
+    },
+    onSave(fn) { onSave = fn; },
+  };
+  if (window.RLP_FIREBASE?.apiKey) import(`./sync.js${V ? `?v=${V}` : ""}`).then((m) => m.start(window.RLP_FIREBASE, sync)).catch((e) => console.warn("sync didn't start", e));
 
   // ---------- boot ----------
   async function getJSON(path) {

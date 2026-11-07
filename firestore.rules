@@ -1,0 +1,17 @@
+rules_version = '2';
+// RL Planner sync: each signed-in person can read and write only their own doc, users/{their uid}.
+// Paste this in Firebase → Firestore Database → Rules, then press Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(["data", "updatedAt", "v"])
+        && request.resource.data.data is string
+        && request.resource.data.data.size() < 500000;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
