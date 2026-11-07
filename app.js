@@ -19,7 +19,7 @@
   // carries a time: done[k] is when it was checked, undone[k] when unchecked, removed[id] when an item or countdown was
   // deleted, lettersAt[date] when a day letter was set or cleared, prefs[name] = { v, t }.
   function load() {
-    const empty = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {} };
+    const empty = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {} };
     try {
       const s = JSON.parse(localStorage.getItem(STORE) || "null");
       return s ? { ...empty, ...s } : empty;
@@ -35,11 +35,11 @@
 
   // what syncs (the rest, like the open tab, stays per device), and how two copies merge: for each check-off, item,
   // countdown, day letter and pref, the newer change wins; a delete or uncheck newer than the item undoes it
-  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs"];
+  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs", "notes"];
   const syncedPart = (s) => Object.fromEntries(SYNCED.map((k) => [k, s?.[k] ?? (Array.isArray(state[k]) ? [] : {})]));
   function mergeState(a, b) {
     const tm = (v) => (typeof v === "string" ? v : ""), max = (...xs) => xs.map(tm).sort().at(-1) || "";
-    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {} };
+    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {} };
     for (const k of new Set([a.done, b.done, a.undone, b.undone].flatMap((m) => Object.keys(m || {})))) {
       const on = a.done?.[k] ?? b.done?.[k], onT = max(a.done?.[k], b.done?.[k]), offT = max(a.undone?.[k], b.undone?.[k]);
       if (on != null && onT >= offT) out.done[k] = onT || on; // a check-off from before times were kept counts as oldest
@@ -58,9 +58,12 @@
       if (from.letters?.[d]) out.letters[d] = from.letters[d];
       if (ta || tb) out.lettersAt[d] = max(ta, tb);
     }
-    for (const k of new Set([a.prefs, b.prefs].flatMap((m) => Object.keys(m || {})))) {
-      const pa = a.prefs?.[k], pb = b.prefs?.[k];
-      out.prefs[k] = !pa ? pb : !pb ? pa : tm(pb.t) > tm(pa.t) ? pb : pa;
+    // settings, and each item's notes / steps / links, go by the newer edit
+    for (const f of ["prefs", "notes"]) {
+      for (const k of new Set([a[f], b[f]].flatMap((m) => Object.keys(m || {})))) {
+        const pa = a[f]?.[k], pb = b[f]?.[k];
+        out[f][k] = !pa ? pb : !pb ? pa : tm(pb.t) > tm(pa.t) ? pb : pa;
+      }
     }
     return out;
   }
@@ -184,13 +187,20 @@
       showDue ? `<span>due ${esc(relDay(it.due))}</span>` : "",
       it.manual ? `<span class="mine">yours</span>` : "",
     ].filter(Boolean).join("");
+    const nt = state.notes?.[it.id], steps = nt?.steps || [], ic = (d, label) => `<svg viewBox="0 0 24 24" aria-label="${label}" role="img"><path d="${d}"/></svg>`;
+    const marks = [
+      nt?.text?.trim() ? ic("M5 4h14v16H5zM8.5 9h7M8.5 13h7M8.5 17h4", "Has notes") : "",
+      steps.length ? `<span class="mk-steps" title="Steps done">${steps.filter((x) => x.done).length}/${steps.length}</span>` : "",
+      nt?.links?.length ? ic("M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1", "Has links") : "",
+      imgCount[it.id] ? ic("M4 6h16v13H4zM4 15l4.5-4.5 4 4 2.5-2.5L20 17M15.5 9.5h.01", "Has photos") : "",
+    ].filter(Boolean).join("");
     const nm = !done && nextMeeting(it.class);
     const next = nm ? `<span class="next" title="${nm.unsure ? "Based on a guessed day letter" : ""}">next class ${esc(/^(Today|Tomorrow)$/.test(relDay(nm.date)) ? relDay(nm.date).toLowerCase() : relDay(nm.date))} ${esc(nm.time)}${nm.unsure ? "?" : ""}</span>` : "";
     return `<li class="item${done ? " done" : ""}${major && !done ? " major" : ""}${overdue ? " overdue" : ""}" style="${cc(it.class)}" data-id="${esc(it.id)}">
       <input type="checkbox" class="check" ${done ? "checked" : ""} aria-label="Done: ${esc(it.title)}">
-      <div class="body">
+      <div class="body" role="button" tabindex="0" aria-label="Open ${esc(it.title)}">
         <span class="title">${esc(it.title)}</span>
-        <span class="meta">${meta}${next}</span>
+        <span class="meta">${meta}${next}${marks ? `<span class="marks">${marks}</span>` : ""}</span>
         ${it.details ? `<span class="det">${esc(it.details)}</span>` : ""}
       </div>
       ${it.manual ? `<button class="edit" type="button" data-edit="${esc(it.id)}">Edit</button>` : "<span></span>"}
@@ -519,7 +529,7 @@
     nu.hidden = !list.length;
     nu.innerHTML = `<span class="nu-k">Next up</span>${list.slice(0, 3).map((i) => {
       const n = daysBetween(t, i.due);
-      return `<span class="nu" style="${cc(i.class)}" title="${esc(i.title)}"><b>${tqTag(i)}</b> · ${esc(tqDay(i.due, n))}${n > 1 ? ` · ${n}d` : ""}</span>`;
+      return `<span class="nu" style="${cc(i.class)}" data-id="${esc(i.id)}" title="${esc(i.title)}"><b>${tqTag(i)}</b> · ${esc(tqDay(i.due, n))}${n > 1 ? ` · ${n}d` : ""}</span>`;
     }).join("")}`;
     nuFit();
     const monday = (d) => addDays(d, -((parse(d).getDay() + 6) % 7)), wk0 = monday(t), weeks = new Map();
@@ -527,7 +537,7 @@
     const wkName = (w) => (w === wk0 ? "This week" : w === addDays(wk0, 7) ? "Next week" : `Week of ${fmt(w, { month: "short", day: "numeric" })}`);
     $("#tq").innerHTML = list.length ? [...weeks].map(([w, items]) => `<div class="sub-h">${wkName(w)}</div><ul class="tq">${items.map((i) => {
       const n = daysBetween(t, i.due);
-      return `<li style="${cc(i.class)}"${n === 0 ? ' class="today"' : ""}><span class="tq-n">${tqLeft(n)}</span><span class="tq-c">${tqTag(i)}</span><span class="tq-t" title="${esc(i.title)}">${esc(i.title)}</span><span class="tq-d">${esc(fmt(i.due, { weekday: "short", month: "numeric", day: "numeric" }))}</span></li>`;
+      return `<li style="${cc(i.class)}" data-id="${esc(i.id)}"${n === 0 ? ' class="today"' : ""}><span class="tq-n">${tqLeft(n)}</span><span class="tq-c">${tqTag(i)}</span><span class="tq-t" title="${esc(i.title)}">${esc(i.title)}</span><span class="tq-d">${esc(fmt(i.due, { weekday: "short", month: "numeric", day: "numeric" }))}</span></li>`;
     }).join("")}</ul>`).join("")
       : `<p class="empty-state">No tests, quizzes, essays or projects in the next 4 weeks.</p>`;
   }
@@ -540,7 +550,9 @@
     for (let k = chips.length - 1; k > 0 && nu.scrollWidth > nu.clientWidth; k--) chips[k].hidden = true;
   }
   addEventListener("resize", () => requestAnimationFrame(nuFit));
-  $("#nextup").addEventListener("click", () => {
+  $("#nextup").addEventListener("click", (e) => {
+    const chip = e.target.closest(".nu[data-id]");
+    if (chip) return openItem(chip.dataset.id);
     showPane("tests");
     showTab("more");
     if (matchMedia("(min-width:760px)").matches) $(".p-more").scrollIntoView({ block: "nearest" });
@@ -1462,6 +1474,265 @@
     renderRotation();
   });
 
+  // ---------- one assignment, opened: notes, steps, links and photos ----------
+  // Tap a row (not its checkbox), a Tests row or a Next up chip: a drawer on laptops, a sheet from the bottom on phones.
+  // Notes, steps and links live in state.notes[item id], so they sync and outlast Muse's refreshes; photos are big, so
+  // they're shrunk and kept in this browser's IndexedDB only.
+  const noteOf = (id) => ({ text: "", steps: [], links: [], ...(state.notes?.[id] || {}) });
+  function setNote(id, patch) {
+    state.notes = { ...state.notes, [id]: { ...noteOf(id), ...patch, t: stamp() } };
+    save();
+  }
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+  // photos: IndexedDB "rlp-img", one record per photo { id, item, blob, w, h, t }; every call can fail (private mode,
+  // storage off), and then photos just aren't available
+  let imgDB = null, imgCount = {};
+  const idb = () => (imgDB ||= new Promise((ok, no) => {
+    const r = indexedDB.open("rlp-img", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("img", { keyPath: "id" }).createIndex("item", "item");
+    r.onsuccess = () => ok(r.result);
+    r.onerror = () => no(r.error);
+  }));
+  async function imgDo(mode, fn) {
+    const db = await idb();
+    return new Promise((ok, no) => {
+      const tx = db.transaction("img", mode), req = fn(tx.objectStore("img"));
+      tx.oncomplete = () => ok(req?.result);
+      tx.onerror = tx.onabort = () => no(tx.error);
+    });
+  }
+  const imgFor = (item) => imgDo("readonly", (s) => s.index("item").getAll(item)).catch(() => []);
+  // how many photos each item has, for the little marker on its row (a key cursor reads no photo data)
+  async function imgCounts() {
+    try {
+      const db = await idb();
+      imgCount = await new Promise((ok) => {
+        const out = {}, cur = db.transaction("img").objectStore("img").index("item").openKeyCursor();
+        cur.onsuccess = () => { const c = cur.result; if (!c) return ok(out); out[c.key] = (out[c.key] || 0) + 1; c.continue(); };
+        cur.onerror = () => ok(out);
+      });
+    } catch { imgCount = {}; }
+  }
+  // shrink to 1600px on the long side; WebP where the browser can make it (Safari can't), JPEG otherwise
+  async function shrink(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const im = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url; });
+      const k = Math.min(1, 1600 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.round(im.naturalWidth * k), h = Math.round(im.naturalHeight * k);
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      c.getContext("2d").drawImage(im, 0, 0, w, h);
+      const webp = await new Promise((ok) => c.toBlob(ok, "image/webp", 0.8));
+      const blob = webp?.type === "image/webp" ? webp : await new Promise((ok) => c.toBlob(ok, "image/jpeg", 0.82));
+      return { blob, w, h };
+    } finally { URL.revokeObjectURL(url); }
+  }
+  async function addPhotos(files) {
+    const id = adId, imgs = [...files].filter((f) => f.type.startsWith("image/"));
+    if (!id || !imgs.length) return;
+    let n = 0;
+    for (const f of imgs) {
+      try {
+        const { blob, w, h } = await shrink(f);
+        if (!blob) continue;
+        await imgDo("readwrite", (s) => s.put({ id: "p" + uid(), item: id, blob, w, h, t: stamp() }));
+        n++;
+      } catch (e) { console.warn("photo not saved", e); }
+    }
+    if (!n) return toast("Couldn't save that photo in this browser");
+    imgCount[id] = (imgCount[id] || 0) + n;
+    if (adId === id) renderPhotos();
+    renderHomework();
+  }
+
+  const ad = $("#ad"), adv = $("#adv");
+  let adId = null, adUrls = [], noteTimer;
+  const linkify = (text) => [...new Set(String(text).match(/https?:\/\/[^\s<>"')]+/g) || [])];
+  const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return u; } };
+  function openItem(id) {
+    if (!allItems().some((i) => i.id === id)) return;
+    adId = id;
+    renderItem();
+    if (!ad.open) {
+      ad.showModal();
+      history.pushState({ ad: id }, ""); // the phone's back gesture closes it
+    }
+    ad.querySelector(".ad-sheet").scrollTop = 0;
+  }
+  function closeItem() {
+    if (!ad.open) return;
+    if (history.state?.ad) history.back(); else ad.close();
+  }
+  addEventListener("popstate", () => { if (adv.open) adv.close(); if (ad.open) ad.close(); });
+  ad.addEventListener("cancel", (e) => { e.preventDefault(); if (!adv.open) closeItem(); });
+  ad.addEventListener("close", () => {
+    clearTimeout(noteTimer);
+    flushNote();
+    adUrls.forEach(URL.revokeObjectURL);
+    adUrls = [];
+    adId = null;
+    renderHomework();
+  });
+  ad.addEventListener("click", (e) => { if (e.target === ad) closeItem(); });
+
+  function renderItem() {
+    const it = allItems().find((i) => i.id === adId);
+    if (!it) return closeItem();
+    const n = noteOf(adId), d = daysBetween(today(), it.due), done = isDone(it), link = classLinks[it.class];
+    const when = d < -1 ? `${-d} days ago` : d === -1 ? "yesterday" : d === 0 ? "today" : d === 1 ? "tomorrow" : `in ${d} days`;
+    const touch = matchMedia("(pointer:coarse)").matches;
+    ad.innerHTML = `<div class="ad-sheet" style="${cc(it.class)}">
+      <header class="ad-head">
+        <div class="ad-top"><span class="chip">${esc(it.class)}</span>${MAJOR.has(it.type) ? `<span class="tag">${esc(it.type)}</span>` : it.type ? `<span class="ad-type">${esc(it.type)}</span>` : ""}
+          <button type="button" class="icon-btn ad-x" data-ad="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+        <h2 id="ad-title">${esc(it.title)}</h2>
+        <p class="ad-due">Due ${esc(fmt(it.due, { weekday: "long", month: "long", day: "numeric" }))} · <b>${when}</b></p>
+        ${it.details ? `<p class="ad-det">${esc(it.details)}</p>` : ""}
+        <div class="ad-acts">
+          <label class="ad-done"><input type="checkbox" class="check" data-ad="done"${done ? " checked" : ""}><span>${done ? "Done" : "Mark done"}</span></label>
+          ${link ? `<a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">${link.topics ? "Topics" : "Bulletin board"} ↗</a>` : ""}
+          ${it.manual ? `<button type="button" class="btn" data-edit="${esc(it.id)}">Edit</button>` : ""}
+        </div>
+      </header>
+      <section class="ad-sec"><h3 class="ad-k">Notes</h3>
+        <textarea class="ad-notes" id="ad-notes" rows="5" placeholder="Anything to remember: what to study, page numbers, questions for class…">${esc(n.text)}</textarea>
+        <div class="ad-found" id="ad-found"></div></section>
+      <section class="ad-sec"><h3 class="ad-k">Steps <span id="ad-stepn"></span></h3>
+        <ul class="ad-steps" id="ad-steps"></ul>
+        <form class="ad-add" data-ad-form="step"><input name="text" placeholder="Add a step, like “read pp. 1–20”" aria-label="New step" autocomplete="off"><button class="btn" type="submit">Add</button></form></section>
+      <section class="ad-sec"><h3 class="ad-k">Links</h3>
+        <ul class="ad-links" id="ad-links"></ul>
+        <form class="ad-add ad-add-link" data-ad-form="link"><input name="url" type="text" inputmode="url" placeholder="Paste a link (the Doc you're writing in…)" aria-label="Link" autocomplete="off" required><input name="label" placeholder="Label (optional)" aria-label="Label" autocomplete="off"><button class="btn" type="submit">Add</button></form></section>
+      <section class="ad-sec ad-photos"><h3 class="ad-k">Photos</h3>
+        <div class="ad-imgs" id="ad-imgs"></div>
+        <div class="ad-img-acts">
+          <label class="btn">Add photo<input type="file" accept="image/*" multiple hidden data-ad-file></label>
+          ${touch ? `<label class="btn">Take photo<input type="file" accept="image/*" capture="environment" hidden data-ad-file></label>` : ""}
+        </div>
+        <p class="ad-cap">${touch ? "" : "Paste or drop images here too. "}Photos stay on this device.</p></section>
+    </div>`;
+    renderFound(n.text);
+    renderSteps();
+    renderLinks();
+    renderPhotos();
+  }
+  function renderFound(text) {
+    const urls = linkify(text);
+    $("#ad-found").innerHTML = urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))} ↗</a>`).join("");
+  }
+  function renderSteps() {
+    const steps = noteOf(adId).steps;
+    $("#ad-stepn").textContent = steps.length ? `${steps.filter((x) => x.done).length}/${steps.length}` : "";
+    $("#ad-steps").innerHTML = steps.map((x) => `<li class="${x.done ? "done" : ""}"><label><input type="checkbox" class="check" data-step="${esc(x.id)}"${x.done ? " checked" : ""}><span>${esc(x.text)}</span></label>
+      <button type="button" class="ad-del" data-step-del="${esc(x.id)}" aria-label="Remove step">×</button></li>`).join("");
+  }
+  function renderLinks() {
+    $("#ad-links").innerHTML = noteOf(adId).links.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener"><b>${esc(x.label || hostOf(x.url))}</b><small>${esc(hostOf(x.url))}</small></a>
+      <button type="button" class="ad-del" data-link-del="${esc(x.id)}" aria-label="Remove link">×</button></li>`).join("");
+  }
+  async function renderPhotos() {
+    const id = adId, list = (await imgFor(id)).sort((a, b) => a.t.localeCompare(b.t));
+    if (adId !== id) return;
+    adUrls.forEach(URL.revokeObjectURL);
+    adUrls = list.map((p) => URL.createObjectURL(p.blob));
+    $("#ad-imgs").innerHTML = list.map((p, i) => `<button type="button" class="ad-thumb" data-photo="${esc(p.id)}" aria-label="Open photo ${i + 1}"><img src="${adUrls[i]}" alt=""></button>`).join("");
+  }
+  function flushNote() {
+    const ta = $("#ad-notes");
+    if (!ta || !adId) return;
+    if (ta.value !== noteOf(adId).text) setNote(adId, { text: ta.value });
+  }
+  ad.addEventListener("input", (e) => {
+    if (e.target.id !== "ad-notes") return;
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => { flushNote(); renderFound(e.target.value); }, 500);
+  });
+  ad.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset.ad === "done") {
+      setDone(adId, t.checked);
+      t.nextElementSibling.textContent = t.checked ? "Done" : "Mark done";
+      renderHomework();
+      if (t.checked) toast("Moved to Done", () => { setDone(adId, false); renderHomework(); if (ad.open) renderItem(); });
+    }
+    if (t.dataset.step) {
+      setNote(adId, { steps: noteOf(adId).steps.map((x) => (x.id === t.dataset.step ? { ...x, done: t.checked } : x)) });
+      renderSteps();
+    }
+    if (t.matches("[data-ad-file]")) { addPhotos(t.files); t.value = ""; }
+  });
+  ad.addEventListener("submit", (e) => {
+    const f = e.target.closest("[data-ad-form]");
+    if (!f) return;
+    e.preventDefault();
+    const v = (k) => f.elements[k]?.value.trim() || "";
+    if (f.dataset.adForm === "step" && v("text")) {
+      setNote(adId, { steps: [...noteOf(adId).steps, { id: "s" + uid(), text: v("text"), done: false }] });
+      renderSteps();
+    }
+    if (f.dataset.adForm === "link" && v("url")) {
+      const url = /^https?:\/\//i.test(v("url")) ? v("url") : `https://${v("url")}`;
+      setNote(adId, { links: [...noteOf(adId).links, { id: "l" + uid(), url, label: v("label") }] });
+      renderLinks();
+    }
+    f.reset();
+    f.elements[0].focus();
+  });
+  ad.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.ad === "close") closeItem();
+    if (b.dataset.stepDel) { setNote(adId, { steps: noteOf(adId).steps.filter((x) => x.id !== b.dataset.stepDel) }); renderSteps(); }
+    if (b.dataset.linkDel) { setNote(adId, { links: noteOf(adId).links.filter((x) => x.id !== b.dataset.linkDel) }); renderLinks(); }
+    if (b.dataset.photo) openPhoto(b.dataset.photo);
+  });
+  // paste a screenshot or drop files anywhere on the drawer
+  ad.addEventListener("paste", (e) => {
+    const files = [...(e.clipboardData?.files || [])].filter((f) => f.type.startsWith("image/"));
+    if (files.length) { e.preventDefault(); addPhotos(files); }
+  });
+  ad.addEventListener("dragover", (e) => { if (e.dataTransfer?.types?.includes("Files")) { e.preventDefault(); ad.classList.add("drop"); } });
+  ad.addEventListener("dragleave", (e) => { if (e.target === ad || !ad.contains(e.relatedTarget)) ad.classList.remove("drop"); });
+  ad.addEventListener("drop", (e) => { e.preventDefault(); ad.classList.remove("drop"); addPhotos(e.dataTransfer.files); });
+
+  // a photo full screen, with delete
+  let advId = null, advUrl = "";
+  async function openPhoto(id) {
+    const p = (await imgFor(adId)).find((x) => x.id === id);
+    if (!p) return;
+    advId = id;
+    advUrl = URL.createObjectURL(p.blob);
+    adv.innerHTML = `<img src="${advUrl}" alt="Photo for this assignment">
+      <div class="adv-bar"><button type="button" class="btn" data-adv="del">Delete photo</button><button type="button" class="btn primary" data-adv="close">Close</button></div>`;
+    adv.showModal();
+  }
+  adv.addEventListener("close", () => { URL.revokeObjectURL(advUrl); advId = null; });
+  adv.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-adv]");
+    if (!b && e.target.tagName !== "IMG") return adv.close();
+    if (b?.dataset.adv === "close") adv.close();
+    if (b?.dataset.adv === "del") {
+      const item = adId;
+      try { await imgDo("readwrite", (s) => s.delete(advId)); } catch { return toast("Couldn't delete that photo"); }
+      imgCount[item] = Math.max(0, (imgCount[item] || 1) - 1);
+      adv.close();
+      renderPhotos();
+      renderHomework();
+    }
+  });
+
+  // open from a homework row (anywhere but the checkbox and buttons), a Tests row, or the keyboard
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".check, button, a, input, label, select, textarea")) return;
+    const row = e.target.closest(".item[data-id], .tq li[data-id]");
+    if (row && !row.closest("dialog")) openItem(row.dataset.id);
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".item .body")) { e.preventDefault(); openItem(e.target.closest(".item").dataset.id); }
+  });
+  imgCounts().then(() => { if (schedule) renderHomework(); });
+
   // ---------- tabs: one strip for the secondary panes; on phones a bottom bar picks the section ----------
   const PANES = ["week", "tests", "sports", "news", "fantasy", "count"], TABS = ["today", "homework", "music", "more"];
   function showPane(name) {
@@ -2069,11 +2340,13 @@
 
   // ---------- quick links: a row of chips for each class's Topics page (links.json, from Muse) ----------
   // Only links Muse posted are shown; a class without one is left out, never guessed. Only school-site addresses.
+  let classLinks = {};
   function renderClassLinks(data) {
     const el = $("#dock-classes"), ok = (u) => typeof u === "string" && /^https:\/\/roxburylatin\.myschoolapp\.com\//.test(u);
     const order = Object.keys(schedule.classes), alias = { "Math-Sci": "MSI", FGC: "Forces", Art: "Arts" };
     const rows = (data?.class_links || []).map((c) => ({ c: alias[c.class] || c.class, topics: ok(c.topics), url: ok(c.topics) ? c.topics : ok(c.bulletin) ? c.bulletin : "" }))
       .filter((r) => r.url && schedule.classes[r.c]).sort((a, b) => order.indexOf(a.c) - order.indexOf(b.c));
+    classLinks = Object.fromEntries(rows.map((r) => [r.c, r]));
     el.hidden = !rows.length;
     // a class with no Topics tab (Latin, Forces, Health) opens its bulletin board instead
     el.innerHTML = rows.map((r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="${cc(r.c)}" title="${esc(cls(r.c).name || r.c)}: ${r.topics ? "Topics" : "bulletin board"}">${esc(cls(r.c).short || r.c)}</a>`).join("");

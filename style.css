@@ -98,6 +98,71 @@ h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:u
 .tq-t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tq-d{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 #tq > .sub-h:first-child{margin-top:0}
+/* one assignment, opened: a drawer from the right on laptops, a sheet from the bottom on phones */
+dialog.ad{margin:0 0 0 auto;width:min(500px,100vw);max-width:none;height:100dvh;max-height:none;border-radius:16px 0 0 16px;overflow:hidden}
+dialog.ad[open]{animation:ad-in .22s ease-out}
+@keyframes ad-in{from{transform:translateX(28px);opacity:0}}
+dialog.ad.drop .ad-sheet{outline:2px dashed var(--accent);outline-offset:-10px}
+.ad-sheet{height:100%;overflow:auto;padding:18px 22px 32px;display:grid;align-content:start;gap:22px;scrollbar-width:thin}
+.ad-head{display:grid;gap:8px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.ad-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ad-type{font-size:12px;color:var(--muted)}
+.ad-x{margin-left:auto}
+.ad-head h2{font-size:22px;line-height:1.25;font-weight:700;text-transform:none;letter-spacing:0;font-family:var(--head,var(--sans))}
+.ad-due{margin:0;font-size:14px;color:var(--muted)}
+.ad-due b{color:var(--fg)}
+.ad-det{margin:0;font-size:14px;line-height:1.5;padding:10px 12px;border-radius:10px;background:var(--surface-2);border-left:3px solid var(--cc)}
+.ad-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:4px}
+.ad-acts a.btn{text-decoration:none;color:var(--fg)}
+.ad-done{display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;margin-right:6px}
+.ad-sec{display:grid;gap:10px}
+.ad-k{margin:0;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px}
+.ad-k span{color:var(--accent);letter-spacing:0}
+.ad-notes{width:100%;min-height:150px;resize:vertical;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:inherit;font-size:15px;line-height:1.55}
+.ad-notes:focus{outline:2px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:0;background:var(--surface)}
+.ad-found{display:flex;flex-wrap:wrap;gap:6px}
+.ad-found:empty{display:none}
+.ad-found a{font-size:12.5px;font-weight:600;color:var(--accent);text-decoration:none;padding:2px 8px;border-radius:999px;background:var(--accent-soft)}
+.ad-steps,.ad-links{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.ad-steps:empty,.ad-links:empty{display:none}
+.ad-steps li,.ad-links li{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 10px;border-radius:10px;background:var(--surface-2)}
+.ad-steps label{flex:1;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14.5px}
+.ad-steps li.done span{text-decoration:line-through;color:var(--done)}
+.ad-links a{flex:1;min-width:0;display:grid;text-decoration:none;color:var(--fg)}
+.ad-links b{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-links small{font-size:12px;color:var(--muted)}
+.ad-del{width:30px;height:30px;flex:none;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
+.ad-del:hover{background:var(--surface);color:var(--bad)}
+.ad-add{display:flex;gap:6px;flex-wrap:wrap}
+.ad-add input{flex:1 1 160px;min-width:0;min-height:38px;padding:7px 11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:14px}
+.ad-add-link input[name="label"]{flex-basis:120px}
+.ad-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.ad-imgs:empty{display:none}
+.ad-thumb{padding:0;border:0;border-radius:10px;overflow:hidden;aspect-ratio:1;cursor:zoom-in;background:var(--surface-2)}
+.ad-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.ad-img-acts{display:flex;gap:8px;flex-wrap:wrap}
+.ad-img-acts .btn{display:inline-flex;align-items:center}
+.ad-cap{margin:-2px 0 0;font-size:12px;color:var(--muted)}
+dialog.adv{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border-radius:0;background:rgb(0 0 0 / .92);display:none;place-items:center;align-content:center;gap:14px;padding:16px}
+dialog.adv[open]{display:grid}
+dialog.adv img{max-width:min(100%,1400px);max-height:calc(100dvh - 110px);border-radius:8px;object-fit:contain}
+.adv-bar{display:flex;gap:10px;justify-content:center}
+.adv-bar .btn:not(.primary){background:transparent;color:#fff;border-color:rgb(255 255 255 / .4)}
+/* rows that have notes, steps, links or photos say so, quietly */
+.item .body{cursor:pointer}
+.tq li[data-id],.nu[data-id]{cursor:pointer}
+.tq li[data-id]:hover{background:color-mix(in srgb,var(--cc) 10%,var(--surface-2))}
+.marks{display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
+.marks svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mk-steps{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+@media (max-width:759px){
+  dialog.ad{margin:auto 0 0;width:100vw;height:94dvh;border-radius:18px 18px 0 0}
+  dialog.ad[open]{animation-name:ad-up}
+  .ad-sheet{padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px))}
+  .ad-head h2{font-size:20px}
+}
+@keyframes ad-up{from{transform:translateY(40px);opacity:0}}
+@media (prefers-reduced-motion:reduce){ dialog.ad[open]{animation:none} }
 /* weather: icon, the temperature now, then the outlook that matters next (after school, or tomorrow morning) */
 .wx{display:flex;align-items:center;gap:8px;flex:none;min-width:0;padding:7px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;font-size:12.5px}
 .wx:hover{border-color:var(--muted)}
