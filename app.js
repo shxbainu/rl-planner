@@ -196,7 +196,7 @@
     const when = at.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
     const stale = hrs > STALE_HOURS;
     el.className = "bar-status" + (stale ? " stale" : "");
-    el.innerHTML = `<span class="pill" title="Homework last updated ${esc(when)}"><span class="dot"></span>${stale ? `Homework is ${ago} old · check Blackbaud` : `Homework updated ${ago}`}</span>`;
+    el.innerHTML = `<span class="pill" title="Homework last updated ${esc(when)}"><span class="dot"></span>${stale ? `Homework is ${ago.replace(" ago", "")} old · check Blackbaud` : `Homework updated ${ago}`}</span>`;
     skinBar();
   }
 
