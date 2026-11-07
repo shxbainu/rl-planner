@@ -196,8 +196,9 @@
 
       <div class="pane" data-pane="news" role="tabpanel" data-xhome data-xname="News" hidden>
         <section class="brief" id="brief" aria-label="Today's briefing"></section>
-        <div class="x-tools"><div role="group" aria-label="News section" id="news-tabs"></div><button class="x-expand" type="button" data-expand><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Expand</button></div>
+        <div class="x-tools news-tools"><span class="panel-meta" id="news-meta"></span><button class="x-expand" type="button" data-expand aria-label="Expand news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button></div>
         <div class="x-body">
+          <div role="group" aria-label="News section" id="news-tabs"></div>
           <ul class="news" id="news"></ul>
           <p class="panel-foot" id="news-foot"></p>
         </div>

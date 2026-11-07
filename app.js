@@ -278,6 +278,19 @@
     return h ? `${h}:${pad(mm)}:${pad(sec % 60)}` : `${mm}:${pad(sec % 60)}`;
   };
   const where = (name) => (name ? cls(name).room || "" : "");
+  // A free has no bell to beat: its split parts, the passing time around it and back-to-back frees
+  // are all one stretch that runs right up to the next class or event.
+  const isFree = (s) => !s.name && !s.ev;
+  function mergeFree(segs) {
+    const out = [];
+    segs.forEach((s, i) => {
+      const nx = segs[i + 1], prev = out.at(-1);
+      if (isFree(s) && prev && isFree(prev)) prev.end = s.end;
+      else out.push(isFree(s) ? { ...s, label: "Free" } : { ...s });
+      if (isFree(out.at(-1)) && nx) out.at(-1).end = nx.start; // the gap after a free is free too
+    });
+    return out;
+  }
 
   // a special schedule shifts the times, so the normal ones for that letter are never shown
   const special = (day) => homework?.special?.[day] || "";
@@ -297,7 +310,7 @@
     // ignore free time before the first class and after the last
     const segs = rows.flatMap((r) => r.segs);
     const firstI = segs.findIndex((s) => s.name || s.edge), lastI = segs.length - 1 - [...segs].reverse().findIndex((s) => s.name);
-    const day_ = segs.slice(firstI, lastI + 1);
+    const day_ = mergeFree(segs.slice(firstI, lastI + 1));
     const t_ = now(), m = t_.getHours() * 60 + t_.getMinutes() + (t_.getSeconds() + t_.getMilliseconds() / 1000) / 60;
     const nextAfter = (i) => day_.slice(i + 1).find((s) => s.name || s.ev);
     const nextLine = (n) => n ? `Then <b>${esc(n.label)}</b> at ${n.start}${n.name ? ` in ${esc(where(n.name))}` : ""}` : "Last one today";
@@ -337,7 +350,7 @@
     const segs = dayRows(letterFor(t).letter, t).flatMap((r) => r.segs);
     if (!segs.some((s) => s.name)) return { mode: "off" };
     const firstI = segs.findIndex((s) => s.name || s.edge), lastI = segs.length - 1 - [...segs].reverse().findIndex((s) => s.name);
-    const day = segs.slice(firstI, lastI + 1);
+    const day = mergeFree(segs.slice(firstI, lastI + 1));
     const n = now(), m = n.getHours() * 60 + n.getMinutes() + (n.getSeconds() + n.getMilliseconds() / 1000) / 60;
     const start = minutes(day[0].start), end = minutes(day.at(-1).end);
     const base = { day, m, start, end };
@@ -1072,7 +1085,12 @@
     wake($("#x-dlg-body"));
     $("#x-dlg-body").scrollTop = 0;
   });
-  xdlg.addEventListener("close", () => { if (xHome) xHome.append($("#x-dlg-body .x-body")); xHome = null; });
+  xdlg.addEventListener("close", () => {
+    if (xHome) xHome.append($("#x-dlg-body .x-body"));
+    // sections live in the big view only; the side box goes back to top stories
+    if (xHome?.dataset.pane === "news" && newsTab !== "top") { newsTab = "top"; renderNews(); }
+    xHome = null;
+  });
   $("#x-close").onclick = () => xdlg.close();
   xdlg.addEventListener("click", (e) => { if (e.target === xdlg) xdlg.close(); });
 
@@ -1384,6 +1402,7 @@
       story({ link: n.link, title: n.title, summary: n.summary, chip: n.source, img: n.image, when: n.published }, i === 0)).join("");
     wake($("#news"));
     tease("t-news", esc(news.sections[newsTab][0]?.title || ""));
+    $("#news-meta").textContent = `Top stories${news.updated_at ? ` · ${ago(news.updated_at)} ago` : ""}`;
     $("#news-foot").textContent = news.updated_at ? `Updated ${ago(news.updated_at)} ago · ${[...new Set(news.sections[newsTab].map((n) => n.source))].join(", ")}` : "";
   }
   $("#news-tabs").addEventListener("click", (e) => {

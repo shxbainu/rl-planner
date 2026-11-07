@@ -580,7 +580,13 @@ details .list{margin-top:6px}
 #news-tabs button::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cc)}
 #news-tabs button[aria-pressed="true"]{background:var(--cc);border-color:var(--cc);color:var(--ct)}
 #news-tabs button[aria-pressed="true"]::before{background:var(--ct)}
-.x-tools:has(#news-tabs){align-items:flex-start}
+/* the side box shows top stories with no section bar; the sections come with the expanded view */
+#news-tabs{margin-bottom:10px}
+.pane #news-tabs{display:none}
+.news-tools{flex:none}
+.news-tools .x-expand{border:0;background:none;padding:2px 4px;color:var(--muted)}
+.news-tools .x-expand:hover{color:var(--fg)}
+.news-tools .x-expand svg{width:15px;height:15px}
 
 /* game dialog */
 /* a definite height so the scrolling body below the score gets real space (Safari collapses it otherwise) */
