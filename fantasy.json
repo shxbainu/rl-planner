@@ -1,14 +1,14 @@
 {
- "updated_at": "2026-11-07T18:12:00-05:00",
- "source": "Muse, live ESPN check Sat Nov 7, 6:10pm (Crosswalk post rfpfq6, file site/fantasy.json)",
+ "updated_at": "2026-11-08T11:05:00-05:00",
+ "source": "Muse, Crosswalk post ild8b0 (Sun Nov 8)",
  "league": "FFantasy Football",
  "team": "The Gibbs That Keep On Giving",
  "week": 9,
  "record": "4-4-0",
  "matchup": {
   "opponent": "tkum",
-  "my_proj": 127.75,
-  "opp_proj": 116.21,
+  "my_proj": 127.83,
+  "opp_proj": 116.2,
   "my_score": 0.0,
   "opp_score": 0.0
  },
@@ -19,7 +19,7 @@
    "team": "SF",
    "opp": "vs LV",
    "kickoff": "2026-11-08T16:25:00-05:00",
-   "proj": 22.19,
+   "proj": 22.2,
    "points": null,
    "status": ""
   },
@@ -29,7 +29,7 @@
    "team": "DET",
    "opp": "@ MIA",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 26.54,
+   "proj": 26.5,
    "points": null,
    "status": ""
   },
@@ -39,7 +39,7 @@
    "team": "DEN",
    "opp": "@ CAR",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 14.42,
+   "proj": 14.4,
    "points": null,
    "status": ""
   },
@@ -49,7 +49,7 @@
    "team": "BUF",
    "opp": "@ MIN",
    "kickoff": "2026-11-09T20:15:00-05:00",
-   "proj": 12.51,
+   "proj": 12.5,
    "points": null,
    "status": ""
   },
@@ -59,7 +59,7 @@
    "team": "MIA",
    "opp": "vs DET",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 9.86,
+   "proj": 9.9,
    "points": null,
    "status": ""
   },
@@ -79,7 +79,7 @@
    "team": "MIA",
    "opp": "vs DET",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 16.36,
+   "proj": 16.4,
    "points": null,
    "status": ""
   },
@@ -89,7 +89,7 @@
    "team": "CHI",
    "opp": "vs TB",
    "kickoff": "2026-11-08T20:20:00-05:00",
-   "proj": 6.37,
+   "proj": 6.4,
    "points": null,
    "status": ""
   },
@@ -121,7 +121,7 @@
    "team": "CAR",
    "opp": "vs DEN",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 15.76,
+   "proj": 15.8,
    "points": null,
    "status": ""
   },
@@ -131,7 +131,7 @@
    "team": "MIN",
    "opp": "vs BUF",
    "kickoff": "2026-11-09T20:15:00-05:00",
-   "proj": 4.01,
+   "proj": 4.0,
    "points": null,
    "status": ""
   },
@@ -161,7 +161,7 @@
    "team": "WSH",
    "opp": "vs LAR",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 11.94,
+   "proj": 11.9,
    "points": null,
    "status": ""
   },
@@ -171,7 +171,7 @@
    "team": "WSH",
    "opp": "vs LAR",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 10.08,
+   "proj": 10.1,
    "points": null,
    "status": ""
   },
@@ -181,17 +181,35 @@
    "team": "NO",
    "opp": "vs CLE",
    "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 5.89,
+   "proj": 5.9,
    "points": null,
    "status": "Q"
   }
  ],
  "moves": [
   {
+   "by": "Claude",
+   "kind": "start/sit",
+   "text": "Keep Malik Washington at WR over Antonio Williams, even though ESPN has Williams up 10.1 to 9.9",
+   "why": "Both lock at 1pm, so decide now. Over their last 5 games Washington has 32 targets, 24 catches and 7 carries; Williams has 26 targets and 16 catches, and has not topped 54 yards or scored in that span. Williams is a close second: McLaurin and Dyami Brown are on IR, Burks is inactive today, and he saw 7 targets last week."
+  },
+  {
+   "by": "Claude",
+   "kind": "waiver",
+   "text": "If DJ Moore or Dalton Kincaid is a surprise scratch Monday, check waivers for someone playing Sunday night or Monday",
+   "why": "Your whole usable bench locks at 1pm today (Young, White, Williams), and Evans is Out, Wilson is Out and Warren is on bye, so nobody on the roster can replace a Monday 8:15pm starter. Risk looks low: Moore (shoulder) has no designation and Kincaid (chest) practiced fully Friday. Depending on when the news breaks, only players in TB at CHI (Sunday 8:20pm) and BUF at MIN would still be unlocked."
+  },
+  {
+   "by": "Claude",
+   "kind": "waiver",
+   "text": "Week 10 prep: check waivers for a D/ST and RB cover, and check whether Tyson can stay in the IR slot",
+   "why": "The Bears and Jonah Coleman's Broncos are both on bye in Week 10, and the Vikings D/ST goes to Green Bay. Tyson (hamstring) came off real IR Saturday and is not on New Orleans' inactive list today, so ESPN may flag the IR slot and block adds until he moves. The bench is full, so that would take a drop. Warren returns from his bye next week, and Evans is questionable at best."
+  },
+  {
    "by": "Muse",
    "kind": "start/sit",
    "text": "Keep DJ Moore starting, Mike Evans benched",
-   "why": "Moore has no injury designation for Monday at Minnesota; Evans is ruled Out for Sunday vs the Raiders (Achilles)."
+   "why": "Moore has no injury designation and is likely to play Monday at Minnesota; Evans is Out for Sunday vs the Raiders (Achilles)."
   },
   {
    "by": "Muse",
@@ -208,8 +226,8 @@
   {
    "by": "Muse",
    "kind": "trade",
-   "text": "Tee Higgins offer still awaiting patel; expires Sun Nov 8, 6:51 PM",
-   "why": "Brian receives Higgins, sends Jaylen Warren and Garrett Wilson. No action needed from Brian now. Smith trade is gone (expired, not accepted)."
+   "text": "Do not re-offer for Tee Higgins; the deal is closed",
+   "why": "The Nov 6 offer (Wilson + Warren for Higgins) was rejected or withdrawn before expiry and is no longer pending. Hold Wilson and Warren."
   }
  ]
 }
