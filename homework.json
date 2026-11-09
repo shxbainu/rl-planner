@@ -1,510 +1,6 @@
 {
- "assignments": [
-  {
-   "assigned": "2026-11-06",
-   "class": "MSI",
-   "details": "In class",
-   "due": "2026-11-06",
-   "title": "Mini-Quiz 3: Functions",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-06",
-   "class": "French",
-   "details": "Telling time; lecture en classe",
-   "due": "2026-11-06",
-   "title": "Quiz sur les heures",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-06",
-   "class": "Forces",
-   "details": "Textbook reading",
-   "due": "2026-11-06",
-   "title": "Reading: Islamic Revitalization",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-09",
-   "class": "Latin",
-   "details": "Vocab meanings, participle agreement, 2nd Punic War · 8:30, 100 pts",
-   "due": "2026-11-09",
-   "title": "Latin Test",
-   "type": "test"
-  },
-  {
-   "assigned": "2026-11-09",
-   "class": "English",
-   "details": "Odyssey XV, 1-243",
-   "due": "2026-11-09",
-   "title": "Odyssey XV",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-06",
-   "class": "MSI",
-   "details": "Make two circuits with two LEDs on a breadboard, each on a different pin; write coinFlip(pin1, pin2) simulating a coin flip; setup() loops 25 times, counts heads, prints Heads: <n>",
-   "due": "2026-11-09",
-   "title": "Assignment #10: coinFlip circuits",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-09",
-   "class": "MSI",
-   "details": "In class",
-   "due": "2026-11-09",
-   "title": "Mini-Quiz 4: Functions, bitRead",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-09",
-   "class": "Forces",
-   "details": "Ottomans/Mughals",
-   "due": "2026-11-09",
-   "title": "Reading: Ottomans/Mughals",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-06",
-   "class": "MSI",
-   "details": "Challenge on the current topic page",
-   "due": "2026-11-09",
-   "title": "Practice building and coding circuits",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-06",
-   "class": "French",
-   "details": "Review for Monday's Unit 2 test",
-   "due": "2026-11-09",
-   "title": "Révision pour le test (Unité 2)",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-09",
-   "class": "French",
-   "details": "11:00",
-   "due": "2026-11-09",
-   "title": "French 1 Test (Unit 2)",
-   "type": "test"
-  },
-  {
-   "assigned": "2026-11-09",
-   "class": "MSI",
-   "details": "",
-   "due": "2026-11-10",
-   "title": "Watch binary numbers video",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-10",
-   "class": "Latin",
-   "details": "20 pts",
-   "due": "2026-11-10",
-   "title": "Vocabulary Quiz 47-48",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-10",
-   "class": "English",
-   "details": "Odyssey XVI, 1-355, 450-501",
-   "due": "2026-11-10",
-   "title": "Odyssey XVI",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-10",
-   "class": "Forces",
-   "details": "Textbook reading",
-   "due": "2026-11-10",
-   "title": "Reading: Colonial Reordering (Egypt)",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-10",
-   "class": "MSI",
-   "details": "In class",
-   "due": "2026-11-10",
-   "title": "Mini-Quiz 5: Attempt Binary Counter",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-10",
-   "class": "MSI",
-   "details": "",
-   "due": "2026-11-11",
-   "title": "Watch Binary Counter video + prep Mini-Quiz 6",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-11",
-   "class": "Latin",
-   "details": "20 pts",
-   "due": "2026-11-11",
-   "title": "Vocabulary Quiz 42-44",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-11",
-   "class": "English",
-   "details": "Odyssey XVII, 1-180, 317-567",
-   "due": "2026-11-11",
-   "title": "Odyssey XVII",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-11",
-   "class": "MSI",
-   "details": "In class",
-   "due": "2026-11-11",
-   "title": "Mini-Quiz 6",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-12",
-   "class": "Latin",
-   "details": "Ut clauses",
-   "due": "2026-11-12",
-   "title": "Worksheet: Identifying English sentences",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-12",
-   "class": "English",
-   "details": "Odyssey XVIII, 1-320, 457-end; RQ 3",
-   "due": "2026-11-12",
-   "title": "Odyssey XVIII + Reading Quiz 3",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-12",
-   "class": "Forces",
-   "details": "Textbook reading",
-   "due": "2026-11-12",
-   "title": "Reading: Rebellion of 1857 (India)",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-13",
-   "class": "MSI",
-   "details": "Handout due next class",
-   "due": "2026-11-16",
-   "title": "Handout on Functions",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-13",
-   "class": "Forces",
-   "details": "10:10, 100 pts",
-   "due": "2026-11-13",
-   "title": "Forces Test",
-   "type": "test"
-  },
-  {
-   "assigned": "2026-11-16",
-   "class": "Latin",
-   "details": "",
-   "due": "2026-11-16",
-   "title": "Vocabulary Quiz 45-46",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-16",
-   "class": "English",
-   "details": "Odyssey XIX (whole book)",
-   "due": "2026-11-16",
-   "title": "Odyssey XIX",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-16",
-   "class": "Forces",
-   "details": "Textbook reading",
-   "due": "2026-11-16",
-   "title": "Reading: Ming China",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-16",
-   "class": "MSI",
-   "details": "In-class practice",
-   "due": "2026-11-16",
-   "title": "Programming Practice",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-17",
-   "class": "Latin",
-   "details": "",
-   "due": "2026-11-17",
-   "title": "Handout (ut clause practice)",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-17",
-   "class": "English",
-   "details": "Odyssey XX, 1-58, 189-305, 376-end + Emily Wilson Article",
-   "due": "2026-11-17",
-   "title": "Odyssey XX + Emily Wilson article",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-17",
-   "class": "Forces",
-   "details": "Textbook reading",
-   "due": "2026-11-17",
-   "title": "Reading: Ming to Qing",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-17",
-   "class": "MSI",
-   "details": "Review for Wed Nov 18 TEST",
-   "due": "2026-11-17",
-   "title": "Test Review",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-18",
-   "class": "Latin",
-   "details": "11:00, 100 pts",
-   "due": "2026-11-18",
-   "title": "Latin Test",
-   "type": "test"
-  },
-  {
-   "assigned": "2026-11-18",
-   "class": "MSI",
-   "details": "",
-   "due": "2026-11-18",
-   "title": "Math-Sci Test",
-   "type": "test"
-  },
-  {
-   "assigned": "2026-11-18",
-   "class": "Arts",
-   "details": "Due 3:00, 40 pts",
-   "due": "2026-11-18",
-   "title": "Mythical Creature Linocut: edition of prints",
-   "type": "project"
-  },
-  {
-   "assigned": "2026-11-18",
-   "class": "English",
-   "details": "Odyssey XXI (whole book)",
-   "due": "2026-11-18",
-   "title": "Odyssey XXI",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-19",
-   "class": "Forces",
-   "details": "May be outdated; row only partially read",
-   "due": "2026-11-19",
-   "title": "Intro to Indo-Pacific Art",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-19",
-   "class": "English",
-   "details": "Odyssey XXII (whole book) + RQ4",
-   "due": "2026-11-19",
-   "title": "Reading Quiz 4 (Odyssey XXII)",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-20",
-   "class": "MSI",
-   "details": "",
-   "due": "2026-11-20",
-   "title": "Project proposal",
-   "type": "project"
-  },
-  {
-   "assigned": "2026-11-23",
-   "class": "Latin",
-   "details": "In class",
-   "due": "2026-11-23",
-   "title": "Map Quiz",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-11-23",
-   "class": "English",
-   "details": "",
-   "due": "2026-11-23",
-   "title": "Odyssey XXIII",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-24",
-   "class": "Latin",
-   "details": "",
-   "due": "2026-11-24",
-   "title": "Reading: pp. 130-140",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-24",
-   "class": "English",
-   "details": "",
-   "due": "2026-11-24",
-   "title": "Odyssey XXIV",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-11-24",
-   "class": "Forces",
-   "details": "In-class presentation work",
-   "due": "2026-11-24",
-   "title": "Intro to Indo-Pacific Art oral presentation",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-30",
-   "class": "Latin",
-   "details": "Review",
-   "due": "2026-11-30",
-   "title": "Review 12",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-11-30",
-   "class": "English",
-   "details": "Odyssey XXV, 1-241",
-   "due": "2026-11-30",
-   "title": "Odyssey XXV.1-241",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-12-01",
-   "class": "Latin",
-   "details": "In class",
-   "due": "2026-12-01",
-   "title": "Subjunctive Quiz",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-12-01",
-   "class": "English",
-   "details": "Essay 2 writing; due Wed Dec 2",
-   "due": "2026-12-01",
-   "title": "Writing Day: Essay #2",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-12-02",
-   "class": "Latin",
-   "details": "Grammar work",
-   "due": "2026-12-02",
-   "title": "Cum Clause",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-12-02",
-   "class": "English",
-   "details": "Due 1:05, 100 pts",
-   "due": "2026-12-02",
-   "title": "Essay #2",
-   "type": "essay"
-  },
-  {
-   "assigned": "2026-12-02",
-   "class": "Arts",
-   "details": "Due 3:00, 30 pts",
-   "due": "2026-12-02",
-   "title": "Color remix of mythical print",
-   "type": "project"
-  },
-  {
-   "assigned": "2026-12-03",
-   "class": "Latin",
-   "details": "",
-   "due": "2026-12-03",
-   "title": "Vocabulary Quiz 49 (cum clauses)",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-12-03",
-   "class": "English",
-   "details": "Study AWWW Ch. 5 words (graded)",
-   "due": "2026-12-03",
-   "title": "AWWW 5",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-12-03",
-   "class": "Latin",
-   "details": "Grammar work",
-   "due": "2026-12-03",
-   "title": "Cum Clause",
-   "type": "homework"
-  },
-  {
-   "assigned": "2026-12-07",
-   "class": "Latin",
-   "details": "8:30, 100 pts",
-   "due": "2026-12-07",
-   "title": "Latin Test",
-   "type": "test"
-  },
-  {
-   "assigned": "2026-12-07",
-   "class": "Forces",
-   "details": "12:20, 100 pts",
-   "due": "2026-12-07",
-   "title": "Oral presentation (first half of class)",
-   "type": "project"
-  },
-  {
-   "assigned": "2026-12-07",
-   "class": "English",
-   "details": "Reading due Dec 7-8",
-   "due": "2026-12-08",
-   "title": "Odyssey Universe Reading",
-   "type": "reading"
-  },
-  {
-   "assigned": "2026-12-08",
-   "class": "MSI",
-   "details": "",
-   "due": "2026-12-08",
-   "title": "Project due",
-   "type": "project"
-  },
-  {
-   "assigned": "2026-12-08",
-   "class": "Forces",
-   "details": "2:00, 100 pts",
-   "due": "2026-12-08",
-   "title": "Oral presentation (second half of class)",
-   "type": "project"
-  },
-  {
-   "assigned": "2026-12-09",
-   "class": "Arts",
-   "details": "Due 3:00, 50 pts",
-   "due": "2026-12-09",
-   "title": "Mythical creature print self-assessment",
-   "type": "project"
-  },
-  {
-   "assigned": "2026-12-09",
-   "class": "English",
-   "details": "Study AWWW Ch. 6 words (graded)",
-   "due": "2026-12-09",
-   "title": "AWWW 6",
-   "type": "quiz"
-  },
-  {
-   "assigned": "2026-12-09",
-   "class": "Latin",
-   "details": "Review",
-   "due": "2026-12-09",
-   "title": "Review Day",
-   "type": "homework"
-  }
- ],
+ "updated_at": "2026-11-08T18:10:00-05:00",
+ "source": "Muse, live portal recheck Sun Nov 8, 5:47-6:04 PM EST (Crosswalk file site/homework.json v5, plus the full Nov 8 sweep, post c4jjvq)",
  "days": {
   "2026-11-09": "A",
   "2026-11-10": "H",
@@ -517,20 +13,12 @@
   "2026-11-19": "D",
   "2026-11-20": "C"
  },
- "notes": [
-  "French week of Nov 9 Topic still not posted.",
-  "English Fri Nov 6 syllabus row still blank; Odyssey XIV.278-end unconfirmed.",
-  "Ohm's Law Worksheet was not found in any portal source on Nov 6; do not treat as confirmed.",
-  "Glee Club and Health & Wellness bulletin boards stayed blank on repeated loads.",
-  "FGC Nov 19-20 rows and Latin Nov 19 / Nov 23-24 rows were only partially read; treat as may be outdated."
- ],
  "off": {
   "2026-11-05": "Founder's Day",
   "2026-11-25": "Thanksgiving break",
   "2026-11-26": "Thanksgiving",
   "2026-11-27": "Thanksgiving break"
  },
- "source": "Muse, Blackbaud portal check Fri Nov 6, 6:00-6:13 PM EST (Crosswalk post yr6af2)",
  "special": {
   "2026-11-11": "Veteran's Day, Order of Classes G-H-A-B-C-F, Health & Wellness 9:20 AM",
   "2026-11-12": "D-35 special schedule, times differ",
@@ -540,11 +28,538 @@
   "2026-12-09": "F-20 schedule, last day of MP2",
   "2026-12-10": "D special schedule: review day",
   "2026-12-11": "C special schedule: review day, late start",
-  "2026-12-14": "Mid-year exams",
-  "2026-12-15": "Mid-year exams",
-  "2026-12-16": "Mid-year exams",
-  "2026-12-17": "Mid-year exams",
+  "2026-12-14": "Mid-year exams: Latin, English",
+  "2026-12-15": "Mid-year exams: Math-Sci, French",
+  "2026-12-16": "Mid-year exams: Arts, FGC",
+  "2026-12-17": "Mid-year exams: make-up day",
   "2026-12-18": "Mid-year exams; Holiday Concert 7:00 PM"
  },
- "updated_at": "2026-11-07T02:36:00Z"
+ "notes": [
+  "English Fri Nov 6 syllabus row STILL blank/dashed - Odyssey XIV.278-end still unconfirmed.",
+  "Glee and Health bulletin boards STILL blank on repeated loads - cannot confirm genuinely empty vs. failing to load.",
+  "Ohm's Law Worksheet: no portal Assignment entry in Math-Sci Assignments or Assignment Center - remains unconfirmed as a graded portal assignment.",
+  "French Semaine 13 NOT posted yet; Tue Nov 17 vocab + possessive quiz date inferred from Semaine 12 note - verify with teacher.",
+  "FGC MP2 readings page numbers carried from Nov 3/7 baseline (may be outdated); MP2 tab re-read Nov 8 confirms topics.",
+  "English Nov 16/18/19 readings are whole books (XIX, XXI, XXII); line ranges unverified.",
+  "FGC PROJECT syllabus and Google Classroom are plain text on the bulletin board, not links - not opened; dates corroborated by 1st Semester syllabus + Assignment Center. Google Classroom itself not checked.",
+  "Latin syllabus has NO Nov 13 row and NO Dec 8 row.",
+  "On the school calendar: MUD Week Nov 16-20; Fall Play Nov 20-21; SAT Sat Dec 5, ACT Sat Dec 12; Winter Musical auditions Dec 7-9, callbacks Dec 10; winter break starts Dec 19."
+ ],
+ "assignments": [
+  {
+   "class": "English",
+   "title": "Odyssey XV",
+   "assigned": "2026-11-09",
+   "due": "2026-11-09",
+   "type": "reading",
+   "details": "Odyssey Book XV lines 1-243 · Odyssey XV.1-243"
+  },
+  {
+   "class": "Forces",
+   "title": "Reading: Ottomans/Mughals",
+   "assigned": "2026-11-09",
+   "due": "2026-11-09",
+   "type": "reading",
+   "details": "Ottomans/Mughals readings (may be outdated: page numbers carried from Nov 3/7 baseline; MP2 tab re-read Nov 8 confirms the Nov 9 Mughal India topic) · p. 612-613, 658-660, 695-698"
+  },
+  {
+   "class": "French",
+   "title": "French 1 Test (Unit 2)",
+   "assigned": "2026-11-09",
+   "due": "2026-11-09",
+   "type": "test",
+   "details": "11:00 AM; Unit 2A & 2B: vocabulary, avoir idioms, telling time"
+  },
+  {
+   "class": "Latin",
+   "title": "Latin Test",
+   "assigned": "2026-11-09",
+   "due": "2026-11-09",
+   "type": "test",
+   "details": "8:30 AM; Ch. 1-41; vocabulary lexical meanings, participle agreement, 2nd Punic War"
+  },
+  {
+   "class": "MSI",
+   "title": "Mini-Quiz 4: Functions, bitRead",
+   "assigned": "2026-11-09",
+   "due": "2026-11-09",
+   "type": "quiz",
+   "details": "Functions, bitRead"
+  },
+  {
+   "class": "MSI",
+   "title": "Assignment #10: coinFlip circuits",
+   "assigned": "2026-11-06",
+   "due": "2026-11-09",
+   "type": "homework",
+   "details": "Two circuits with two LEDs on a breadboard, each on a different pin; write coinFlip(pin1, pin2) simulating a coin flip (Heads 0 = first LED, Tails 1 = second LED, return 0 or 1); in setup() loop 25 times calling coinFlip, count heads, print 'Heads: ' + number"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XVI",
+   "assigned": "2026-11-10",
+   "due": "2026-11-10",
+   "type": "reading",
+   "details": "Odyssey Book XVI · Odyssey XVI.1-355, 450-501"
+  },
+  {
+   "class": "Forces",
+   "title": "Reading: Colonial Reordering (Egypt)",
+   "due": "2026-11-10",
+   "type": "reading",
+   "details": "Read for class; not re-verified Nov 8 · p. 775-777"
+  },
+  {
+   "class": "French",
+   "title": "Study vocab Lecon 3A + Ex. 1, 2, 3, 4 p.121",
+   "assigned": "2026-11-09",
+   "due": "2026-11-10",
+   "type": "homework",
+   "details": "Study vocab Lecon 3A p.120-121, Exercises 1-4 p.121; due next French class"
+  },
+  {
+   "class": "Latin",
+   "title": "Vocabulary Quiz 47-48",
+   "assigned": "2026-11-10",
+   "due": "2026-11-10",
+   "type": "quiz",
+   "details": "Study for Vocabulary Quiz; 20 pts"
+  },
+  {
+   "class": "MSI",
+   "title": "Watch binary numbers video",
+   "assigned": "2026-11-09",
+   "due": "2026-11-10",
+   "type": "homework",
+   "details": "Homework due next class"
+  },
+  {
+   "class": "MSI",
+   "title": "Mini-Quiz 5: Attempt Binary Counter",
+   "assigned": "2026-11-10",
+   "due": "2026-11-10",
+   "type": "quiz",
+   "details": "Attempt Binary Counter; HW due next class: watch the Binary Counter video; prepare for Mini-Quiz 6"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XVII",
+   "assigned": "2026-11-11",
+   "due": "2026-11-11",
+   "type": "reading",
+   "details": "Odyssey Book XVII · Odyssey XVII.1-180, 317-567"
+  },
+  {
+   "class": "Latin",
+   "title": "Vocabulary Quiz 42-44",
+   "assigned": "2026-11-11",
+   "due": "2026-11-11",
+   "type": "quiz",
+   "details": "Study for Vocabulary Quiz; 20 pts"
+  },
+  {
+   "class": "MSI",
+   "title": "Mini-Quiz 6",
+   "assigned": "2026-11-11",
+   "due": "2026-11-11",
+   "type": "quiz",
+   "details": "Mini-Quiz 6"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XVIII + Reading Quiz 3",
+   "assigned": "2026-11-12",
+   "due": "2026-11-12",
+   "type": "quiz",
+   "details": "Graded item RQ3 on this row; Odyssey Book XVIII · Odyssey XVIII.1-320, 457-end"
+  },
+  {
+   "class": "Forces",
+   "title": "Reading: Rebellion of 1857 (India)",
+   "due": "2026-11-12",
+   "type": "reading",
+   "details": "Read for class; not re-verified Nov 8 · p. 823-828"
+  },
+  {
+   "class": "French",
+   "title": "Feuille d'exercices sur le vocabulaire 3A",
+   "assigned": "2026-11-10",
+   "due": "2026-11-12",
+   "type": "homework",
+   "details": "Vocabulary 3A worksheet; due next French class"
+  },
+  {
+   "class": "Latin",
+   "title": "Vocabulary Quiz 41",
+   "assigned": "2026-11-12",
+   "due": "2026-11-12",
+   "type": "quiz",
+   "details": "Worksheet: Identifying English sentences (ut clauses); VQ: 41"
+  },
+  {
+   "class": "Latin",
+   "title": "Worksheet: Identifying English sentences",
+   "due": "2026-11-12",
+   "type": "homework",
+   "details": ""
+  },
+  {
+   "class": "Forces",
+   "title": "Forces Test",
+   "assigned": "2026-11-13",
+   "due": "2026-11-13",
+   "type": "test",
+   "details": "10:10 AM; 100 pts"
+  },
+  {
+   "class": "French",
+   "title": "Ex. 1, 2, 3 p.134",
+   "assigned": "2026-11-12",
+   "due": "2026-11-13",
+   "type": "homework",
+   "details": "Possessive adjectives exercises; due next French class · p.134"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XIX",
+   "assigned": "2026-11-16",
+   "due": "2026-11-16",
+   "type": "reading",
+   "details": "Whole book; line ranges unverified · Odyssey XIX"
+  },
+  {
+   "class": "Forces",
+   "title": "Reading: Ming China",
+   "due": "2026-11-16",
+   "type": "reading",
+   "details": "Read for class; not re-verified Nov 8 · p. 614, 627"
+  },
+  {
+   "class": "French",
+   "title": "Feuille d'exercices",
+   "assigned": "2026-11-13",
+   "due": "2026-11-16",
+   "type": "homework",
+   "details": "Worksheet due next French class (title unconfirmed; 'Le monde du cinema' label not in Semaine 12 as posted). Note on row: QZ MARDI SUR LE VOC. & ADJ. POSS."
+  },
+  {
+   "class": "Latin",
+   "title": "Vocabulary Quiz 45-46",
+   "assigned": "2026-11-16",
+   "due": "2026-11-16",
+   "type": "quiz",
+   "details": "Sequence of tenses; Study for Vocabulary Quiz; 20 pts"
+  },
+  {
+   "class": "MSI",
+   "title": "Handout on Functions",
+   "assigned": "2026-11-13",
+   "due": "2026-11-16",
+   "type": "homework",
+   "details": "Handout on Functions due next class"
+  },
+  {
+   "class": "MSI",
+   "title": "Programming Practice",
+   "due": "2026-11-16",
+   "type": "homework",
+   "details": "In-class practice; Handout on Functions"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XX + Emily Wilson article",
+   "assigned": "2026-11-17",
+   "due": "2026-11-17",
+   "type": "reading",
+   "details": "Odyssey Book XX + Emily Wilson's Article · Odyssey XX.1-58, 189-305, 376-end"
+  },
+  {
+   "class": "Forces",
+   "title": "Reading: Ming to Qing",
+   "due": "2026-11-17",
+   "type": "reading",
+   "details": "Read for class; not re-verified Nov 8 · p. 660-665"
+  },
+  {
+   "class": "French",
+   "title": "Quiz: vocab 3A + possessive adjectives",
+   "assigned": "2026-11-17",
+   "due": "2026-11-17",
+   "type": "quiz",
+   "details": "Quiz on vocabulaire 3A and adjectifs possessifs; date inferred from Semaine 12 note 'QZ MARDI SUR LE VOC. & ADJ. POSS.' - verify with teacher"
+  },
+  {
+   "class": "Latin",
+   "title": "Handout (ut clause practice)",
+   "due": "2026-11-17",
+   "type": "homework",
+   "details": ""
+  },
+  {
+   "class": "MSI",
+   "title": "Test Review",
+   "due": "2026-11-17",
+   "type": "homework",
+   "details": "Review for Wed Nov 18 TEST"
+  },
+  {
+   "class": "Arts",
+   "title": "Mythical Creature Linocut: edition of prints",
+   "assigned": "2026-11-18",
+   "due": "2026-11-18",
+   "type": "project",
+   "details": "3:00 PM; 40 pts"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XXI",
+   "assigned": "2026-11-18",
+   "due": "2026-11-18",
+   "type": "reading",
+   "details": "Whole book; line ranges unverified · Odyssey XXI"
+  },
+  {
+   "class": "Latin",
+   "title": "Latin Test",
+   "assigned": "2026-11-18",
+   "due": "2026-11-18",
+   "type": "test",
+   "details": "11:00 AM; 100 pts; Vocabulary, Forms, Identifying Clauses, Second Punic War"
+  },
+  {
+   "class": "MSI",
+   "title": "Math-Sci Test",
+   "assigned": "2026-11-18",
+   "due": "2026-11-18",
+   "type": "test",
+   "details": "Circuits & Arduino unit test"
+  },
+  {
+   "class": "English",
+   "title": "Reading Quiz 4 (Odyssey XXII)",
+   "assigned": "2026-11-19",
+   "due": "2026-11-19",
+   "type": "quiz",
+   "details": "Graded item RQ4 on this row; Odyssey Book XXII (whole book; line ranges unverified) · Odyssey XXII"
+  },
+  {
+   "class": "Forces",
+   "title": "Reading: East Asia / Qing Empire",
+   "due": "2026-11-19",
+   "type": "reading",
+   "details": "Skip 2nd paragraph of p. 689-701; not re-verified Nov 8 · p. 689-701, 777-781"
+  },
+  {
+   "class": "Latin",
+   "title": "Read Ancient Rome p.110 (Scipio in Spain) to end of chapter",
+   "assigned": "2026-11-19",
+   "due": "2026-11-19",
+   "type": "reading",
+   "details": "History / Ut Clause Practice · Ancient Rome p.110 to end of chapter"
+  },
+  {
+   "class": "Forces",
+   "title": "Reading: Prophecy and Rebellion in China",
+   "due": "2026-11-20",
+   "type": "reading",
+   "details": "Read for class; not re-verified Nov 8 · p. 803-808"
+  },
+  {
+   "class": "MSI",
+   "title": "Project proposal",
+   "assigned": "2026-11-20",
+   "due": "2026-11-20",
+   "type": "project",
+   "details": "Project proposal due"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XXIII",
+   "assigned": "2026-11-23",
+   "due": "2026-11-23",
+   "type": "reading",
+   "details": "Odyssey Book XXIII · Odyssey XXIII"
+  },
+  {
+   "class": "Latin",
+   "title": "Map Quiz",
+   "assigned": "2026-11-23",
+   "due": "2026-11-23",
+   "type": "quiz",
+   "details": "Read Ch. 15 pp.117-120; study map of Hellenistic World; Map Quiz"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey XXIV",
+   "assigned": "2026-11-24",
+   "due": "2026-11-24",
+   "type": "reading",
+   "details": "Odyssey Book XXIV · Odyssey XXIV"
+  },
+  {
+   "class": "Latin",
+   "title": "Reading: pp. 130-140",
+   "due": "2026-11-24",
+   "type": "reading",
+   "details": "Book 6 Part 2"
+  },
+  {
+   "class": "Latin",
+   "title": "Review 12",
+   "due": "2026-11-30",
+   "type": "homework",
+   "details": "p.282 Ex. C all (#1=veniamus); Sentences Ex. A #1-10 (except 2, 9)"
+  },
+  {
+   "class": "Latin",
+   "title": "Subjunctive Quiz",
+   "assigned": "2026-12-01",
+   "due": "2026-12-01",
+   "type": "quiz",
+   "details": "Study for quiz"
+  },
+  {
+   "class": "Arts",
+   "title": "Color remix of mythical print",
+   "assigned": "2026-12-02",
+   "due": "2026-12-02",
+   "type": "project",
+   "details": "3:00 PM; 30 pts"
+  },
+  {
+   "class": "English",
+   "title": "Essay #2",
+   "assigned": "2026-12-02",
+   "due": "2026-12-02",
+   "type": "essay",
+   "details": "1:05 PM; 100 pts"
+  },
+  {
+   "class": "Latin",
+   "title": "Cum Clause",
+   "due": "2026-12-02",
+   "type": "homework",
+   "details": "p.274 Ex. C #1-5; p.286 Ex. B #1, 3, 5, 8, 10"
+  },
+  {
+   "class": "English",
+   "title": "AWWW 5",
+   "assigned": "2026-12-03",
+   "due": "2026-12-03",
+   "type": "quiz",
+   "details": "AWWW 5 graded vocabulary assessment"
+  },
+  {
+   "class": "Latin",
+   "title": "Vocabulary Quiz 49 (cum clauses)",
+   "assigned": "2026-12-03",
+   "due": "2026-12-03",
+   "type": "quiz",
+   "details": "VQ: 49"
+  },
+  {
+   "class": "Latin",
+   "title": "Cum Clause",
+   "due": "2026-12-03",
+   "type": "homework",
+   "details": "p.274 Ex. C #1-5; p.286 Ex. B #4, 9"
+  },
+  {
+   "class": "Forces",
+   "title": "Oral presentation (first half of class)",
+   "assigned": "2026-12-07",
+   "due": "2026-12-07",
+   "type": "project",
+   "details": "12:20 PM; 100 pts"
+  },
+  {
+   "class": "Latin",
+   "title": "Latin Test",
+   "assigned": "2026-12-07",
+   "due": "2026-12-07",
+   "type": "test",
+   "details": "8:30 AM; 100 pts; Unit 2 Test"
+  },
+  {
+   "class": "English",
+   "title": "Odyssey Universe Reading",
+   "due": "2026-12-08",
+   "type": "reading",
+   "details": "Reading due Dec 7-8"
+  },
+  {
+   "class": "Forces",
+   "title": "Oral presentation (second half of class)",
+   "assigned": "2026-12-08",
+   "due": "2026-12-08",
+   "type": "project",
+   "details": "2:00 PM; 100 pts"
+  },
+  {
+   "class": "MSI",
+   "title": "Project due",
+   "assigned": "2026-12-08",
+   "due": "2026-12-08",
+   "type": "project",
+   "details": "Project due (syllabus only, NOT an Assignment Center entry)"
+  },
+  {
+   "class": "Arts",
+   "title": "Mythical creature print self-assessment",
+   "assigned": "2026-12-09",
+   "due": "2026-12-09",
+   "type": "project",
+   "details": "3:00 PM; 50 pts"
+  },
+  {
+   "class": "English",
+   "title": "AWWW 6",
+   "assigned": "2026-12-09",
+   "due": "2026-12-09",
+   "type": "quiz",
+   "details": "AWWW 6 graded vocabulary assessment; last day of MP2"
+  },
+  {
+   "class": "English",
+   "title": "Mid-Year Exam",
+   "due": "2026-12-14",
+   "type": "test",
+   "details": "Mid-year exams: Latin + English"
+  },
+  {
+   "class": "Latin",
+   "title": "Mid-Year Exam",
+   "due": "2026-12-14",
+   "type": "test",
+   "details": "Mid-year exams: Latin + English"
+  },
+  {
+   "class": "French",
+   "title": "Mid-Year Exam",
+   "due": "2026-12-15",
+   "type": "test",
+   "details": "Mid-year exams: Math-Sci + French"
+  },
+  {
+   "class": "MSI",
+   "title": "Mid-Year Exam",
+   "due": "2026-12-15",
+   "type": "test",
+   "details": "Mid-year exams: Math-Sci + French"
+  },
+  {
+   "class": "Arts",
+   "title": "Mid-Year Exam",
+   "due": "2026-12-16",
+   "type": "test",
+   "details": "Mid-year exams: Arts + FGC"
+  },
+  {
+   "class": "Forces",
+   "title": "Mid-Year Exam",
+   "due": "2026-12-16",
+   "type": "test",
+   "details": "Mid-year exams: Arts + FGC"
+  }
+ ]
 }
