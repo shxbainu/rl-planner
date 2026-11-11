@@ -13,13 +13,15 @@
 
   let schedule = null, homework = null;
   let state = load();
+  let quoteDeck = [], qFilter = "all"; // the quote deck (quotes.json) and the Quotes tab filter
 
   // ---------- storage ----------
   // localStorage is the store; the sync further down mirrors it to one shared copy online. So two devices can merge, every change
   // carries a time: done[k] is when it was checked, undone[k] when unchecked, removed[id] when an item or countdown was
-  // deleted, lettersAt[date] when a day letter was set or cleared, prefs[name] = { v, t }.
+  // deleted, lettersAt[date] when a day letter was set or cleared, prefs[name] = { v, t }. Quotes: quotes[id] is that quote's
+  // practice progress { lv, step, due, seen, last, t }, myQuotes the ones Brian added, qlog[date] how many he practiced that day.
   function load() {
-    const empty = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {} };
+    const empty = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {}, quotes: {}, myQuotes: [], qlog: {} };
     try {
       const s = JSON.parse(localStorage.getItem(STORE) || "null");
       return s ? { ...empty, ...s } : empty;
@@ -35,11 +37,11 @@
 
   // what syncs (the rest, like the open tab, stays per device), and how two copies merge: for each check-off, item,
   // countdown, day letter and pref, the newer change wins; a delete or uncheck newer than the item undoes it
-  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs", "notes"];
+  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs", "notes", "quotes", "myQuotes", "qlog"];
   const syncedPart = (s) => Object.fromEntries(SYNCED.map((k) => [k, s?.[k] ?? (Array.isArray(state[k]) ? [] : {})]));
   function mergeState(a, b) {
     const tm = (v) => (typeof v === "string" ? v : ""), max = (...xs) => xs.map(tm).sort().at(-1) || "";
-    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {} };
+    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {}, quotes: {}, myQuotes: [], qlog: {} };
     for (const k of new Set([a.done, b.done, a.undone, b.undone].flatMap((m) => Object.keys(m || {})))) {
       const on = a.done?.[k] ?? b.done?.[k], onT = max(a.done?.[k], b.done?.[k]), offT = max(a.undone?.[k], b.undone?.[k]);
       if (on != null && onT >= offT) out.done[k] = onT || on; // a check-off from before times were kept counts as oldest
@@ -53,13 +55,15 @@
     };
     out.manual = list(a.manual, b.manual, "uid");
     out.countdowns = list(a.countdowns, b.countdowns, "id");
+    out.myQuotes = list(a.myQuotes, b.myQuotes, "id");
+    for (const d of new Set([a.qlog, b.qlog].flatMap((m) => Object.keys(m || {})))) out.qlog[d] = Math.max(a.qlog?.[d] || 0, b.qlog?.[d] || 0);
     for (const d of new Set([a.letters, b.letters, a.lettersAt, b.lettersAt].flatMap((m) => Object.keys(m || {})))) {
       const ta = tm(a.lettersAt?.[d]), tb = tm(b.lettersAt?.[d]), from = tb > ta ? b : ta > tb ? a : a.letters?.[d] ? a : b;
       if (from.letters?.[d]) out.letters[d] = from.letters[d];
       if (ta || tb) out.lettersAt[d] = max(ta, tb);
     }
-    // settings, and each item's notes / steps / links, go by the newer edit
-    for (const f of ["prefs", "notes"]) {
+    // settings, each item's notes / steps / links, and each quote's progress go by the newer edit
+    for (const f of ["prefs", "notes", "quotes"]) {
       for (const k of new Set([a[f], b[f]].flatMap((m) => Object.keys(m || {})))) {
         const pa = a[f]?.[k], pb = b[f]?.[k];
         out[f][k] = !pa ? pb : !pb ? pa : tm(pb.t) > tm(pa.t) ? pb : pa;
@@ -1439,6 +1443,7 @@
     renderCounts();
     renderFantasy();
     renderNews();
+    renderQuotes();
   }
 
   // ---------- interactions ----------
@@ -1754,8 +1759,256 @@
   });
   imgCounts().then(() => { if (schedule) renderHomework(); });
 
+
+  // ---------- quotes: lines to memorize for speaking and debate, a few each day ----------
+  // A deck from quotes.json plus Brian's own. Each quote climbs four hint levels (0: every 4th key word blank, 1: every
+  // other word, 2: first letters only, 3: nothing but the author) and a review ladder of 1, 3, 7, 14, 30, 60 days.
+  const Q_STEPS = [1, 3, 7, 14, 30, 60], Q_NEW_PER_DAY = 2;
+  const allQuotes = () => [...quoteDeck, ...(state.myQuotes || []).filter((q) => !(state.removed?.[q.id] > q.t))];
+  const qById = (id) => allQuotes().find((q) => q.id === id);
+  const qProg = (id) => state.quotes?.[id];
+  const qMastered = (p) => !!p && p.lv >= 3 && Q_STEPS[p.step] >= 30;
+  // what's due (most overdue first), then up to two unseen ones; the same pick on every device for the same day
+  function qQueue() {
+    const t = today(), qs = allQuotes();
+    const due = qs.filter((q) => qProg(q.id)?.due && qProg(q.id).due <= t)
+      .sort((a, b) => qProg(a.id).due.localeCompare(qProg(b.id).due) || a.id.localeCompare(b.id));
+    const introduced = qs.filter((q) => qProg(q.id)?.seen === t).length;
+    const fresh = qs.filter((q) => !qProg(q.id)).sort((a, b) => hash(t + a.id).localeCompare(hash(t + b.id)) || a.id.localeCompare(b.id));
+    return { due, fresh: fresh.slice(0, Math.max(0, Q_NEW_PER_DAY - introduced)) };
+  }
+  function qOfDay() {
+    const { due, fresh } = qQueue(), t = today();
+    if (due[0] || fresh[0]) return due[0] || fresh[0];
+    const qs = allQuotes(), todays = qs.filter((q) => qProg(q.id)?.last === t);
+    const pool = todays.length ? todays : qs;
+    return [...pool].sort((a, b) => hash(t + a.id).localeCompare(hash(t + b.id)))[0] || null;
+  }
+  function qStreak() {
+    let d = today(), n = 0;
+    if (!state.qlog?.[d]) d = addDays(d, -1);
+    while (state.qlog?.[d]) { n++; d = addDays(d, -1); }
+    return n;
+  }
+  // 0 Again: back to 1 day, a level down. 1 Almost: same interval again. 2 Got it: a level up and the next interval.
+  function qGrade(id, g) {
+    const t = today(), p = qProg(id) || { lv: 0, step: -1, seen: t };
+    let { lv, step } = p;
+    if (g === 2) { lv = Math.min(3, lv + 1); step = Math.min(Q_STEPS.length - 1, step + 1); }
+    else if (g === 1) step = Math.max(0, step);
+    else { lv = Math.max(0, lv - 1); step = 0; }
+    state.quotes = { ...state.quotes, [id]: { lv, step, due: addDays(t, Q_STEPS[step]), seen: p.seen || t, last: t, t: stamp() } };
+    state.qlog = { ...state.qlog, [t]: (state.qlog?.[t] || 0) + 1 };
+    save();
+  }
+
+  // the quote with some words hidden: words keep their punctuation; a blank is as wide as the word it hides
+  const Q_STOP = new Set("a an the and or but nor of to in on at by for with as is are was were be been am it its it's that this these those from not no so if than then we you he she they i me my our your his her their them us do does did has have had will would can could shall should may might must".split(" "));
+  function qHint(text, lv) {
+    let wi = 0, ci = 0;
+    return text.split(/(\s+)/).map((tok) => {
+      if (!tok.trim()) return tok;
+      const m = tok.match(/^([^\p{L}\p{N}]*)([\p{L}\p{N}][\p{L}\p{N}'’-]*)?(.*)$/u);
+      const [, pre, w, post] = m || ["", "", "", tok];
+      if (!w) return esc(tok);
+      const i = wi++, content = w.length > 2 && !Q_STOP.has(w.toLowerCase().replace(/’/g, "'"));
+      const hide = lv === 0 ? content && ci++ % 4 === 1 : lv === 1 ? i % 2 === 1 : false;
+      if (lv === 2) return `${esc(pre)}<span class="q1">${esc(w[0])}</span>${esc(post)}`;
+      return hide ? `${esc(pre)}<span class="qb" style="--n:${Math.min(w.length, 14)}" aria-label="blank"></span>${esc(post)}` : esc(tok);
+    }).join("");
+  }
+  // "Type it": compare word by word, ignoring case and punctuation; missed words are marked, extra words struck
+  const qKey = (w) => w.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}]/gu, "");
+  function qDiff(orig, typed) {
+    const A = orig.split(/\s+/).filter(Boolean), B = typed.split(/\s+/).filter((w) => qKey(w));
+    const a = A.map(qKey), b = B.map(qKey), n = a.length, m = b.length;
+    const L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = !a[i] ? L[i + 1][j] : a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    const out = [];
+    let i = 0, j = 0, hit = 0;
+    while (i < n || j < m) {
+      if (i < n && !a[i]) { out.push(esc(A[i++])); continue; } // a lone dash or the like
+      if (i < n && j < m && a[i] === b[j]) { out.push(`<span class="q-ok">${esc(A[i])}</span>`); i++; j++; hit++; }
+      else if (j < m && (i >= n || L[i][j + 1] >= L[i + 1][j])) out.push(`<s class="q-extra" title="You typed this">${esc(B[j++])}</s>`);
+      else out.push(`<mark class="q-miss" title="Missed">${esc(A[i++])}</mark>`);
+    }
+    return { html: out.join(" "), hit, total: a.filter(Boolean).length };
+  }
+
+  // the slim line under the schedule: today's quote, or how many are due
+  function renderQuoteLine() {
+    const el = $("#qline"), q = qOfDay();
+    el.hidden = !q;
+    if (!q) return;
+    const { due } = qQueue(), p = qProg(q.id), short = q.text.length > 90 ? q.text.slice(0, 88).replace(/\s+\S*$/, "") + "…" : q.text;
+    const k = due.length ? `${due.length} ${due.length === 1 ? "quote" : "quotes"} due` : !p ? "New quote" : "Quote";
+    el.setAttribute("aria-label", `${k}: open quote practice`);
+    el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.2 6C4.9 7.3 3.5 9.6 3.5 12.6V18h6v-6H6.6c.1-1.9 1.1-3.3 2.6-4.2zm10 0c-2.3 1.3-3.7 3.6-3.7 6.6V18h6v-6h-2.9c.1-1.9 1.1-3.3 2.6-4.2z"/></svg><b class="ql-k${due.length ? " due" : ""}">${esc(k)}</b><span class="ql-t">${esc(short)}</span><span class="ql-by">${esc(q.by || "")}</span>`;
+  }
+
+  // the Quotes tab: the deck, a filter, progress, and a form to add your own
+  function renderQuotes() {
+    renderQuoteLine();
+    const qs = allQuotes(), t = today();
+    if (!qs.length) { $("#qlist").innerHTML = `<li class="empty-state">The quote deck hasn't loaded.</li>`; return; }
+    const { due, fresh } = qQueue(), mastered = qs.filter((q) => qMastered(qProg(q.id))).length, streak = qStreak();
+    $("#q-stats").textContent = `${mastered} of ${qs.length} mastered · ${streak ? `${streak}-day streak` : "no streak yet"}`;
+    const go = due.length + fresh.length;
+    $("#q-go").textContent = due.length ? `Practice ${due.length} due` : fresh.length ? `Learn ${fresh.length} new` : "Practice";
+    $("#q-go").classList.toggle("primary", go > 0);
+    const tags = new Map();
+    for (const q of qs) for (const g of q.tags || []) tags.set(g, (tags.get(g) || 0) + 1);
+    const opts = [["all", `All quotes · ${qs.length}`], ["due", `Due now · ${due.length}`], ["new", `Not started · ${qs.filter((q) => !qProg(q.id)).length}`], ["mastered", `Mastered · ${mastered}`]];
+    if (state.myQuotes?.length) opts.push(["mine", `Mine · ${qs.filter((q) => q.id.startsWith("u-")).length}`]);
+    const tagOpts = [...tags].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([g, n]) => [`tag:${g}`, `${g[0].toUpperCase() + g.slice(1)} · ${n}`]);
+    if (![...opts, ...tagOpts].some(([v]) => v === qFilter)) qFilter = "all";
+    $("#q-tag").innerHTML = opts.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("") +
+      `<optgroup label="Tags">${tagOpts.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</optgroup>`;
+    $("#q-tag").value = qFilter;
+    const show = qs.filter((q) => {
+      const p = qProg(q.id);
+      return qFilter === "all" ? true : qFilter === "due" ? p?.due && p.due <= t : qFilter === "new" ? !p : qFilter === "mastered" ? qMastered(p)
+        : qFilter === "mine" ? q.id.startsWith("u-") : (q.tags || []).includes(qFilter.slice(4));
+    });
+    const when = (p) => !p ? "New" : qMastered(p) ? "Mastered" : p.due <= t ? "Due" : `In ${daysBetween(t, p.due)}d`;
+    $("#qlist").innerHTML = show.map((q) => {
+      const p = qProg(q.id), lv = p ? p.lv : -1;
+      return `<li class="q-row${p?.due && p.due <= t ? " is-due" : ""}" data-qid="${esc(q.id)}" tabindex="0" role="button" aria-label="Practice: ${esc(q.text.slice(0, 60))}">
+        <span class="q-lv" title="${p ? `Level ${lv} of 3` : "Not started"}">${[0, 1, 2].map((k) => `<i${lv > k ? ' class="on"' : ""}></i>`).join("")}</span>
+        <span class="q-main"><span class="q-txt">${esc(q.text)}</span><span class="q-by">${esc(q.by || "Unattributed")}${q.note ? ` <span class="q-flag" title="${esc(q.note)}">attribution</span>` : ""}</span></span>
+        <span class="q-when">${when(p)}</span>
+        ${q.id.startsWith("u-") ? `<button class="q-del" type="button" data-qdel="${esc(q.id)}" aria-label="Delete this quote">×</button>` : ""}
+      </li>`;
+    }).join("") || `<li class="empty-state">Nothing here yet.</li>`;
+  }
+  $("#q-tag").addEventListener("change", (e) => { qFilter = e.target.value; renderQuotes(); });
+  $("#q-go").addEventListener("click", () => qStart());
+  $("#qline").addEventListener("click", () => qStart());
+  $("#qlist").addEventListener("click", (e) => {
+    const del = e.target.closest("[data-qdel]");
+    if (del) {
+      const id = del.dataset.qdel, q = qById(id);
+      state.removed = { ...state.removed, [id]: stamp() };
+      state.myQuotes = state.myQuotes.filter((x) => x.id !== id);
+      save(); renderQuotes();
+      toast("Quote deleted", () => { state.myQuotes = [...state.myQuotes, { ...q, t: stamp() }]; save(); renderQuotes(); });
+      return;
+    }
+    const row = e.target.closest("[data-qid]");
+    if (row) qStart([row.dataset.qid]);
+  });
+  $("#qlist").addEventListener("keydown", (e) => {
+    const row = e.target.closest("[data-qid]");
+    if (row && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); qStart([row.dataset.qid]); }
+  });
+  $("#q-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = $("#q-text").value.trim();
+    if (!text) return;
+    const q = { id: "u-" + uid(), text, by: $("#q-by").value.trim() || "Unattributed", source: $("#q-source").value.trim(), use: $("#q-use").value.trim(),
+      tags: $("#q-tags").value.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean), note: "", t: stamp() };
+    state.myQuotes = [...(state.myQuotes || []), q];
+    save();
+    e.target.reset();
+    $("#q-add").open = false;
+    qFilter = "mine";
+    renderQuotes();
+    toast("Quote added");
+  });
+
+  // practice, one quote at a time: read it (new ones), recall it with hints, reveal, grade
+  const qp = $("#qp");
+  let qs_ = { list: [], i: 0, stage: "recall", done: 0, typed: "" };
+  function qStart(ids) {
+    let list = ids;
+    if (!list) { const { due, fresh } = qQueue(); list = [...due, ...fresh].map((q) => q.id); }
+    if (!list.length) { const q = qOfDay(); list = q ? [q.id] : []; }
+    if (!list.length) return;
+    qs_ = { list, i: 0, done: 0, stage: qProg(list[0]) ? "recall" : "read", typed: "" };
+    renderPractice();
+    if (!qp.open) qp.showModal();
+  }
+  const qTyping = () => state.qType === true;
+  function renderPractice() {
+    const id = qs_.list[qs_.i], q = id && qById(id);
+    if (!q) {
+      qp.innerHTML = `<div class="qp-in"><div class="qp-h"><span class="qp-k">Practice</span><button class="icon-btn" type="button" data-qp="close" aria-label="Close">×</button></div>
+        <div class="qp-body qp-end"><p class="qp-big">All caught up.</p><p class="qp-sub">${qs_.done} practiced${qStreak() ? ` · ${qStreak()}-day streak` : ""}. More come due over the next days.</p></div>
+        <div class="qp-f"><button class="btn primary" type="button" data-qp="close">Done</button></div></div>`;
+      qp.querySelector(".qp-f .btn")?.focus();
+      return;
+    }
+    const p = qProg(q.id), lv = p ? p.lv : 0, st = qs_.stage;
+    const meta = `${esc(q.by || "Unattributed")}${q.source ? `, <cite>${esc(q.source)}</cite>` : ""}`;
+    const full = st === "read" || st === "reveal";
+    let body;
+    if (st === "reveal" && qs_.typed.trim()) {
+      const d = qDiff(q.text, qs_.typed);
+      body = `<blockquote class="qp-q diff">${d.html}</blockquote><p class="qp-score">${d.hit} of ${d.total} words${d.hit === d.total ? " · word for word" : ""}</p>`;
+    } else if (full) body = `<blockquote class="qp-q">${esc(q.text)}</blockquote>`;
+    else body = lv >= 3 ? `<div class="qp-q qp-hidden"><span>Say it from memory</span><small>${q.text.split(/\s+/).length} words</small></div>` : `<blockquote class="qp-q hint l${lv}">${qHint(q.text, lv)}</blockquote>`;
+    const extra = full ? `${q.note ? `<p class="qp-attr"><b>Attribution</b> ${esc(q.note)}</p>` : ""}${q.use ? `<p class="qp-use"><b>Use it</b> ${esc(q.use)}</p>` : ""}` : "";
+    const typeBox = st === "recall" && qTyping() ? `<textarea class="qp-type" id="qp-type" rows="3" placeholder="Type it from memory, then Enter to check" aria-label="Type the quote">${esc(qs_.typed)}</textarea>` : "";
+    const levelTxt = p ? `Level ${lv} of 3` : "New";
+    const foot = st === "read" ? `<button class="btn primary" type="button" data-qp="start">Hide words and recall <kbd>Space</kbd></button>`
+      : st === "recall" ? `<label class="qp-tg"><input type="checkbox" data-qp="type"${qTyping() ? " checked" : ""}> Type it</label><button class="btn" type="button" data-qp="peek">Read it</button><button class="btn primary" type="button" data-qp="reveal">Reveal <kbd>Space</kbd></button>`
+      : `<div class="qp-grade"><button class="btn g0" type="button" data-qg="0">Again <kbd>1</kbd></button><button class="btn g1" type="button" data-qg="1">Almost <kbd>2</kbd></button><button class="btn g2 primary" type="button" data-qg="2">Got it <kbd>3</kbd></button></div>`;
+    qp.innerHTML = `<div class="qp-in">
+      <div class="qp-h"><span class="qp-k">${qs_.list.length > 1 ? `${qs_.i + 1} of ${qs_.list.length} · ` : ""}${levelTxt}</span><button class="icon-btn" type="button" data-qp="close" aria-label="Close">×</button></div>
+      <div class="qp-body">
+        <p class="qp-step">${st === "read" ? "Read it out loud" : st === "recall" ? (lv >= 3 ? "Say the whole quote" : "Say it out loud, filling the blanks") : "How did it go?"}</p>
+        ${body}
+        <p class="qp-by">— ${lv >= 3 || full ? meta : esc(q.by || "Unattributed")}</p>
+        ${extra}${typeBox}
+      </div>
+      <div class="qp-f">${foot}</div></div>`;
+    const ta = qp.querySelector("#qp-type");
+    if (ta && !matchMedia("(pointer:coarse)").matches) ta.focus();
+    else qp.querySelector(".qp-f .primary")?.focus();
+  }
+  function qNext() {
+    qs_.i++;
+    qs_.typed = "";
+    const id = qs_.list[qs_.i];
+    qs_.stage = id && !qProg(id) ? "read" : "recall";
+    renderPractice();
+  }
+  function qReveal() {
+    qs_.typed = qp.querySelector("#qp-type")?.value || "";
+    qs_.stage = "reveal";
+    renderPractice();
+  }
+  function qDoGrade(g) {
+    qGrade(qs_.list[qs_.i], g);
+    qs_.done++;
+    renderQuotes();
+    qNext();
+  }
+  qp.addEventListener("click", (e) => {
+    if (e.target === qp) return qp.close();
+    const g = e.target.closest("[data-qg]");
+    if (g) return qDoGrade(+g.dataset.qg);
+    const a = e.target.closest("[data-qp]")?.dataset.qp;
+    if (a === "close") qp.close();
+    else if (a === "start") { qs_.stage = "recall"; renderPractice(); }
+    else if (a === "peek") { qs_.stage = "read"; renderPractice(); }
+    else if (a === "reveal") qReveal();
+  });
+  qp.addEventListener("change", (e) => {
+    if (e.target.matches('[data-qp="type"]')) { state.qType = e.target.checked; save(); qs_.typed = ""; renderPractice(); }
+  });
+  qp.addEventListener("keydown", (e) => {
+    if (e.target.id === "qp-type") {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); qReveal(); }
+      return;
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.matches("input,select,textarea")) return;
+    if (e.key === " " && qs_.stage !== "reveal" && qs_.list[qs_.i]) { e.preventDefault(); qs_.stage === "read" ? (qs_.stage = "recall", renderPractice()) : qReveal(); }
+    else if (qs_.stage === "reveal" && ["1", "2", "3"].includes(e.key)) { e.preventDefault(); qDoGrade(+e.key - 1); }
+  });
+
   // ---------- tabs: one strip for the secondary panes; on phones a bottom bar picks the section ----------
-  const PANES = ["week", "tests", "sports", "news", "fantasy", "count"], TABS = ["today", "homework", "music", "more"];
+  const PANES = ["week", "tests", "quotes", "sports", "news", "fantasy", "count"], TABS = ["today", "homework", "music", "more"];
   function showPane(name) {
     if (!PANES.includes(name)) name = "week";
     document.querySelectorAll("[data-tab-pane]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tabPane === name)));
@@ -2504,7 +2757,7 @@
     ["Study mode", "study focus", () => openStudy()], ["Homework", "homework calendar hw", go("homework")], ["Today's schedule", "schedule today bell", go("today")],
     ["Music", "music spotify lofi", go("music")], ["Rotation", "rotation week letters", go("more", "week")],
     ["Sports: Warriors, 49ers, scores", "sports warriors 49ers teams scores nba nfl", go("more", "sports")], ["News", "news", go("more", "news")], ["Lunch menu", "lunch menu food sage", () => { showTab("today"); return $(".p-lunch"); }], ["Today's briefing", "briefing summary ai news today", () => { $("#brief-peek").click(); }],
-    ["Tests", "tests quizzes essays projects", go("more", "tests")], ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
+    ["Tests", "tests quizzes essays projects", go("more", "tests")], ["Quotes", "quotes practice memorize speech debate", go("more", "quotes")], ["Practice quotes", "quote drill review", () => qStart()], ["Fantasy", "fantasy lineup", go("more", "fantasy")], ["Countdowns", "countdowns", go("more", "count")], ["Light / dark", "dark light mode", () => $("#theme-btn").click()],
     ...Object.entries(SKINS).map(([k, v]) => [`Theme: ${v}`, `theme ${k} ${v.toLowerCase()}`, () => { setSkin(k); document.querySelectorAll(".skin-select").forEach((o) => { o.value = k; }); }]),
   ];
   let cmdSel = 0, cmdItems = [];
@@ -2608,8 +2861,9 @@
     if (!r.ok) throw new Error(`${path}: ${r.status}`);
     return r.json();
   }
-  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null), getJSON("news_summary.json").catch(() => null), getJSON("menu.json").catch(() => null), getJSON("links.json").catch(() => null)])
-    .then(([s, h, f, n, b, mn, ln]) => {
+  Promise.all([getJSON("schedule.json"), getJSON("homework.json").catch(() => null), getJSON("fantasy.json").catch(() => null), getJSON("news.json").catch(() => null), getJSON("news_summary.json").catch(() => null), getJSON("menu.json").catch(() => null), getJSON("links.json").catch(() => null), getJSON("quotes.json").catch(() => null)])
+    .then(([s, h, f, n, b, mn, ln, qd]) => {
+      quoteDeck = Array.isArray(qd?.quotes) ? qd.quotes.filter((q) => q?.id && q.text) : [];
       news = n;
       brief = b;
       menu = mn;

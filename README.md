@@ -22,6 +22,12 @@ A Roxbury Latin schedule + homework dashboard. Plain HTML/CSS/JS, no build step.
 - **Quick links** (under Today): Portal, Classroom, Gmail, Drive, Membean, Chess.com and Spotify in one row (it scrolls sideways on phones), and under them a chip for each class that opens its Blackbaud Topics page. The class chips come from `links.json` (`{"class_links":[{"class":"Latin","topics":"<url>","bulletin":"<url>"}]}`, class names as in `schedule.json`), which Muse posts; only roxburylatin.myschoolapp.com addresses are used, and a class without one is left out.
 - **Layout**: Today, Homework and Music stay open; Week, Tests, Sports, News, Fantasy and Countdowns share one tab strip. On phones a bottom bar switches between Today, Homework, Music and More.
 
+## Quotes (memorizing lines for speaking and debate)
+
+`quotes.json` is the deck: each quote has `id`, `tags`, `text`, `by`, `source`, `note` (attribution warnings) and `use` (when to use it in a round). The **Quotes** tab lists it, filters by tag, and has an "Add your own" form; the line under the schedule shows today's quote, or how many are due, and opens practice.
+
+Practice goes read (new quotes only), recall with hints, reveal, grade. Hints get thinner as a quote's level rises: level 0 blanks every 4th key word, level 1 every other word, level 2 shows first letters only, level 3 shows just the author. **Got it** moves up a level and along the review ladder (1, 3, 7, 14, 30, 60 days), **Almost** repeats the interval, **Again** goes back to 1 day and down a level. Level 3 at 30+ days counts as mastered. At most 2 new quotes a day; the pick is the same on every device. Keys: Space reveals, 1/2/3 grade; "Type it" checks a typed version word by word. Progress, your own quotes and the practice streak sync like check-offs.
+
 ## Turning on the daily briefing (once)
 
 1. Go to https://console.anthropic.com, sign in or make an account, and add a payment method under **Billing**. It's pay as you go.

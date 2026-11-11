@@ -65,6 +65,7 @@
     </section>
     <a class="wx" id="wx" href="https://forecast.weather.gov/MapClick.php?lat=42.2793&amp;lon=-71.1495" target="_blank" rel="noopener" hidden></a>
     <button type="button" class="nextup" id="nextup" aria-label="Upcoming tests and quizzes: open the Tests tab" hidden></button>
+    <button type="button" class="qline" id="qline" hidden></button>
     <section class="panel p-lunch" aria-labelledby="lunch-h">
       <div class="panel-h"><h2 id="lunch-h">Lunch</h2>
         <div class="lunch-nav">
@@ -155,6 +156,7 @@
       <div class="tabs" role="tablist" aria-label="More">
         <button type="button" role="tab" data-tab-pane="week" aria-selected="true">Week</button>
         <button type="button" role="tab" data-tab-pane="tests" aria-selected="false">Tests</button>
+        <button type="button" role="tab" data-tab-pane="quotes" aria-selected="false">Quotes</button>
         <button type="button" role="tab" data-tab-pane="sports" aria-selected="false">Sports</button>
         <button type="button" role="tab" data-tab-pane="news" aria-selected="false">News</button>
         <button type="button" role="tab" data-tab-pane="fantasy" aria-selected="false">Fantasy</button>
@@ -175,6 +177,28 @@
       <div class="pane p-tests" data-pane="tests" role="tabpanel" hidden>
         <div class="x-tools"><span class="panel-meta">Tests, quizzes, essays and projects · next 4 weeks</span></div>
         <div id="tq"></div>
+      </div>
+
+      <div class="pane p-quotes" data-pane="quotes" role="tabpanel" hidden>
+        <div class="x-tools">
+          <span class="panel-meta" id="q-stats"></span>
+          <button class="btn q-go" type="button" id="q-go">Practice</button>
+        </div>
+        <label class="q-filter"><span class="sr-only">Show</span><select id="q-tag" aria-label="Show quotes"></select></label>
+        <ul class="qlist" id="qlist"></ul>
+        <details class="q-add" id="q-add">
+          <summary>Add your own</summary>
+          <form id="q-form" autocomplete="off">
+            <label>Quote<textarea id="q-text" rows="3" maxlength="600" required></textarea></label>
+            <div class="q-two">
+              <label>Who said it<input id="q-by" maxlength="80" placeholder="Unattributed"></label>
+              <label>Source<input id="q-source" maxlength="120" placeholder="Speech, book, year"></label>
+            </div>
+            <label>When to use it<input id="q-use" maxlength="200" placeholder="e.g. closing a case on fairness"></label>
+            <label>Tags<input id="q-tags" maxlength="80" placeholder="courage, justice"></label>
+            <button class="btn" type="submit">Add quote</button>
+          </form>
+        </details>
       </div>
 
       <div class="pane" data-pane="sports" role="tabpanel" hidden>
@@ -306,6 +330,7 @@
 </div>
 
 <dialog class="ad" id="ad" aria-labelledby="ad-title"></dialog>
+<dialog class="qp" id="qp" aria-label="Quote practice"></dialog>
 <dialog class="adv" id="adv" aria-label="Photo"></dialog>
 <dialog class="cmd" id="cmd" aria-label="Command bar">
   <form method="dialog" id="cmd-form" autocomplete="off">

@@ -96,7 +96,7 @@ html[data-skin="moss"]{
 
   /* tests, next up, weather, quick links: pebbles */
   .tq li{border-radius:10px}
-  :is(.nextup,.wx){border-radius:14px;box-shadow:var(--stone)}
+  :is(.nextup,.wx,.qline){border-radius:14px;box-shadow:var(--stone)}
   .dock-main a{border-radius:14px;box-shadow:var(--stone)}
   .lunch-mains li::before{width:8px;height:8px;top:.45em;border-radius:0;background:var(--accent);
     -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 14C2 7 6.5 2 14 2c0 7.5-5 12-12 12z'/%3E%3C/svg%3E") center/contain no-repeat;
