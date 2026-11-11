@@ -1,233 +1,190 @@
 {
- "updated_at": "2026-11-08T11:05:00-05:00",
- "source": "Muse, Crosswalk post ild8b0 (Sun Nov 8)",
- "league": "FFantasy Football",
- "team": "The Gibbs That Keep On Giving",
- "week": 9,
- "record": "4-4-0",
- "matchup": {
-  "opponent": "tkum",
-  "my_proj": 127.83,
-  "opp_proj": 116.2,
-  "my_score": 0.0,
-  "opp_score": 0.0
- },
- "lineup": [
-  {
-   "slot": "QB",
-   "player": "Brock Purdy",
-   "team": "SF",
-   "opp": "vs LV",
-   "kickoff": "2026-11-08T16:25:00-05:00",
-   "proj": 22.2,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "RB",
-   "player": "Jahmyr Gibbs",
-   "team": "DET",
-   "opp": "@ MIA",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 26.5,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "RB",
-   "player": "Jonah Coleman",
-   "team": "DEN",
-   "opp": "@ CAR",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 14.4,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "WR",
-   "player": "DJ Moore",
-   "team": "BUF",
-   "opp": "@ MIN",
-   "kickoff": "2026-11-09T20:15:00-05:00",
-   "proj": 12.5,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "WR",
-   "player": "Malik Washington",
-   "team": "MIA",
-   "opp": "vs DET",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 9.9,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "TE",
-   "player": "Dalton Kincaid",
-   "team": "BUF",
-   "opp": "@ MIN",
-   "kickoff": "2026-11-09T20:15:00-05:00",
-   "proj": 8.6,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "FLEX",
-   "player": "Ollie Gordon II",
-   "team": "MIA",
-   "opp": "vs DET",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 16.4,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "D/ST",
-   "player": "Bears",
-   "team": "CHI",
-   "opp": "vs TB",
-   "kickoff": "2026-11-08T20:20:00-05:00",
-   "proj": 6.4,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "K",
-   "player": "Spencer Shrader",
-   "team": "IND",
-   "opp": "vs DAL",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 10.9,
-   "points": null,
-   "status": ""
-  }
- ],
  "bench": [
   {
-   "slot": "BE",
+   "kickoff": "2026-11-15T16:25:00-05:00",
+   "opp": "@ DAL",
    "player": "Mike Evans",
-   "team": "SF",
-   "opp": "vs LV",
-   "kickoff": "2026-11-08T16:25:00-05:00",
-   "proj": 0.0,
    "points": null,
-   "status": "O"
+   "proj": 0.0,
+   "slot": "BE",
+   "status": "Q",
+   "team": "SF"
   },
   {
-   "slot": "BE",
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "@ NO",
    "player": "Bryce Young",
-   "team": "CAR",
-   "opp": "vs DEN",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 15.8,
    "points": null,
-   "status": ""
+   "proj": 18.8,
+   "slot": "BE",
+   "status": "",
+   "team": "CAR"
   },
   {
-   "slot": "BE",
-   "player": "Vikings D/ST",
-   "team": "MIN",
-   "opp": "vs BUF",
-   "kickoff": "2026-11-09T20:15:00-05:00",
-   "proj": 4.0,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "BE",
-   "player": "Garrett Wilson",
-   "team": "NYJ",
-   "opp": "@ KC",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 0.0,
-   "points": null,
-   "status": "O"
-  },
-  {
-   "slot": "BE",
-   "player": "Jaylen Warren",
-   "team": "PIT",
-   "opp": "BYE",
-   "kickoff": null,
-   "proj": null,
-   "points": null,
-   "status": ""
-  },
-  {
-   "slot": "BE",
+   "kickoff": "2026-11-12T20:15:00-05:00",
+   "opp": "@ NYG",
    "player": "Rachaad White",
-   "team": "WSH",
-   "opp": "vs LAR",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 11.9,
    "points": null,
-   "status": ""
-  },
-  {
+   "proj": 10.85,
    "slot": "BE",
-   "player": "Antonio Williams",
-   "team": "WSH",
-   "opp": "vs LAR",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 10.1,
-   "points": null,
-   "status": ""
+   "status": "",
+   "team": "WSH"
   },
   {
-   "slot": "IR",
-   "player": "Jordyn Tyson",
-   "team": "NO",
-   "opp": "vs CLE",
-   "kickoff": "2026-11-08T13:00:00-05:00",
-   "proj": 5.9,
+   "kickoff": null,
+   "opp": "BYE",
+   "player": "Jonah Coleman",
    "points": null,
-   "status": "Q"
+   "proj": null,
+   "slot": "BE",
+   "status": "",
+   "team": "DEN"
+  },
+  {
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "vs CAR",
+   "player": "Jordyn Tyson",
+   "points": null,
+   "proj": 8.58,
+   "slot": "BE",
+   "status": "",
+   "team": "NO"
+  },
+  {
+   "kickoff": null,
+   "opp": "BYE",
+   "player": "Bears",
+   "points": null,
+   "proj": null,
+   "slot": "BE",
+   "status": "",
+   "team": "CHI"
   }
  ],
+ "inactives": "No games started yet; all scores 0.0. Garrett Wilson (Q, back from concussion) is starting vs BUF and Mike Evans (Q) is benched with a 0.0 projection; watch the Sun Nov 15 ~11:30 AM ET inactive lists — if Wilson is ruled out, Jordyn Tyson (8.58) is the only bench WR. Jonah Coleman (DEN) and Bears D/ST are on bye.",
+ "league": "FFantasy Football",
+ "lineup": [
+  {
+   "kickoff": "2026-11-15T16:25:00-05:00",
+   "opp": "@ DAL",
+   "player": "Brock Purdy",
+   "points": null,
+   "proj": 20.73,
+   "slot": "QB",
+   "status": "",
+   "team": "SF"
+  },
+  {
+   "kickoff": "2026-11-15T09:30:00-05:00",
+   "opp": "vs NE",
+   "player": "Jahmyr Gibbs",
+   "points": null,
+   "proj": 23.86,
+   "slot": "RB",
+   "status": "",
+   "team": "DET"
+  },
+  {
+   "kickoff": "2026-11-15T20:20:00-05:00",
+   "opp": "@ CIN",
+   "player": "Jaylen Warren",
+   "points": null,
+   "proj": 15.55,
+   "slot": "RB",
+   "status": "",
+   "team": "PIT"
+  },
+  {
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "@ NYJ",
+   "player": "DJ Moore",
+   "points": null,
+   "proj": 13.34,
+   "slot": "WR",
+   "status": "",
+   "team": "BUF"
+  },
+  {
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "vs BUF",
+   "player": "Garrett Wilson",
+   "points": null,
+   "proj": 12.71,
+   "slot": "WR",
+   "status": "Q",
+   "team": "NYJ"
+  },
+  {
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "@ NYJ",
+   "player": "Dalton Kincaid",
+   "points": null,
+   "proj": 8.85,
+   "slot": "TE",
+   "status": "",
+   "team": "BUF"
+  },
+  {
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "@ IND",
+   "player": "Ollie Gordon II",
+   "points": null,
+   "proj": 15.7,
+   "slot": "FLEX",
+   "status": "",
+   "team": "MIA"
+  },
+  {
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "@ GB",
+   "player": "Vikings",
+   "points": null,
+   "proj": 5.19,
+   "slot": "D/ST",
+   "status": "",
+   "team": "MIN"
+  },
+  {
+   "kickoff": "2026-11-15T13:00:00-05:00",
+   "opp": "vs MIA",
+   "player": "Spencer Shrader",
+   "points": null,
+   "proj": 10.63,
+   "slot": "K",
+   "status": "",
+   "team": "IND"
+  }
+ ],
+ "matchup": {
+  "my_proj": 126.56,
+  "my_score": 0.0,
+  "opp_proj": 101.9,
+  "opp_score": 0.0,
+  "opponent": "I like pizza (Declan)"
+ },
  "moves": [
-  {
-   "by": "Claude",
-   "kind": "start/sit",
-   "text": "Keep Malik Washington at WR over Antonio Williams, even though ESPN has Williams up 10.1 to 9.9",
-   "why": "Both lock at 1pm, so decide now. Over their last 5 games Washington has 32 targets, 24 catches and 7 carries; Williams has 26 targets and 16 catches, and has not topped 54 yards or scored in that span. Williams is a close second: McLaurin and Dyami Brown are on IR, Burks is inactive today, and he saw 7 targets last week."
-  },
-  {
-   "by": "Claude",
-   "kind": "waiver",
-   "text": "If DJ Moore or Dalton Kincaid is a surprise scratch Monday, check waivers for someone playing Sunday night or Monday",
-   "why": "Your whole usable bench locks at 1pm today (Young, White, Williams), and Evans is Out, Wilson is Out and Warren is on bye, so nobody on the roster can replace a Monday 8:15pm starter. Risk looks low: Moore (shoulder) has no designation and Kincaid (chest) practiced fully Friday. Depending on when the news breaks, only players in TB at CHI (Sunday 8:20pm) and BUF at MIN would still be unlocked."
-  },
-  {
-   "by": "Claude",
-   "kind": "waiver",
-   "text": "Week 10 prep: check waivers for a D/ST and RB cover, and check whether Tyson can stay in the IR slot",
-   "why": "The Bears and Jonah Coleman's Broncos are both on bye in Week 10, and the Vikings D/ST goes to Green Bay. Tyson (hamstring) came off real IR Saturday and is not on New Orleans' inactive list today, so ESPN may flag the IR slot and block adds until he moves. The bench is full, so that would take a drop. Warren returns from his bye next week, and Evans is questionable at best."
-  },
   {
    "by": "Muse",
    "kind": "start/sit",
-   "text": "Keep DJ Moore starting, Mike Evans benched",
-   "why": "Moore has no injury designation and is likely to play Monday at Minnesota; Evans is Out for Sunday vs the Raiders (Achilles)."
+   "text": "Keep Garrett Wilson starting despite the Q tag",
+   "why": "Wilson projects 12.71 vs BUF; the only bench WR is Tyson at 8.58, and Evans (Q) projects 0.0. Check Sunday inactives before 1 PM."
   },
   {
    "by": "Muse",
    "kind": "start/sit",
    "text": "Keep Ollie Gordon II at flex over Rachaad White",
-   "why": "Gordon projects 16.4 vs White 11.9."
-  },
-  {
-   "by": "Muse",
-   "kind": "start/sit",
-   "text": "Keep Brock Purdy starting over Bryce Young",
-   "why": "Purdy projects 22.2 vs Young 15.8."
+   "why": "Gordon projects 15.7 vs White 10.85."
   },
   {
    "by": "Muse",
    "kind": "trade",
-   "text": "Do not re-offer for Tee Higgins; the deal is closed",
-   "why": "The Nov 6 offer (Wilson + Warren for Higgins) was rejected or withdrawn before expiry and is no longer pending. Hold Wilson and Warren."
+   "text": "Decide on the pending Justin Jefferson offer before it expires ~Thu Nov 12, 4:33 PM",
+   "why": "Jefferson would upgrade WR, but sending Warren leaves RB2 to White (10.85) with Coleman on bye; weigh the RB depth cost before accepting."
   }
- ]
+ ],
+ "record": "5-4-0",
+ "team": "The Gibbs That Keep On Giving",
+ "trades": "Tee Higgins deal is closed: Higgins remains on patel's roster (starting WR, proj 16.2 vs PIT) and Warren/Wilson remain on Brian's roster; the Nov 6 offer never executed. NEW pending trade, proposed by Brian Nov 10 at 4:33 PM, expires ~Nov 12 at 4:33 PM: receive Justin Jefferson (MIN WR) from What's Fay, send Bryce Young (CAR QB) and Jaylen Warren (PIT RB). No action taken; recommend-only. No waiver claims processed for Brian; waiver order 7 of 12. Roster moves since Nov 8: dropped Malik Washington (Tue Nov 10, 6:10 PM) and Antonio Williams (Tue Nov 10, 3:05 PM). Week 9 result: beat tkum 110.38-100.96, now 5-4-0, 6th of 12.",
+ "updated_at": "2026-11-10T18:53:00-05:00",
+ "week": 10
 }
