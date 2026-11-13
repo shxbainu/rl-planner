@@ -116,11 +116,28 @@ def clean_item(a):
     return a
 
 
+def clean_days(d):
+    """A special order like "G-H-A-B-C-F" is the day's letter (G) plus a note; one odd value must not sink the whole file."""
+    days, special = {}, dict(d.get("special") or {})
+    for day, val in d["days"].items():
+        v = str(val or "").strip()
+        if re.fullmatch("[A-H]", v):
+            days[day] = v
+        elif re.match(r"[A-H]\b", v):
+            days[day] = v[0]
+            special.setdefault(day, f"Special order {v}, times differ")
+        else:
+            print(f"  dropped day letter {day}: {v!r}")
+    return {**d, "days": days, "special": special}
+
+
 def normalize_homework(d):
     """Muse sometimes saves {generated, day_letters, coverage_gaps, ...}; turn that into the site's shape."""
     if not isinstance(d, dict) or not isinstance(d.get("assignments"), list):
         return d
     d = {**d, "assignments": [clean_item(a) for a in d["assignments"]]}
+    if isinstance(d.get("days"), dict):
+        d = clean_days(d)
     if d.get("updated_at") or not d.get("generated"):
         return d
     try:
