@@ -339,8 +339,10 @@ html.studying .p-music{display:flex!important}
 .item.leaving{opacity:0;transition:opacity .2s}
 .hw-note{margin:0 0 6px;font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:6px 10px}
 /* Muse's notes under the list: quiet, one line each */
-.hw-notes{margin-top:8px;padding:8px 10px;border-radius:8px;border:1px dashed var(--line);font-size:12px;line-height:1.45;color:var(--muted)}
-.hw-notes ul{margin:2px 0 0;padding-left:16px;display:grid;gap:2px}
+.hw-notes{margin-top:8px}
+.hw-notes ul{margin:4px 0 8px;padding-left:18px;display:grid;gap:4px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+/* weather, next up and quote: one block in Ink & Paper, separate strips in the skins */
+.today{display:contents}
 .empty-state{color:var(--muted);font-size:13px;background:var(--surface-2);border-radius:8px;padding:10px 12px;margin:0 0 10px}
 
 details{border-top:1px solid var(--line);margin-top:auto}
@@ -848,31 +850,57 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 /* study mode: full screen, the theme's colors over a scene drawn for the subject */
 .study-btn{width:auto;padding:0 11px;gap:6px;font-weight:600;font-size:13px;display:inline-flex;align-items:center}
 .study-btn svg{width:16px;height:16px}
-.study{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);grid-template-rows:auto minmax(0,1fr);
+.study{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.8fr);grid-template-rows:auto minmax(0,1fr);
   grid-template-areas:"top top" "left right";gap:16px;padding:14px 20px 20px;padding-top:calc(14px + env(safe-area-inset-top,0px));background:var(--bg);color:var(--fg);overflow:hidden}
 .study[hidden]{display:none}
 .st-scene{position:absolute;inset:0;pointer-events:none}
 .st-scene svg{display:block;width:100%;height:100%}
 .study.has-scene{background:#0d111a}
-.study > :not(.st-scene,.st-nudge){position:relative}
+.study > :not(.st-scene,.st-nudge,.st-fx){position:relative}
+.st-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 html.studying body{overflow:hidden}
 .st-top{grid-area:top;display:flex;align-items:center;gap:12px;min-height:38px}
 .st-where{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .st-stats{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .study.has-scene .st-top,.study.has-scene .st-stats{color:#ece8de}
+.st-mo{height:38px;padding:0 14px 0 30px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 12.5px var(--ui,inherit);cursor:pointer;flex:none;position:relative}
+.st-mo::before{content:"";position:absolute;left:12px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;border:1.5px solid currentColor}
+.st-mo[aria-pressed="true"]::before{background:currentColor;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 22%,transparent)}
+.st-mo[aria-pressed="false"]{color:var(--muted)}
 .st-x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:15px;cursor:pointer;flex:none}
-.st-left{grid-area:left;display:flex;flex-direction:column;gap:16px;min-height:0}
-.st-right{grid-area:right;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto;scrollbar-width:thin}
+.st-left{grid-area:left;display:flex;flex-direction:column;justify-content:safe center;gap:14px;min-height:0;max-width:980px}
+.st-right{grid-area:right;display:flex;flex-direction:column;gap:12px;min-height:0}
+.st-scroll{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;overflow:auto;scrollbar-width:thin}
+.st-left .st-work{flex:none}
 .st-card{background:color-mix(in srgb,var(--surface) 90%,transparent);color:var(--fg);border:1px solid var(--line);border-radius:16px;padding:16px 18px;
   -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 10px 30px rgb(0 0 0 / .18)}
 .st-k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 /* the clock card wears the theme's countdown look (it is also a .now-card); the ids keep its size */
-#st-clock{flex:1;display:flex;flex-direction:column;justify-content:safe center;gap:10px;padding:24px 28px;min-height:0;overflow:auto}
+#st-clock{flex:0 1 auto;display:flex;flex-direction:column;justify-content:safe center;gap:10px;padding:24px 28px;min-height:0;overflow:auto}
 #st-clock .lbl{font-size:clamp(20px,2.3vw,30px);font-weight:700;line-height:1.15}
 #st-clock .lbl small{display:block;font-size:14px;font-weight:500;color:inherit;opacity:.75;margin-top:3px}
 #st-clock .num{font-family:var(--digits,var(--mono));font-size:clamp(76px,12.5vw,190px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 #st-clock .prog{height:10px;max-width:none}
 #st-clock .sub{font-size:15px}
+.st-row{display:flex;align-items:center;gap:clamp(18px,3vw,44px);flex-wrap:wrap}
+/* on a break: a ring that swells for 4 seconds (breathe in) and shrinks for 4 (breathe out) */
+.st-breathe{position:relative;display:grid;place-items:center;width:clamp(96px,10vw,140px);aspect-ratio:1;flex:none}
+.st-breathe i{position:absolute;inset:0;border-radius:50%;border:2px solid currentColor;background:color-mix(in srgb,currentColor 8%,transparent);animation:st-breathe 8s ease-in-out infinite}
+.st-breathe span{grid-area:1/1;font-size:13px;font-weight:700;letter-spacing:.02em;animation:st-say 8s linear infinite}
+.st-breathe span + span{animation-delay:-4s}
+@keyframes st-breathe{0%,100%{transform:scale(.55);opacity:.4}50%{transform:scale(1);opacity:.9}}
+@keyframes st-say{0%,46%{opacity:1}50%,96%{opacity:0}100%{opacity:1}}
+/* the scene's own motion, only while Motion is on */
+.study.fx .fx-wave path{animation-name:st-wave;animation-timing-function:linear;animation-iteration-count:infinite}
+@keyframes st-wave{to{transform:translateX(-80px)}}
+.study.fx .fx-bob{transform-box:fill-box;transform-origin:50% 100%;animation:st-bob 7s ease-in-out infinite alternate}
+@keyframes st-bob{from{transform:translateY(0) rotate(-.9deg)}to{transform:translateY(5px) rotate(.9deg)}}
+.study.fx .fx-shim{animation:st-shim 5s ease-in-out infinite alternate}
+@keyframes st-shim{from{opacity:.03}to{opacity:.1}}
+.study.fx .fx-glow{transform-box:fill-box;transform-origin:center;animation:st-glow 9s ease-in-out infinite alternate}
+@keyframes st-glow{from{transform:scale(.92)}to{transform:scale(1.08)}}
+.study.fx .fx-win{animation-name:st-win;animation-iteration-count:infinite}
+@keyframes st-win{0%{opacity:1}38%{opacity:1}39%{opacity:.08}71%{opacity:.08}72%{opacity:1}}
 .st-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
 /* the clock card can be light or dark depending on the theme, so its controls take the card's own text color */
 #st-clock .btn,#st-clock .seg{background:transparent;color:inherit;border:1.5px solid color-mix(in srgb,currentColor 35%,transparent)}
@@ -942,14 +970,18 @@ html.st-dock .st-music{display:none}
   #add-btn{width:38px;padding:0;font-size:20px;line-height:1}
   #add-btn span{display:none}
   .study{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"top" "left" "right";overflow:auto;gap:12px;padding-left:12px;padding-right:12px}
-  .st-right{overflow:visible}
-  #st-clock{padding:18px 20px}
+  .st-right,.st-scroll{overflow:visible}
+  .st-left,.st-right,.st-scroll{min-height:auto}
+  #st-clock{padding:18px 20px;flex:none}
+  .st-mo{width:38px;padding:0;font-size:0}
+  .st-mo::before{left:50%;margin-left:-4.5px}
   #st-clock .num{font-size:clamp(68px,23vw,120px)}
 }
 @media (max-height:520px) and (min-width:760px){
   .study{overflow:auto;gap:10px;padding-top:8px}
-  .st-right{overflow:visible}
-  #st-clock{padding:14px 18px;gap:6px}
+  .st-right,.st-scroll{overflow:visible}
+  .st-left,.st-right,.st-scroll{min-height:auto}
+  #st-clock{padding:14px 18px;gap:6px;flex:none}
   #st-clock .num{font-size:clamp(48px,15vh,84px)}
   #st-clock .lbl{font-size:20px}
   #st-clock .lbl small{display:none}
@@ -1037,3 +1069,4 @@ dialog.qp{width:min(680px,calc(100vw - 24px));max-width:none;max-height:calc(100
   .q-two{grid-template-columns:1fr}
 }
 @media (pointer:coarse){.qp-f kbd{display:none}}
+@media (prefers-reduced-motion:reduce){.st-breathe span + span{display:none}}

@@ -480,6 +480,8 @@
 
   // Two school weeks (Mon–Fri) of chips by due date; the picked day's full checklist sits underneath.
   let calWeek = 0, selDay = null, showOverdue = false;
+  let notesOpen = false;
+  $("#hw-notes").addEventListener("toggle", (e) => { notesOpen = e.target.open; }, true);
   function renderHomework() {
     const t = today();
     const items = allItems();
@@ -524,7 +526,8 @@
       ? list.map((i) => itemHTML(i, { overdue: showOverdue, showDue: showOverdue })).join("")
       : `<li class="empty-state">Nothing due${offName(selDay) ? ` (${esc(offName(selDay))})` : ""}.</li>`;
     const notes = homework?.notes || [];
-    $("#hw-notes").innerHTML = notes.length ? `<div class="hw-notes"><b>Notes</b><ul>${notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></div>` : "";
+    // closed by default, one line like "Done"; stays open across re-renders once opened
+    $("#hw-notes").innerHTML = notes.length ? `<details class="hw-notes"${notesOpen ? " open" : ""}><summary>Notes <span class="count">${notes.length}</span></summary><ul>${notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></details>` : "";
 
     const done = items.filter(isDone).sort((a, b) => b.due.localeCompare(a.due));
     $("#done-count").textContent = done.length;
@@ -2271,44 +2274,210 @@
     const rnd = ((s) => () => (s = (s * 16807) % 2147483647) / 2147483647)(7);
     const stars = (n, h) => Array.from({ length: n }, () => `<circle cx="${(rnd() * W) | 0}" cy="${(rnd() * h) | 0}" r="${(0.6 + rnd() * 1.2).toFixed(1)}" fill="#fff" opacity="${(0.25 + rnd() * 0.5).toFixed(2)}"/>`).join("");
     if (name === "English") {
-      const waves = Array.from({ length: 16 }, (_, i) => { const y = 560 + i * 22 + i * i; let d = `M0 ${y}`; for (let x = 0; x < W; x += 80) d += ` q40 ${-4 - i * 0.5} 80 0`; return `<path d="${d}" stroke="#9fb1cf" stroke-opacity="${(0.05 + i * 0.008).toFixed(3)}" fill="none" stroke-width="1.4"/>`; }).join("");
+      const waves = Array.from({ length: 16 }, (_, i) => { const y = 560 + i * 22 + i * i; let d = `M0 ${y}`; for (let x = 0; x < W + 160; x += 80) d += ` q40 ${-4 - i * 0.5} 80 0`; return `<path d="${d}" stroke="#9fb1cf" stroke-opacity="${(0.05 + i * 0.008).toFixed(3)}" fill="none" stroke-width="1.4" style="animation-duration:${(34 - i * 1.6).toFixed(1)}s"/>`; }).join("");
       return { label: "The wine-dark sea", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#101729"/><stop offset=".55" stop-color="#2a2c46"/><stop offset="1" stop-color="#5a3a47"/></linearGradient><linearGradient id="w" x2="0" y2="1"><stop offset="0" stop-color="#3a2a3c"/><stop offset=".25" stop-color="#1b2136"/><stop offset="1" stop-color="#0c111d"/></linearGradient><radialGradient id="g"><stop offset="0" stop-color="#efe6cf" stop-opacity=".18"/><stop offset="1" stop-color="#efe6cf" stop-opacity="0"/></radialGradient></defs>
         <rect width="${W}" height="540" fill="url(#s)"/>${stars(70, 420)}<circle cx="1180" cy="230" r="150" fill="url(#g)"/><circle cx="1180" cy="230" r="42" fill="#ece3cc" opacity=".9"/>
-        <rect y="540" width="${W}" height="${H - 540}" fill="url(#w)"/><rect x="1150" y="545" width="60" height="300" fill="#ece3cc" opacity=".05"/>${waves}
-        <g fill="#0a0d16"><path d="M380 548h150l-22 16H404z"/><rect x="452" y="470" width="4" height="80"/><path d="M420 482h68l-6 48h-56z" opacity=".92"/></g>`) };
+        <rect y="540" width="${W}" height="${H - 540}" fill="url(#w)"/><rect class="fx-shim" x="1150" y="545" width="60" height="300" fill="#ece3cc" opacity=".05"/><g class="fx-wave">${waves}</g>
+        <g class="fx-bob" fill="#0a0d16"><path d="M380 548h150l-22 16H404z"/><rect x="452" y="470" width="4" height="80"/><path d="M420 482h68l-6 48h-56z" opacity=".92"/></g>`) };
     }
     if (name === "Latin") {
       const cols = [180, 260, 340, 420, 980, 1060, 1300].map((x, i) => { const h = [300, 300, 300, 300, 230, 160, 270][i]; return `<rect x="${x}" y="${720 - h}" width="38" height="${h}"/><rect x="${x - 7}" y="${720 - h - 14}" width="52" height="14"/><rect x="${x - 9}" y="704" width="56" height="16"/>`; }).join("");
       return { label: "The Forum at dusk", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#1f2034"/><stop offset=".55" stop-color="#5a4152"/><stop offset=".85" stop-color="#b9805f"/><stop offset="1" stop-color="#cf9a6c"/></linearGradient></defs>
-        <rect width="${W}" height="${H}" fill="url(#s)"/>${stars(30, 260)}<circle cx="760" cy="640" r="70" fill="#f1c08a" opacity=".55"/>
+        <rect width="${W}" height="${H}" fill="url(#s)"/>${stars(30, 260)}<circle class="fx-glow" cx="760" cy="640" r="70" fill="#f1c08a" opacity=".55"/>
         <path d="M0 650 C200 600 380 640 560 610 S900 590 1100 620 1450 600 1600 630V900H0z" fill="#3a2b36"/>
         <g fill="#1a1520">${cols}<rect x="166" y="392" width="300" height="26"/><path d="M1130 720V520a110 110 0 0 1 220 0v200h-46V530a64 64 0 0 0-128 0v190z"/><rect y="718" width="${W}" height="${H - 718}"/></g>`) };
     }
     if (name === "French") {
       let roofs = "M0 900V640", win = "";
       for (let x = 0; x < W; x += 0) { const w = 90 + ((rnd() * 90) | 0), top = 560 + ((rnd() * 90) | 0); roofs += ` L${x} ${top + 30} L${x + 14} ${top} L${x + w - 14} ${top} L${x + w} ${top + 30}`; if (rnd() > 0.5) roofs += ` L${x + w - 30} ${top + 30} L${x + w - 30} ${top - 22} L${x + w - 18} ${top - 22} L${x + w - 18} ${top + 30}`;
-        for (let r = 0; r < 4; r++) for (let c = 0; c < Math.floor(w / 28); c++) if (rnd() > 0.62) win += `<rect x="${x + 10 + c * 28}" y="${top + 48 + r * 54}" width="12" height="20" rx="1"/>`; x += w; }
+        for (let r = 0; r < 4; r++) for (let c = 0; c < Math.floor(w / 28); c++) if (rnd() > 0.62) win += `<rect${rnd() > 0.86 ? ` class="fx-win" style="animation-delay:-${(rnd() * 30).toFixed(1)}s;animation-duration:${(16 + rnd() * 22).toFixed(1)}s"` : ""} x="${x + 10 + c * 28}" y="${top + 48 + r * 54}" width="12" height="20" rx="1"/>`; x += w; }
       roofs += ` L${W} 640 V900z`;
       return { label: "Paris at night", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#0d1326"/><stop offset="1" stop-color="#232b47"/></linearGradient><radialGradient id="l"><stop offset="0" stop-color="#f3cd86" stop-opacity=".45"/><stop offset="1" stop-color="#f3cd86" stop-opacity="0"/></radialGradient></defs>
         <rect width="${W}" height="${H}" fill="url(#s)"/>${stars(90, 520)}
         <path d="M1150 150l7 70h-14zM1143 220h14l22 170h-58zM1121 390h58l40 140h-138zM1081 530h138l60 200h-60c-10-70-40-110-69-110s-59 40-69 110h-60z" fill="#0a0e1b"/><circle cx="1150" cy="148" r="4" fill="#f3cd86"/>
         <path d="${roofs}" fill="#0b0f1c"/><g fill="#e9bb6e" opacity=".75">${win}</g>
-        <rect x="300" y="560" width="6" height="340" fill="#06080f"/><circle cx="303" cy="560" r="90" fill="url(#l)"/><circle cx="303" cy="556" r="9" fill="#f6d79c"/>`) };
+        <rect x="300" y="560" width="6" height="340" fill="#06080f"/><circle class="fx-glow" cx="303" cy="560" r="90" fill="url(#l)"/><circle cx="303" cy="556" r="9" fill="#f6d79c"/>`) };
     }
     if (name === "MSI") {
       let traces = "", nodes = "";
-      for (let i = 0; i < 26; i++) { let x = ((rnd() * 16) | 0) * 100, y = ((rnd() * 9) | 0) * 100, d = `M${x} ${y}`; for (let k = 0; k < 5; k++) { if (rnd() > 0.5) x += (rnd() > 0.5 ? 1 : -1) * 100; else y += (rnd() > 0.5 ? 1 : -1) * 100; d += ` L${x} ${y}`; } traces += `<path d="${d}"/>`; nodes += `<circle cx="${x}" cy="${y}" r="5"/>`; }
-      return { label: "Circuit board", svg: svg(`<defs><radialGradient id="b" cx=".7" cy=".4" r=".9"><stop offset="0" stop-color="#14302a"/><stop offset="1" stop-color="#0a1311"/></radialGradient><filter id="f"><feGaussianBlur stdDeviation="6"/></filter></defs>
+      const pts = [];
+      for (let i = 0; i < 26; i++) { let x = ((rnd() * 16) | 0) * 100, y = ((rnd() * 9) | 0) * 100, d = `M${x} ${y}`; const tr = [[x, y]]; for (let k = 0; k < 5; k++) { if (rnd() > 0.5) x += (rnd() > 0.5 ? 1 : -1) * 100; else y += (rnd() > 0.5 ? 1 : -1) * 100; d += ` L${x} ${y}`; tr.push([x, y]); } pts.push(tr); traces += `<path d="${d}"/>`; nodes += `<circle cx="${x}" cy="${y}" r="5"/>`; }
+      return { label: "Circuit board", data: { traces: pts }, svg: svg(`<defs><radialGradient id="b" cx=".7" cy=".4" r=".9"><stop offset="0" stop-color="#14302a"/><stop offset="1" stop-color="#0a1311"/></radialGradient><filter id="f"><feGaussianBlur stdDeviation="6"/></filter></defs>
         <rect width="${W}" height="${H}" fill="url(#b)"/><g fill="none" stroke="#5fc4a4" stroke-width="2" opacity=".18" filter="url(#f)">${traces}</g><g fill="none" stroke="#5fc4a4" stroke-width="1.6" opacity=".28">${traces}</g><g fill="#7fdcbf" opacity=".45">${nodes}</g>
         <g fill="#0d1b18" stroke="#5fc4a4" stroke-opacity=".35"><rect x="1080" y="300" width="240" height="240" rx="10"/></g><g stroke="#5fc4a4" stroke-opacity=".3" stroke-width="3">${Array.from({ length: 8 }, (_, i) => `<path d="M${1100 + i * 28} 300v-30M${1100 + i * 28} 540v30M1080 ${320 + i * 28}h-30M1320 ${320 + i * 28}h30"/>`).join("")}</g>`) };
     }
     if (name === "Forces") {
-      const merid = Array.from({ length: 7 }, (_, i) => `<ellipse cx="1150" cy="450" rx="${50 + i * 48}" ry="340"/>`).join(""), par = Array.from({ length: 7 }, (_, i) => { const y = 450 + (i - 3) * 96, w = Math.sqrt(Math.max(0, 340 ** 2 - (y - 450) ** 2)); return `<path d="M${1150 - w} ${y}H${1150 + w}"/>`; }).join("");
-      return { label: "The world at night", svg: svg(`<defs><radialGradient id="b" cx=".7" cy=".5" r=".8"><stop offset="0" stop-color="#18263b"/><stop offset="1" stop-color="#0c121d"/></radialGradient></defs>
-        <rect width="${W}" height="${H}" fill="url(#b)"/>${stars(60, H)}<circle cx="1150" cy="450" r="340" fill="#122036" stroke="#6f8fb8" stroke-opacity=".35"/><g fill="none" stroke="#6f8fb8" stroke-opacity=".22">${merid}${par}</g>`) };
+      const par = Array.from({ length: 7 }, (_, i) => { const y = 470 + (i - 3) * 112, w = Math.sqrt(Math.max(0, 400 ** 2 - (y - 470) ** 2)); return `<path d="M${800 - w} ${y}H${800 + w}"/>`; }).join("");
+      return { label: "The world at night", data: { globe: { cx: 800, cy: 470, r: 400 } }, svg: svg(`<defs><radialGradient id="b" cx=".5" cy=".52" r=".8"><stop offset="0" stop-color="#18263b"/><stop offset="1" stop-color="#0c121d"/></radialGradient></defs>
+        <rect width="${W}" height="${H}" fill="url(#b)"/>${stars(60, H)}<circle cx="800" cy="470" r="400" fill="#122036" stroke="#6f8fb8" stroke-opacity=".35"/><g fill="none" stroke="#6f8fb8" stroke-opacity=".22">${par}</g>`) };
     }
     return { label: "", svg: "" };
   }
+
+  // ---------- study mode: ambient motion over the drawn scene ----------
+  // One canvas at about 30 frames a second, drawn in the scene's own 1600×900 space so it lines up with the SVG
+  // (same "slice" fit). Slow and dim on purpose: it slows further on a break, sleeps in a hidden tab, and the
+  // Motion button turns it off (off by default with reduced motion). The SVG bits (waves, windows) are CSS, gated by .fx.
+  const fx = { raf: 0, on: false, ctx: null, dpr: 1, k: 1, ox: 0, oy: 0, last: 0, t: 0, speed: 1, p: null };
+  function stMotionPref() {
+    let v = null;
+    try { v = localStorage.getItem("rlp-st-motion"); } catch {}
+    return v ? v === "on" : !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+  function fxSize() {
+    const cv = $("#st-fx"), r = cv.getBoundingClientRect();
+    fx.dpr = Math.min(1.5, devicePixelRatio || 1);
+    cv.width = Math.max(1, Math.round(r.width * fx.dpr));
+    cv.height = Math.max(1, Math.round(r.height * fx.dpr));
+    fx.k = Math.max(r.width / 1600, r.height / 900);
+    fx.ox = (r.width - 1600 * fx.k) / 2;
+    fx.oy = (r.height - 900 * fx.k) / 2;
+    fx.ctx = cv.getContext("2d");
+  }
+  // a theme color as r,g,b, whatever syntax the theme wrote it in
+  function fxRGB(cssVar) {
+    const probe = document.createElement("i");
+    probe.style.color = `var(${cssVar})`;
+    study.append(probe);
+    const c = getComputedStyle(probe).color;
+    probe.remove();
+    const x = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+    x.fillStyle = c; x.fillRect(0, 0, 1, 1);
+    return [...x.getImageData(0, 0, 1, 1).data.slice(0, 3)];
+  }
+  const fxEmber = (rnd, scatter) => ({ x: 380 + rnd() * 840, y: scatter ? 420 + rnd() * 420 : 700 + rnd() * 140, vy: -(9 + rnd() * 16), ph: rnd() * 6.28, r: 1 + rnd() * 1.7, top: 260 + rnd() * 240 });
+  function fxSetup(name, data) {
+    const rnd = ((s) => () => (s = (s * 16807) % 2147483647) / 2147483647)(11);
+    const sky = { English: 420, Latin: 260, French: 520, Forces: 900 }[name] || 0;
+    const p = { name, data, sky, rnd, stars: [], parts: [], shoot: null, nextShoot: 5 + rnd() * 8 };
+    for (let i = 0; i < (sky ? 46 : 0); i++) p.stars.push({ x: rnd() * 1600, y: rnd() * sky, r: 0.7 + rnd() * 1.3, ph: rnd() * 6.28, sp: 0.4 + rnd() * 1.1 });
+    if (name === "Latin") for (let i = 0; i < 40; i++) p.parts.push(fxEmber(rnd, true));
+    if (name === "English") for (let i = 0; i < 28; i++) p.parts.push({ x: 1120 + rnd() * 120, y: 560 + rnd() * 320, w: 8 + rnd() * 26, ph: rnd() * 6.28, sp: 0.5 + rnd() * 1.3 });
+    if (name === "MSI" && data?.traces) for (let i = 0; i < 16; i++) p.parts.push({ tr: (rnd() * data.traces.length) | 0, at: rnd(), sp: 0.05 + rnd() * 0.07 });
+    if (name === "Forces") for (let i = 0; i < 110; i++) p.parts.push({ lat: Math.asin(2 * rnd() - 1) * 0.85, lon: rnd() * 6.283, r: 0.8 + rnd() * 1.5 });
+    if (!name) { // no subject scene: soft washes of the theme's own colors drifting, and a little dust
+      p.blobs = ["--accent", "--c-latin", "--c-fr", "--c-msi"].map((v) => {
+        const [r, g, b] = fxRGB(v), img = document.createElement("canvas");
+        img.width = img.height = 256;
+        const x = img.getContext("2d"), gr = x.createRadialGradient(128, 128, 0, 128, 128, 128);
+        gr.addColorStop(0, `rgba(${r},${g},${b},.2)`); gr.addColorStop(0.6, `rgba(${r},${g},${b},.07)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        x.fillStyle = gr; x.fillRect(0, 0, 256, 256);
+        return { img, ax: 300 + rnd() * 1000, ay: 200 + rnd() * 500, rx: 180 + rnd() * 260, ry: 120 + rnd() * 160, sx: 0.025 + rnd() * 0.03, sy: 0.02 + rnd() * 0.03, ph: rnd() * 6.28, r: 380 + rnd() * 240 };
+      });
+      p.ink = `rgb(${fxRGB("--fg").join(",")})`;
+      for (let i = 0; i < 36; i++) p.parts.push({ x: rnd() * 1600, y: rnd() * 900, r: 0.8 + rnd() * 1.7, vy: -(4 + rnd() * 8), ph: rnd() * 6.28 });
+    }
+    fx.p = p;
+  }
+  function fxAlong(tr, f) {
+    const n = tr.length - 1, at = Math.min(n - 1e-6, Math.max(0, f * n)), i = Math.floor(at), u = at - i;
+    return [tr[i][0] + (tr[i + 1][0] - tr[i][0]) * u, tr[i][1] + (tr[i + 1][1] - tr[i][1]) * u];
+  }
+  function fxDot(ctx, x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); }
+  function fxDraw(dt) {
+    const { ctx, p } = fx, t = fx.t;
+    if (!ctx || !p) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.setTransform(fx.k * fx.dpr, 0, 0, fx.k * fx.dpr, fx.ox * fx.dpr, fx.oy * fx.dpr);
+    if (p.blobs) {
+      for (const b of p.blobs) { ctx.globalAlpha = 1; ctx.drawImage(b.img, b.ax + Math.sin(t * b.sx + b.ph) * b.rx - b.r, b.ay + Math.cos(t * b.sy + b.ph * 1.3) * b.ry - b.r, b.r * 2, b.r * 2); }
+      ctx.fillStyle = p.ink;
+      for (const m of p.parts) {
+        m.y += m.vy * dt; m.x += Math.sin(t * 0.5 + m.ph) * 4 * dt;
+        if (m.y < -10) { m.y = 910; m.x = p.rnd() * 1600; }
+        ctx.globalAlpha = 0.1 + 0.07 * Math.sin(t + m.ph); fxDot(ctx, m.x, m.y, m.r);
+      }
+      return;
+    }
+    // twinkling stars and, now and then, a shooting star
+    ctx.fillStyle = "#fff";
+    for (const s of p.stars) { ctx.globalAlpha = 0.1 + 0.5 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph)); fxDot(ctx, s.x, s.y, s.r); }
+    if (p.stars.length && p.name !== "Forces") {
+      p.nextShoot -= dt;
+      if (p.nextShoot <= 0 && !p.shoot) { p.shoot = { x: 400 + p.rnd() * 1100, y: 30 + p.rnd() * p.sky * 0.45, life: 0 }; p.nextShoot = 12 + p.rnd() * 18; }
+      if (p.shoot) {
+        const s = p.shoot, k = (s.life += dt / fx.speed) / 1.1;
+        if (k >= 1) p.shoot = null;
+        else {
+          const hx = s.x - k * 360, hy = s.y + k * 140, g = ctx.createLinearGradient(hx, hy, hx + 130, hy - 50);
+          g.addColorStop(0, "rgba(255,255,255,.9)"); g.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.globalAlpha = Math.sin(k * Math.PI); ctx.strokeStyle = g; ctx.lineWidth = 1.8;
+          ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + 130, hy - 50); ctx.stroke();
+        }
+      }
+    }
+    if (p.name === "Latin") { // embers drifting up out of the sunset
+      ctx.globalCompositeOperation = "lighter";
+      ctx.fillStyle = "#ffb26b";
+      for (const e of p.parts) {
+        e.y += e.vy * dt; e.x += Math.sin(t * 0.7 + e.ph) * 7 * dt;
+        if (e.y < e.top) Object.assign(e, fxEmber(p.rnd));
+        const a = Math.max(0, Math.min(0.7, (e.y - e.top) / 260)) * (0.75 + 0.25 * Math.sin(t * 3 + e.ph));
+        ctx.globalAlpha = a * 0.18; fxDot(ctx, e.x, e.y, e.r * 3.2);
+        ctx.globalAlpha = a; fxDot(ctx, e.x, e.y, e.r);
+      }
+      ctx.globalCompositeOperation = "source-over";
+    }
+    if (p.name === "English") { // moonlight glinting on the water
+      ctx.fillStyle = "#f3ead2";
+      for (const g of p.parts) { ctx.globalAlpha = Math.max(0, Math.sin(t * g.sp + g.ph)) * 0.32; ctx.fillRect(g.x + Math.sin(t * 0.3 + g.ph) * 10, g.y, g.w * (0.6 + (0.4 * (g.y - 560)) / 320), 1.6); }
+    }
+    if (p.name === "MSI") { // pulses of current running along the traces
+      ctx.globalCompositeOperation = "lighter";
+      ctx.fillStyle = "#86ffd8";
+      for (const q of p.parts) {
+        const tr = p.data.traces[q.tr];
+        q.at += q.sp * dt;
+        if (q.at >= 1) { q.at = 0; q.tr = (p.rnd() * p.data.traces.length) | 0; }
+        const a = Math.sin(q.at * Math.PI);
+        for (let j = 3; j >= 0; j--) { const [x, y] = fxAlong(tr, q.at - j * 0.012); ctx.globalAlpha = a * (j ? 0.18 / j : 0.85); fxDot(ctx, x, y, j ? 2.4 : 3.2); }
+        const [x, y] = fxAlong(tr, q.at); ctx.globalAlpha = a * 0.14; fxDot(ctx, x, y, 13);
+      }
+      ctx.globalCompositeOperation = "source-over";
+    }
+    if (p.name === "Forces") { // the globe turns: meridians and city lights
+      const { cx, cy, r } = p.data.globe, ph = t * 0.05;
+      ctx.strokeStyle = "#8fb0d8"; ctx.lineWidth = 1.2;
+      for (let i = 0; i < 12; i++) {
+        const lon = ph + (i * Math.PI) / 6, c = Math.cos(lon), sn = Math.sin(lon);
+        if (c <= 0) continue;
+        ctx.globalAlpha = 0.06 + 0.2 * c;
+        ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(0.5, Math.abs(sn) * r), r, 0, -Math.PI / 2, Math.PI / 2, sn < 0); ctx.stroke();
+      }
+      ctx.fillStyle = "#ffd28a";
+      for (const d of p.parts) {
+        const lon = d.lon + ph, z = Math.cos(d.lat) * Math.cos(lon);
+        if (z <= 0) continue;
+        ctx.globalAlpha = (0.2 + 0.6 * z) * (0.8 + 0.2 * Math.sin(t * 2 + d.lon * 9));
+        fxDot(ctx, cx + r * Math.cos(d.lat) * Math.sin(lon), cy - r * Math.sin(d.lat), d.r);
+      }
+    }
+  }
+  function fxFrame(ts) {
+    fx.raf = requestAnimationFrame(fxFrame);
+    if (document.hidden || ts - fx.last < 32) return;
+    const dt = Math.min(0.1, (ts - fx.last) / 1000) * fx.speed;
+    fx.last = ts;
+    fx.t += dt;
+    fxDraw(dt);
+  }
+  function fxRun() {
+    const want = st.open && fx.on;
+    study.classList.toggle("fx", want);
+    $("#st-motion").setAttribute("aria-pressed", String(fx.on));
+    if (want && !fx.raf) { fxSize(); fx.last = 0; fx.raf = requestAnimationFrame(fxFrame); }
+    if (!want && fx.raf) {
+      cancelAnimationFrame(fx.raf); fx.raf = 0;
+      fx.ctx?.setTransform(1, 0, 0, 1, 0, 0); fx.ctx?.clearRect(0, 0, fx.ctx.canvas.width, fx.ctx.canvas.height);
+    }
+  }
+  $("#st-motion").onclick = () => {
+    fx.on = !fx.on;
+    try { localStorage.setItem("rlp-st-motion", fx.on ? "on" : "off"); } catch {}
+    fxRun();
+  };
 
   // the Music card sits over its slot (laptop) or docks along the bottom (phone, or a phone held sideways)
   const stDockMQ = matchMedia("(max-width:759px), (max-height:520px)");
@@ -2343,13 +2512,14 @@
     const label = s.mode === "class" ? (s.seg.name ? cls(s.seg.name).name : s.seg.label) : s.mode === "passing" ? `Passing · next ${s.next.name ? cls(s.next.name).name : s.next.label}` : s.mode === "before" ? "Until school" : f.phase;
     const key = `${s.mode}|${label}|${f.preset}`;
     const el = $("#st-clock");
+    fx.speed = s.mode === "focus" && f.phase === "break" ? 0.4 : 1;
     if (key !== st.key) {
       st.key = key;
       const room = (seg) => seg?.name ? where(seg.name) : "";
       el.style.cssText = s.mode === "class" && s.seg.name ? cc(s.seg.name) : s.mode === "passing" && s.next.name ? cc(s.next.name) : "";
       if (s.mode === "focus") {
         el.innerHTML = `<div class="st-k">${s.note ? `Special schedule today · ${esc(s.note)}` : f.phase === "focus" ? `Focus · round ${f.round}` : "Break"}</div>
-          <div class="num st-num" id="st-num"></div><div class="prog"><i id="st-bar"></i></div>
+          <div class="st-row"><div class="num st-num" id="st-num"></div>${f.phase === "break" ? `<div class="st-breathe" aria-hidden="true"><i></i><span>Breathe in</span><span>Breathe out</span></div>` : ""}</div><div class="prog"><i id="st-bar"></i></div>
           <div class="st-ctrl"><button class="btn primary" type="button" data-st="go"></button><button class="btn" type="button" data-st="reset">Reset</button>
           <div class="seg" role="group" aria-label="Focus length">${Object.keys(ST_PRESETS).map((k) => `<button type="button" data-preset="${k}" aria-pressed="${k === f.preset}">${k}</button>`).join("")}</div></div>`;
       } else {
@@ -2399,6 +2569,7 @@
       const sc = stScene(scene);
       $("#st-scene").innerHTML = sc.svg;
       study.classList.toggle("has-scene", !!sc.svg);
+      fxSetup(sc.svg ? scene : "", sc.data);
       $("#st-where").textContent = sc.label || "Study mode";
     }
     $("#st-work").innerHTML = it ? `<div class="st-k">Now working on</div>
@@ -2450,13 +2621,14 @@
     if (st.open) return;
     Object.assign(st, { open: true, t0: Date.now(), done: 0, key: "", nudged: 0, pick: null });
     stSceneName = null;
+    fx.on = stMotionPref();
     study.hidden = false;
     document.documentElement.classList.add("studying");
     spRender(true);
     document.documentElement.requestFullscreen?.().catch(() => {});
     stRenderWork();
     stTick();
-    requestAnimationFrame(stPlaceMusic);
+    requestAnimationFrame(() => { stPlaceMusic(); fxRun(); });
     setTimeout(stPlaceMusic, 400); // once the player has its height
     stWake();
     $("#st-close").focus();
@@ -2465,6 +2637,7 @@
     if (!st.open) return;
     st.open = false;
     clearTimeout(stTimer);
+    fxRun();
     study.hidden = true;
     document.documentElement.classList.remove("studying");
     stPlaceMusic();
@@ -2476,7 +2649,7 @@
   $("#study-btn").onclick = openStudy;
   $("#st-close").onclick = closeStudy;
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.open) closeStudy(); });
-  addEventListener("resize", () => { if (st.open) stPlaceMusic(); });
+  addEventListener("resize", () => { if (st.open) { stPlaceMusic(); if (fx.raf) fxSize(); } });
   stDockMQ.addEventListener("change", stPlaceMusic);
   document.addEventListener("visibilitychange", () => { if (!document.hidden && st.open) { stWake(); stTick(); } });
 
@@ -2897,15 +3070,14 @@
       const name = pane.dataset.pane;
       if (!pane.querySelector(":scope > .feed-h")) pane.insertAdjacentHTML("afterbegin", `<h2 class="feed-h">${esc($(`[data-tab-pane="${name}"]`)?.textContent || name)}</h2>`);
     });
-    const cards = [$(".p-lunch"), $(".p-more"), ...panes];
+    // Music rides with the cards below so the two columns above end together
+    const cards = [$(".p-lunch"), $(".p-more"), $(".p-music"), ...panes];
     if (on) {
       cards.forEach((el) => moveTo(el, feed));
-      moveTo($(".p-music"), $(".col-a"));
       panes.forEach(wake);
       if (FEED.includes(state.pane)) showPane("week");
     } else {
       [...cards].reverse().forEach(moveHome);
-      moveHome($(".p-music"));
     }
   }
   matchMedia("(min-width:900px)").addEventListener("change", placeFeed);

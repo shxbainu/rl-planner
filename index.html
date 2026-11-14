@@ -64,9 +64,11 @@
       <ol class="tl" id="timeline"></ol>
       <p class="after" id="after"></p>
     </section>
+    <div class="today" id="today">
     <a class="wx" id="wx" href="https://forecast.weather.gov/MapClick.php?lat=42.2793&amp;lon=-71.1495" target="_blank" rel="noopener" hidden></a>
     <button type="button" class="nextup" id="nextup" aria-label="Upcoming tests and quizzes: open the Tests tab" hidden></button>
     <button type="button" class="qline" id="qline" hidden></button>
+    </div>
     <section class="panel p-lunch" aria-labelledby="lunch-h">
       <div class="panel-h"><h2 id="lunch-h">Lunch</h2>
         <div class="lunch-nav">
@@ -314,19 +316,23 @@
 
 <div class="study" id="study" role="dialog" aria-modal="true" aria-label="Study mode" hidden>
   <div class="st-scene" id="st-scene" aria-hidden="true"></div>
+  <canvas class="st-fx" id="st-fx" aria-hidden="true"></canvas>
   <header class="st-top">
     <span class="st-where" id="st-where">Study mode</span>
     <span class="st-stats" id="st-stats"></span>
+    <button class="st-mo" id="st-motion" type="button" aria-pressed="true" title="Background motion on or off">Motion</button>
     <button class="st-x" id="st-close" type="button" aria-label="Close study mode (Esc)">✕</button>
   </header>
   <div class="st-left">
     <section class="st-card st-clock now-card" id="st-clock" aria-live="off"></section>
-    <div class="st-music" id="st-music"></div>
+    <section class="st-card st-work" id="st-work"></section>
   </div>
   <div class="st-right">
-    <section class="st-card st-work" id="st-work"></section>
-    <section class="st-card st-help" id="st-help" hidden></section>
-    <section class="st-card st-queue" id="st-queue"></section>
+    <div class="st-scroll">
+      <section class="st-card st-queue" id="st-queue"></section>
+      <section class="st-card st-help" id="st-help" hidden></section>
+    </div>
+    <div class="st-music" id="st-music"></div>
   </div>
   <p class="st-nudge" id="st-nudge" role="status" hidden></p>
 </div>

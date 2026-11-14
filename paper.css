@@ -72,7 +72,9 @@
 :root:not([data-skin]) .grp-h .rel,:root:not([data-skin]) .agenda-h b{font:650 17px var(--head)}
 :root:not([data-skin]) .agenda{border-top:1px solid var(--line);padding-top:14px;gap:8px}
 :root:not([data-skin]) .overdue-strip{background:color-mix(in srgb,var(--bad) 10%,var(--surface));border-radius:8px;padding:8px 12px;font-weight:700}
-:root:not([data-skin]) .hw-notes{border-style:dashed;border-color:var(--line);font-size:12.5px}
+:root:not([data-skin]) .hw-notes summary{font-family:var(--sans)}
+:root:not([data-skin]) .hw-notes ul{color:var(--fg);font-size:13px}
+:root:not([data-skin]) .hw-notes li::marker{color:var(--faint)}
 
 /* checkbox: a drawn square; checking draws an ink tick that runs past the box */
 :root:not([data-skin]) .check{width:20px;height:20px;border:1.75px solid color-mix(in srgb,var(--fg) 55%,transparent);border-radius:3px 4px 3px 5px;background:var(--surface);position:relative;overflow:visible;transition:transform .3s var(--spring)}
@@ -121,11 +123,40 @@
 :root:not([data-skin]) .now-card .num{font:800 34px/1 var(--head);font-variant-numeric:tabular-nums}
 :root:not([data-skin]) .now-card .sub{font-size:13px;color:var(--muted)}
 
-/* slips under the schedule */
-:root:not([data-skin]) :is(.wx,.nextup,.qline){border:0;border-radius:8px;background-color:var(--surface);box-shadow:var(--ink-shadow);padding:10px 14px;font-size:13px}
-:root:not([data-skin]) .nu-k{font:700 10.5px var(--sans);letter-spacing:.12em;color:var(--faint)}
-:root:not([data-skin]) .nu{border:0;border-radius:3px 7px 4px 8px;background:color-mix(in srgb,var(--cc) 24%,transparent);font-size:12.5px}
-:root:not([data-skin]) .qline{font-family:var(--head);font-style:italic}
+/* "Today": weather, next tests and the quote in one card, each on its own row with a label on the left,
+   text that wraps instead of getting cut off */
+:root:not([data-skin]) .today{display:grid;padding:2px 16px;border-radius:8px;background:var(--surface) var(--grain);box-shadow:var(--ink-shadow)}
+:root:not([data-skin]) .today:not(:has(> :not([hidden]))){display:none}
+:root:not([data-skin]) .today > :is(.wx,.nextup,.qline){position:relative;width:100%;box-sizing:border-box;margin:0;padding:12px 0 12px 84px;border:0;border-radius:0;
+  background:none;box-shadow:none;font-size:13.5px;line-height:1.45;min-height:0}
+:root:not([data-skin]) .today > :not([hidden]) ~ :not([hidden]){border-top:1px solid var(--rule)}
+:root:not([data-skin]) .today > :is(.wx,.nextup,.qline):hover{background:none}
+:root:not([data-skin]) .today > :hover :is(.wx-s,.ql-t){color:var(--fg)}
+:root:not([data-skin]) .today > *::before,:root:not([data-skin]) .today :is(.nu-k,.ql-k){position:absolute;left:0;top:14px;margin:0;font:700 10.5px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+:root:not([data-skin]) .today > .wx::before{content:"Weather"}
+:root:not([data-skin]) .today .ql-k.due{color:var(--accent-ink,var(--accent))}
+/* weather: icon, temp, then the forecast wraps */
+:root:not([data-skin]) .today .wx{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+:root:not([data-skin]) .today .wx svg{align-self:center;width:18px;height:18px}
+:root:not([data-skin]) .today .wx-t{font:700 18px/1 var(--head)}
+:root:not([data-skin]) .today .wx-s{white-space:normal;overflow:visible;flex:1 1 200px}
+/* next tests: chips wrap onto a second line */
+:root:not([data-skin]) .today .nextup{display:flex;flex-wrap:wrap;gap:6px;overflow:visible}
+:root:not([data-skin]) .today .nu{border:0;border-radius:3px 7px 4px 8px;background:color-mix(in srgb,var(--cc) 24%,transparent);font-size:13px;padding:3px 9px}
+/* quote: the whole line (up to three lines), then who said it */
+:root:not([data-skin]) .today .qline{display:grid;gap:3px;font-family:var(--head)}
+:root:not([data-skin]) .today .qline svg{display:none}
+:root:not([data-skin]) .today .ql-t{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;font-size:14.5px;line-height:1.4}
+:root:not([data-skin]) .today .ql-by{max-width:none;font:13px var(--sans);color:var(--muted)}
+/* links: four across with the label beside the icon, so nothing is cramped */
+:root:not([data-skin]) .dock{gap:8px}
+@media (min-width:760px){
+  :root:not([data-skin]) .dock-main{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:6px;overflow:visible}
+  :root:not([data-skin]) .dock-main a{flex-direction:row;justify-content:flex-start;gap:8px;padding:10px 12px;font-size:13px}
+  :root:not([data-skin]) .dock-main a svg{width:18px;height:18px;flex:none}
+  :root:not([data-skin]) .dock-classes{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;overflow:visible}
+  :root:not([data-skin]) .dock-classes a{padding:5px 6px}
+}
 
 /* game night: a ticket stub with a perforated edge */
 :root:not([data-skin]) .gn{background-image:var(--grain);border-bottom:0;box-shadow:inset 0 -3px 0 var(--gn2,var(--accent))}
@@ -200,4 +231,34 @@
   :root:not([data-skin]) .cell .cnt i{display:none}
   :root:not([data-skin]) .cell:has(.cnt i) .top b{text-decoration:underline 2px var(--bad);text-underline-offset:3px}
   :root:not([data-skin]) .cell.off .offn{font-size:10.5px;line-height:1.25}
+}
+
+/* ===== study mode in Ink & Paper ===== */
+/* the clock in the serif, a little lighter than the mono */
+:root:not([data-skin]) #st-clock .num{font-family:var(--head);font-weight:600;letter-spacing:-.025em}
+:root:not([data-skin]) #st-clock::before{display:none}
+/* over a drawn scene, every card turns to frosted dark glass so the scene (and its motion) shows through.
+   The tokens are redefined inside the glass, so chips, buttons and the music player all follow. */
+:root:not([data-skin]) .study.has-scene :is(.st-card,.st-mo,.st-x),
+:root:not([data-skin]).studying:has(.study.has-scene:not([hidden])) .p-music{
+  --fg:#f1eadf; --muted:rgb(241 234 223 / .7); --faint:rgb(241 234 223 / .52); --done:rgb(241 234 223 / .45);
+  --surface:rgb(255 255 255 / .07); --surface-2:rgb(255 255 255 / .05); --line:rgb(255 255 255 / .14); --rule:rgb(255 255 255 / .12);
+  --accent-soft:rgb(255 255 255 / .08);
+  color:var(--fg);background:rgb(13 15 26 / .5);background-image:none;border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(16px) saturate(1.25);backdrop-filter:blur(16px) saturate(1.25);box-shadow:0 22px 44px -22px rgb(0 0 0 / .7)}
+:root:not([data-skin]) .study.has-scene .st-card{border-radius:14px}
+:root:not([data-skin]) .study.has-scene #st-clock{background:rgb(13 15 26 / .34);padding:26px 30px}
+:root:not([data-skin]) .study.has-scene #st-clock .prog{background:rgb(255 255 255 / .12)}
+:root:not([data-skin]) .study.has-scene #st-clock .prog i{background:var(--fg)}
+:root:not([data-skin]) .study.has-scene .st-queue button:hover{background:rgb(255 255 255 / .12)}
+:root:not([data-skin]) .study.has-scene .st-check{background:transparent}
+:root:not([data-skin]) .study.has-scene .chip{color:var(--fg)}
+:root:not([data-skin]).studying:has(.study.has-scene:not([hidden])) .p-music{border-radius:14px}
+:root:not([data-skin]) .study.has-scene #st-clock :is(.num,.lbl){color:var(--fg)}
+/* the clock card blurs less, so the scene's motion still reads through it */
+:root:not([data-skin]) .study.has-scene #st-clock{-webkit-backdrop-filter:blur(7px) saturate(1.2);backdrop-filter:blur(7px) saturate(1.2)}
+/* phones: the Today labels sit above each row so the text gets the full width */
+@media (max-width:559px){
+  :root:not([data-skin]) .today > :is(.wx,.nextup,.qline){padding:30px 0 12px}
+  :root:not([data-skin]) .today > *::before,:root:not([data-skin]) .today :is(.nu-k,.ql-k){top:12px}
 }
