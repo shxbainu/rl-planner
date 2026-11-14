@@ -157,10 +157,29 @@
   :root:not([data-skin]) .p-sched{display:none}
   :root:not([data-skin]) .dash{grid-template-areas:"rail" "hw" "a" "c"}
 }
-@media (min-width:900px){ :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-areas:"rail rail" "hw a" "c c"} }
-@media (min-width:1280px){
-  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.3fr) minmax(0,1.1fr) minmax(290px,.78fr);grid-template-areas:"rail rail rail" "hw c a";grid-template-rows:auto minmax(0,1fr)}
+/* laptops: the page scrolls like a page (no squeezed columns that each scroll); homework on the left, today's side
+   cards and the Week/Tests/Quotes tabs on the right, and sports, fantasy, news and countdowns as open cards below */
+@media (min-width:900px){
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);grid-template-areas:"rail rail" "hw a" "hw c" "feed feed";grid-template-rows:auto auto 1fr auto;align-items:start}
+  :root:not([data-skin]) .col-c{display:flex;flex-direction:column;align-items:stretch}
+  :root:not([data-skin]) .feed{grid-area:feed;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+  :root:not([data-skin]) .feed > .pane,:root:not([data-skin]) .feed > .pane[hidden]{display:grid!important;align-content:start;gap:10px;min-width:0;max-height:620px;overflow:auto;scrollbar-width:thin;
+    background:var(--grain),var(--surface);border-radius:10px;padding:16px 18px;box-shadow:var(--ink-shadow)}
+  :root:not([data-skin]) .p-more .tabs :is([data-tab-pane="sports"],[data-tab-pane="news"],[data-tab-pane="fantasy"],[data-tab-pane="count"]){display:none}
 }
+@media (min-width:1280px){
+  :root:not([data-skin]) body{height:auto;display:block}
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.5fr) minmax(360px,1fr);max-width:1560px;flex:none}
+  :root:not([data-skin]) :is(.col,.p-hw){overflow:visible}
+  :root:not([data-skin]) .col-c > .p-more{flex:none}
+  :root:not([data-skin]) .p-more .pane:not([hidden]){flex:none;overflow:visible}
+  :root:not([data-skin]) .p-week .rot-scroll{flex:none;display:block}
+  :root:not([data-skin]) .p-week .rot{height:auto}
+}
+.feed{display:none}
+:root:not([data-skin]) .p-more .feed-h{display:none}
+:root:not([data-skin]) .feed-h{padding-bottom:3px;background:linear-gradient(var(--accent),var(--accent)) 0 100%/1.3em 2px no-repeat;justify-self:start}
+
 :root:not([data-skin]) .sbc{display:none!important}
 :root:not([data-skin]) .rail-h{display:flex;align-items:center;gap:18px;min-width:0}
 :root:not([data-skin]) .rail-h h2{flex:none}
@@ -200,7 +219,7 @@
 :root:not([data-skin]) .rb-hw:hover{transform:translateY(-1px)}
 :root:not([data-skin]) .rb-hw:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 :root:not([data-skin]) .rb.empty{min-width:0;flex:1;font:italic 14px var(--head);color:var(--muted);background:var(--surface-2);box-shadow:none}
-:root:not([data-skin]) .rail-line{position:absolute;top:-4px;bottom:-2px;width:2px;margin-left:-1px;background:var(--accent);border-radius:2px;pointer-events:none;z-index:2}
+:root:not([data-skin]) .rail-line{position:absolute;top:0;bottom:2px;width:2px;margin-left:-1px;background:var(--accent);border-radius:2px;pointer-events:none;z-index:2}
 :root:not([data-skin]) .rail-line::before{content:"";position:absolute;top:-3px;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
 
 /* phones */

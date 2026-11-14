@@ -1462,6 +1462,7 @@
     renderFantasy();
     renderNews();
     renderQuotes();
+    placeFeed();
     inkWatch();
   }
 
@@ -2151,7 +2152,7 @@
       root.dataset.skin = name;
     }
     if (remember) { try { localStorage.setItem(SKIN, name); } catch {} setPref("skin", name); }
-    if (schedule) { renderBar(); renderSchedule(); renderHomework(); }
+    if (schedule) { renderBar(); renderSchedule(); renderHomework(); placeFeed(); }
     spRender();
     inkWatch(true);
   }
@@ -2891,6 +2892,25 @@
     if (wx) { if (on) { if (wx.parentNode !== $("#rail-side")) $("#rail-side").append(wx); } else if (wx.parentNode === $("#rail-side")) $(".p-sched").after(wx); }
   }
   matchMedia("(min-width:760px)").addEventListener("change", () => { placeNow(); renderRail(); inkAll(false); });
+
+  // Sports, fantasy, news and countdowns as open cards in a row under everything (laptops, Ink & Paper), instead of
+  // tabs nobody opens; the More panel keeps Week, Tests and Quotes. Phones and skins keep all seven tabs.
+  const FEED = ["sports", "fantasy", "news", "count"];
+  const feedOn = () => !root.dataset.skin && matchMedia("(min-width:900px)").matches;
+  function placeFeed() {
+    const on = feedOn(), feed = $("#feed"), more = $(".p-more");
+    if (!feed || !more) return;
+    FEED.forEach((name) => {
+      const pane = $(`.pane[data-pane="${name}"]`);
+      if (!pane) return;
+      if (!pane.querySelector(":scope > .feed-h")) pane.insertAdjacentHTML("afterbegin", `<h2 class="feed-h">${esc($(`[data-tab-pane="${name}"]`)?.textContent || name)}</h2>`);
+      const home = on ? feed : more;
+      if (pane.parentNode !== home) home.append(pane);
+      wake(pane);
+    });
+    if (on && FEED.includes(state.pane)) showPane("week");
+  }
+  matchMedia("(min-width:900px)").addEventListener("change", placeFeed);
   function renderRail() {
     if (!schedule || !$("#rail")) return;
     const t = today(), day = schoolDay(), isToday = day === t, { letter } = letterFor(day);
