@@ -371,6 +371,7 @@
   // once a second: update the number and bar in place; redraw the card when the block changes
   function tickNow() {
     renderScoreboard();
+    railLine();
     const day = schoolDay(), { letter } = letterFor(day);
     const num = $("#now-card .num");
     if (!num) return;
@@ -399,6 +400,8 @@
       $("#timeline").innerHTML = `<li class="empty">Times for this special schedule aren't posted yet.</li>`;
       skinSchedule();
       $("#after").innerHTML = "";
+      placeNow();
+      renderRail();
       return;
     }
 
@@ -431,6 +434,9 @@
     const af = schedule.after_school;
     $("#after").innerHTML = af ? `After school: <b>${esc(af.name)}</b>, ${esc(af.coach)}` : "";
     renderScoreboard();
+    placeNow();
+    renderRail();
+    if (`${day}|${letter}` !== schedKey) { schedKey = `${day}|${letter}`; rowsIn(); }
   }
 
   function renderRotation() {
@@ -530,6 +536,8 @@
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
     renderSeasonal();
     renderTests();
+    renderRail();
+    ring($("#cal .cell.sel"));
   }
 
   // ---------- tests: tests, quizzes, essays and projects for the next 4 weeks ----------
@@ -540,8 +548,7 @@
   const tqTag = (i) => `${esc(cls(i.class).short || i.class)} ${esc(i.type)}`;
   function renderTests() {
     // today's are over once the planner has rolled on to the next school day (after 3:30)
-    const t = today(), from = schoolDay() === t ? t : addDays(t, 1);
-    const list = allItems().filter((i) => MAJOR.has(i.type) && !isDone(i) && i.due >= from && i.due <= addDays(t, 28));
+    const t = today(), list = testsAhead();
     const nu = $("#nextup");
     nu.hidden = !list.length;
     nu.innerHTML = `<span class="nu-k">Next up</span>${list.slice(0, 3).map((i) => {
@@ -557,6 +564,10 @@
       return `<li style="${cc(i.class)}" data-id="${esc(i.id)}"${n === 0 ? ' class="today"' : ""}><span class="tq-n">${tqLeft(n)}</span><span class="tq-c">${tqTag(i)}</span><span class="tq-t" title="${esc(i.title)}">${esc(i.title)}</span><span class="tq-d">${esc(fmt(i.due, { weekday: "short", month: "numeric", day: "numeric" }))}</span></li>`;
     }).join("")}</ul>`).join("")
       : `<p class="empty-state">No tests, quizzes, essays or projects in the next 4 weeks.</p>`;
+  }
+  function testsAhead() {
+    const t = today(), from = schoolDay() === t ? t : addDays(t, 1);
+    return allItems().filter((i) => MAJOR.has(i.type) && !isDone(i) && i.due >= from && i.due <= addDays(t, 28));
   }
   // as many chips as fit on the one line (at least one)
   function nuFit() {
@@ -577,7 +588,11 @@
   });
   $("#cal").addEventListener("click", (e) => {
     const c = e.target.closest("[data-day]");
-    if (c) { selDay = c.dataset.day; showOverdue = false; renderHomework(); }
+    if (!c) return;
+    const d = c.dataset.day, dir = showOverdue ? 0 : Math.sign(d.localeCompare(selDay));
+    if (!dir && !showOverdue) return;
+    ring(c, true);
+    swapIn([$("#ag-h"), $("#agenda")], dir, () => { selDay = d; showOverdue = false; renderHomework(); });
   });
   $("#overdue-bar").addEventListener("click", (e) => {
     if (e.target.closest("[data-overdue]")) { showOverdue = !showOverdue; renderHomework(); }
@@ -585,10 +600,13 @@
   document.querySelector(".cal-nav").addEventListener("click", (e) => {
     const b = e.target.closest("[data-cal]");
     if (!b) return;
-    const n = Number(b.dataset.cal);
-    calWeek = n === 0 ? 0 : calWeek + n * 2;
-    if (n === 0) selDay = schoolDay();
-    renderHomework();
+    const n = Number(b.dataset.cal), dir = n === 0 ? Math.sign(-calWeek) : n;
+    ringHide();
+    swapIn([$("#cal")], dir, () => {
+      calWeek = n === 0 ? 0 : calWeek + n * 2;
+      if (n === 0) selDay = schoolDay();
+      renderHomework();
+    }, 28);
   });
 
   // ---------- teams (ESPN's public schedule feed) ----------
@@ -1444,6 +1462,7 @@
     renderFantasy();
     renderNews();
     renderQuotes();
+    inkWatch();
   }
 
   // ---------- interactions ----------
@@ -1472,9 +1491,12 @@
       const id = li.dataset.id, on = e.target.checked;
       li.classList.toggle("done", on);
       setDone(id, on);
-      li.style.setProperty("--rnd", (Math.random() * 2 - 1).toFixed(2));
-      li.classList.add("leaving");
-      setTimeout(renderHomework, leaveMs());
+      if (mo()) checkOff(li, e.target);
+      else {
+        li.style.setProperty("--rnd", (Math.random() * 2 - 1).toFixed(2));
+        li.classList.add("leaving");
+        setTimeout(renderHomework, leaveMs());
+      }
       if (on) {
         toast("Moved to Done", () => { setDone(id, false); renderHomework(); });
         // finished everything due that day? celebrate a little
@@ -1489,6 +1511,8 @@
       state.lettersAt[d] = stamp();
       save();
       render();
+      const m = mo(), sel = e.target;
+      if (m) settle(m.animate(sel, { rotateX: [-85, 0], rotate: -4, transformPerspective: 500 }, spring(0.45, 0.3)), () => { sel.style.transform = ""; });
     }
   });
 
@@ -2110,7 +2134,7 @@
 
   // ---------- skins: optional looks from themes/, picked in the top bar (index.html applies the saved one before paint) ----------
   const SKIN = "rlp-skin";
-  const SKINS = { original: "Original", herbarium: "Herbarium", moss: "Moss", departure: "Departure board", blueprint: "Blueprint", catalog: "Card catalog", nautical: "Nautical chart", almanac: "Seed almanac", arcade: "Arcade", chess: "Chess club", hardwood: "Hardwood" };
+  const SKINS = { original: "Ink & Paper", herbarium: "Herbarium", moss: "Moss", departure: "Departure board", blueprint: "Blueprint", catalog: "Card catalog", nautical: "Nautical chart", almanac: "Seed almanac", arcade: "Arcade", chess: "Chess club", hardwood: "Hardwood" };
   const V = new URL(document.currentScript.src).searchParams.get("v") || "";
   const skinNow = () => root.dataset.skin || "original";
   function setSkin(name, remember = true) {
@@ -2127,8 +2151,9 @@
       root.dataset.skin = name;
     }
     if (remember) { try { localStorage.setItem(SKIN, name); } catch {} setPref("skin", name); }
-    if (schedule) { renderBar(); renderSchedule(); }
+    if (schedule) { renderBar(); renderSchedule(); renderHomework(); }
     spRender();
+    inkWatch(true);
   }
   // a saved skin that's since been retired (Riso zine, Star chart) is forgotten; index.html already showed the original
   try { const s = localStorage.getItem(SKIN); if (s && !SKINS[s]) localStorage.removeItem(SKIN); } catch {}
@@ -2854,6 +2879,183 @@
       try { fetch(syncURL, { method: "PUT", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(mergeState(syncedPart(state), lastCloud)) }); } catch {}
     });
   }
+
+  // ---------- your day: one strip across the top on laptops ----------
+  // Every block of the day in order, as wide as it is long, with what's due in that class underneath, lunch's main
+  // dishes on the lunch block and after school at the end; a line marks now. The live countdown (the now-card) and the
+  // weather move up into its header. Phones and skins keep the Schedule panel instead.
+  const railOn = () => !root.dataset.skin && matchMedia("(min-width:760px)").matches;
+  function placeNow() {
+    const on = railOn(), nc = $("#now-card"), wx = $("#wx");
+    if (nc) { if (on) { if (nc.parentNode !== $("#rail-now")) $("#rail-now").append(nc); } else if (nc.parentNode === $("#rail-now")) $("#sbc").after(nc); }
+    if (wx) { if (on) { if (wx.parentNode !== $("#rail-side")) $("#rail-side").append(wx); } else if (wx.parentNode === $("#rail-side")) $(".p-sched").after(wx); }
+  }
+  matchMedia("(min-width:760px)").addEventListener("change", () => { placeNow(); renderRail(); inkAll(false); });
+  function renderRail() {
+    if (!schedule || !$("#rail")) return;
+    const t = today(), day = schoolDay(), isToday = day === t, { letter } = letterFor(day);
+    const rows = letter && !special(day) ? dayRows(letter, day) : [];
+    const first = rows.findIndex((r) => r.kind === "class"), last = rows.length - 1 - [...rows].reverse().findIndex((r) => r.kind === "class");
+    const shown = rows.filter((r, i) => !(r.kind === "free" && (i < first || i > last)));
+    $("#rail-h").textContent = `${isToday ? "Today" : relDay(day)}${letter ? ` · ${letter} day` : ""}`;
+
+    const due = allItems().filter((i) => !isDone(i) && i.due === day).sort((a, b) => MAJOR.has(b.type) - MAJOR.has(a.type));
+    const meets = new Set(shown.filter((r) => r.name).map((r) => r.name));
+    const placed = new Set();
+    const hw = (list) => list.map((i) => `<button type="button" class="rb-hw${MAJOR.has(i.type) ? " major" : ""}" data-id="${esc(i.id)}" style="${cc(i.class)}" title="${esc(i.title)}">${MAJOR.has(i.type) ? `<span class="tag">${esc(i.type)}</span>` : ""}<span>${esc(i.title)}</span></button>`).join("");
+    const lunch = menu?.days?.[day]?.stations?.filter((st) => LUNCH_MAIN.includes(st.name)).flatMap((st) => st.items).slice(0, 2).map((it) => it.name) || [];
+    const m = now().getHours() * 60 + now().getMinutes();
+
+    const blocks = shown.map((r) => {
+      const a = minutes(r.bell.start), b = minutes(r.bell.end), c = r.name && cls(r.name);
+      const st = !isToday ? "" : m >= b ? " past" : m >= a ? " now" : "";
+      const mine = c && !placed.has(r.name) ? due.filter((i) => i.class === r.name) : [];
+      if (c) placed.add(r.name);
+      const isEv = ["lunch", "homeroom", "hall"].includes(r.kind);
+      const badge = { lunch: "L", homeroom: "HR", hall: "HL" }[r.kind] || (c ? c.block : "·");
+      const label = isEv ? r.segs[0].label : c ? (c.short || c.name) : "Free";
+      return `<li class="rb ${r.kind}${st}" style="${r.name ? `${cc(r.name)};` : ""}flex-grow:${b - a}" data-a="${a}" data-b="${b}">
+        <span class="rb-top"><span class="blk">${badge}</span><span class="rb-t">${r.bell.start}</span></span>
+        <b class="rb-n" title="${esc(c ? c.name : label)}">${esc(label)}</b>
+        ${c?.room ? `<span class="rb-w">${esc(c.room)}</span>` : ""}
+        ${r.kind === "lunch" && lunch.length ? `<span class="rb-w rb-lunch">${lunch.map(esc).join(" · ")}</span>` : ""}
+        ${mine.length ? `<span class="rb-due">${hw(mine)}</span>` : ""}
+      </li>`;
+    });
+    const rest = due.filter((i) => !meets.has(i.class));
+    if (rest.length) blocks.push(`<li class="rb extra"><span class="rb-top"><span class="rb-t">Also due</span></span><span class="rb-due">${hw(rest)}</span></li>`);
+    const af = schedule.after_school;
+    if (af) blocks.push(`<li class="rb after"><span class="rb-top"><span class="rb-t">After school</span></span><b class="rb-n">${esc(af.name)}</b><span class="rb-w">${esc(af.coach)}</span></li>`);
+    $("#rail-track").innerHTML = rows.length ? blocks.join("") + `<span class="rail-line" aria-hidden="true" hidden></span>`
+      : `<li class="rb empty">${special(day) ? "Special schedule: times for it aren't posted yet." : "Set the day letter (the stamp, top left) to see your classes."}</li>`;
+    railLine();
+  }
+  // the now line sits inside whichever block holds the time, at how far through it we are
+  function railLine() {
+    const line = $("#rail-track .rail-line");
+    if (!line) return;
+    const m = now().getHours() * 60 + now().getMinutes() + now().getSeconds() / 60;
+    const li = schoolDay() === today() && [...document.querySelectorAll("#rail-track .rb[data-a]")].find((x) => m >= +x.dataset.a && m < +x.dataset.b);
+    line.hidden = !li;
+    if (li) line.style.left = `${li.offsetLeft + ((m - li.dataset.a) / (li.dataset.b - li.dataset.a)) * li.offsetWidth}px`;
+  }
+  $("#rail-track").addEventListener("click", (e) => { const b = e.target.closest(".rb-hw[data-id]"); if (b) openItem(b.dataset.id); });
+
+  // ---------- motion: spring physics from Motion (motion.dev), loaded as a module in index.html ----------
+  // Only on the Ink & Paper look (skins have their own effects), never with reduced motion, and not in a hidden tab
+  // (it pauses animations, which would leave things mid-fade). Without Motion
+  // (offline, blocked CDN) every change below still happens, just instantly.
+  const mo = () => (window.Motion && !root.dataset.skin && !document.hidden && !matchMedia("(prefers-reduced-motion:reduce)").matches ? window.Motion : null);
+  const spring = (visualDuration, bounce) => ({ type: "spring", visualDuration, bounce });
+  // run fn when the animation ends, or after ms at the latest: a hidden tab pauses animations, and the change itself must never wait on one
+  function settle(anim, fn, ms = 450) {
+    let done = false;
+    const go = () => { if (!done) { done = true; fn(); } };
+    Promise.resolve(anim?.finished || anim).then(go, go);
+    setTimeout(go, ms);
+  }
+
+  // a highlighter that slides between tabs and toggles (.tabs, .seg) instead of jumping
+  function inkTo(box, glide) {
+    const el = box.querySelector(':scope > [aria-selected="true"], :scope > [aria-pressed="true"]');
+    let ink = box.querySelector(":scope > .ink");
+    const m = window.Motion && !root.dataset.skin ? window.Motion : null;
+    if (!el || !m) { ink?.remove(); box.classList.remove("has-ink"); return; }
+    if (!el.offsetWidth) return; // hidden for now; the resize watcher places it once it shows
+    const to = { left: el.offsetLeft, top: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight };
+    if (!ink) {
+      ink = document.createElement("span");
+      ink.className = "ink";
+      ink.setAttribute("aria-hidden", "true");
+      box.prepend(ink);
+      glide = false;
+    }
+    box.classList.add("has-ink");
+    const at = ink.dataset.at, key = `${to.left},${to.top},${to.width},${to.height}`;
+    if (at === key) return;
+    ink.dataset.at = key;
+    m.animate(ink, to, glide && mo() ? spring(0.3, 0.2) : { duration: 0 });
+  }
+  const inkAll = (glide) => document.querySelectorAll(".tabs, .seg").forEach((b) => inkTo(b, glide));
+  function inkWatch(redo) {
+    document.querySelectorAll(".tabs, .seg").forEach((box) => {
+      if (box.dataset.ink) { if (redo) inkTo(box, false); return; }
+      box.dataset.ink = "1";
+      new MutationObserver(() => inkTo(box, true)).observe(box, { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-selected", "aria-pressed"] });
+      new ResizeObserver(() => inkTo(box, false)).observe(box);
+      inkTo(box, false);
+    });
+  }
+
+  // the picked calendar day's ring glides from the last day to the new one
+  let ringAt = "";
+  function ringHide() {
+    const r = $(".cal-wrap > .cal-ring"), m = mo();
+    if (r && m) m.animate(r, { opacity: 0 }, { duration: 0.1 });
+    ringAt = "";
+  }
+  function ring(cell, glide) {
+    const wrap = $(".cal-wrap"), cal = $("#cal"), m = mo();
+    let r = wrap?.querySelector(":scope > .cal-ring");
+    if (!wrap || !cell || !m) { r?.remove(); cal.classList.remove("has-ring"); ringAt = ""; return; }
+    const to = { left: cell.offsetLeft + cal.clientLeft, top: cell.offsetTop + cal.clientTop, width: cell.offsetWidth, height: cell.offsetHeight };
+    if (!to.width) return;
+    const key = `${to.left},${to.top},${to.width},${to.height}`;
+    cal.classList.add("has-ring");
+    if (r && key === ringAt) return;
+    if (!r) {
+      r = document.createElement("span");
+      r.className = "cal-ring";
+      r.setAttribute("aria-hidden", "true");
+      wrap.append(r);
+      glide = false;
+    }
+    if (glide && ringAt) m.animate(r, { ...to, opacity: 1 }, spring(0.34, 0.2));
+    else { m.animate(r, to, { duration: 0 }); m.animate(r, { opacity: [0, 1] }, { duration: 0.18, delay: 0.1 }); }
+    ringAt = key;
+  }
+
+  // switch what a panel shows: the old content slips out, the new springs in from the side you moved toward
+  function swapIn(els, dir, update, dist = 14) {
+    const m = mo();
+    if (!m || !dir) { update(); return; }
+    settle(m.animate(els, { opacity: 0, x: -dist * dir }, { duration: 0.12, ease: "easeIn" }), () => {
+      update();
+      m.animate(els, { opacity: [0, 1], x: [dist * 1.3 * dir, 0] }, spring(0.38, 0.12));
+    });
+  }
+
+  // checking off: the box squishes, the tick draws (CSS), the title is struck, the row slides away, the rest close up
+  function checkOff(li, box) {
+    const m = mo();
+    m.animate(box, { scale: [0.8, 1] }, spring(0.25, 0.5));
+    setTimeout(() => settle(m.animate(li, { x: 26, opacity: 0 }, spring(0.3, 0)), () => flip(renderHomework)), 300);
+  }
+  function flip(update) {
+    const m = mo(), key = (el) => `${el.closest("ul")?.id}:${el.dataset.id}`, before = new Map();
+    document.querySelectorAll(".p-hw .item[data-id]").forEach((el) => before.set(key(el), el.getBoundingClientRect().top));
+    update();
+    if (!m) return;
+    document.querySelectorAll(".p-hw .item[data-id]").forEach((el) => {
+      const top = before.get(key(el));
+      if (top == null) m.animate(el, { opacity: [0, 1], y: [-6, 0] }, spring(0.35, 0.1));
+      else if (Math.abs(top - el.getBoundingClientRect().top) > 1) m.animate(el, { y: [top - el.getBoundingClientRect().top, 0] }, spring(0.35, 0.1));
+    });
+  }
+
+  // schedule rows rise in one after another when the day or letter changes (not on the clock's own updates)
+  let schedKey = "";
+  function rowsIn() {
+    const m = mo(), li = [...document.querySelectorAll(railOn() ? "#rail-track .rb" : "#timeline li")].slice(0, 14);
+    if (m && li.length) m.animate(li, { opacity: [0, 1], y: [8, 0] }, { ...spring(0.4, 0.15), delay: m.stagger(0.035, { startDelay: 0.05 }) });
+  }
+  document.addEventListener("motion-ready", () => {
+    if (!schedule) return;
+    inkWatch(true);
+    ring($("#cal .cell.sel"));
+    rowsIn();
+  });
+  document.fonts?.ready.then(() => inkAll(false));
 
   // ---------- boot ----------
   async function getJSON(path) {

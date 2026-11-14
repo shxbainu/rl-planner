@@ -1,0 +1,213 @@
+/* Ink & Paper: the planner's own look (the "Original" choice in the theme menu). Warm paper, real ink, highlighter
+   for subject colors, a notebook margin for the checklist. Skins in themes/ replace all of this, so every rule here
+   is scoped to pages with no skin set (:root:not([data-skin])). */
+
+:root:not([data-skin]){
+  --bg:#f5efe3; --surface:#fffcf6; --surface-2:#faf5ec; --fg:#231d19; --muted:#574d47; --faint:#887c73; --line:#e5dac8;
+  --accent:#7a1a22; --accent-fg:#fffaf3; --accent-soft:#f4e3dc; --done:#a0958c;
+  --rule:rgb(78 108 158 / .2); --margin:rgb(196 64 64 / .32); --tape:rgb(246 226 170 / .62);
+  --hi:30%; --ink-shadow:0 0 0 1px rgb(70 45 25 / .07),0 1px 1px rgb(70 45 25 / .05),0 8px 18px -10px rgb(70 45 25 / .24),0 22px 36px -28px rgb(70 45 25 / .28);
+  --sans:"Atkinson Hyperlegible Next",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --head:"Fraunces",Georgia,"Times New Roman",serif;
+  --mono:"Atkinson Hyperlegible Mono",ui-monospace,Menlo,monospace;
+  --spring:linear(0, .075 4%, .246 7%, .45 11%, .642 14%, .807 18%, .932 21%, 1.015 25%, 1.063 29%, 1.083 32%, 1.083 36%, 1.073 39%, 1.056 43%, 1.039 46%, 1.023 50%, 1.011 54%, 1.002 57%, .996 61%, .993 68%, .996 79%, .999 86%, 1);
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .22 0 0 0 0 .12 0 0 0 .075 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root:not([data-skin])[data-mode="dark"]{
+  --bg:#16120e; --surface:#211b15; --surface-2:#1c1712; --fg:#f0e7d8; --muted:#c6b9a7; --faint:#978a7b; --line:#3a3027;
+  --accent:#e8979c; --accent-fg:#2a1416; --accent-soft:#3c2521; --done:#7d7268;
+  --rule:rgb(150 172 214 / .13); --margin:rgb(236 116 116 / .26); --tape:rgb(200 170 100 / .22); --hi:32%;
+  --ink-shadow:0 0 0 1px rgb(255 240 220 / .05),0 10px 24px -14px rgb(0 0 0 / .7);
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .92 0 0 0 0 .8 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* paper and ink */
+:root:not([data-skin]) body{background:var(--grain),var(--bg);font-size:14.5px;line-height:1.5;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+:root:not([data-skin]) :is(.panel,.gl,.wx,.nextup,.qline,.bar,.tabbar,dialog){background-image:var(--grain)}
+:root:not([data-skin]) h2{font:600 18px/1.2 var(--head);letter-spacing:-.005em;text-transform:none;color:var(--fg)}
+:root:not([data-skin]) .panel-h h2::before{display:none}
+:root:not([data-skin]) .panel-h h2{padding-bottom:3px;background:linear-gradient(var(--accent),var(--accent)) 0 100%/1.3em 2px no-repeat}
+:root:not([data-skin]) .panel-meta,:root:not([data-skin]) .panel-foot{font:italic 400 13px var(--head);color:var(--faint)}
+
+/* top bar: letterhead with a double rule, and the day letter as a rubber stamp */
+:root:not([data-skin]) .bar{background-color:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 2px 0 -1px var(--surface),0 3px 0 -1px var(--line);padding:12px 20px}
+:root:not([data-skin]) .bar-date{font:650 20px/1.2 var(--head);letter-spacing:-.01em}
+:root:not([data-skin]) .bar-sub{font-size:13px;color:var(--muted)}
+:root:not([data-skin]) .letter-pick select{font:800 24px/1 var(--head);background:transparent;color:var(--accent);border:2.5px solid currentColor;border-radius:9px 11px 8px 12px;
+  transform:rotate(-4deg);box-shadow:inset 0 0 0 2px var(--surface),inset 0 0 0 3.5px color-mix(in srgb,var(--accent) 45%,transparent);transition:transform .45s var(--spring)}
+:root:not([data-skin]) .letter-pick select:hover{transform:rotate(-1deg) scale(1.04)}
+:root:not([data-skin]) .bar-status span.pill{background:var(--surface-2);font-size:12.5px}
+
+/* buttons press down like paper, and spring back */
+:root:not([data-skin]) :is(.btn,.icon-btn){border-radius:10px;background-color:var(--surface);border-color:var(--line);box-shadow:0 1.5px 0 var(--line);transition:transform .35s var(--spring),box-shadow .2s,border-color .15s}
+:root:not([data-skin]) :is(.btn,.icon-btn):active{transform:translateY(1.5px) scale(.97);box-shadow:0 0 0 var(--line)}
+:root:not([data-skin]) .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);box-shadow:0 1.5px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+
+/* layout: index cards on a desk, with room to breathe */
+:root:not([data-skin]) .dash{gap:18px;padding:18px 20px 24px}
+:root:not([data-skin]) .col{gap:16px}
+:root:not([data-skin]) .panel{background-color:var(--surface);border:0;border-radius:10px;padding:16px 18px;gap:12px;box-shadow:var(--ink-shadow)}
+
+/* subject color as a highlighter swipe, and status as a little stamp */
+:root:not([data-skin]) .chip{font:700 11.5px/1.35 var(--sans);color:color-mix(in srgb,var(--cc) 62%,var(--fg));padding:0 .4em;border-radius:3px 7px 4px 8px;
+  background:linear-gradient(100deg,transparent .15em,color-mix(in srgb,var(--cc) var(--hi),transparent) .3em calc(100% - .2em),transparent)}
+:root:not([data-skin]) .tag{display:inline-block;background:transparent;color:color-mix(in srgb,var(--cc) 82%,var(--fg));border:1.5px solid currentColor;border-radius:3px 5px 3px 6px;
+  padding:0 5px;font:700 9.5px/1.6 var(--sans);letter-spacing:.13em;transform:rotate(-2.5deg);opacity:.92}
+:root:not([data-skin]) .tag.bad{color:var(--bad)}
+:root:not([data-skin]) .tag.unsure{border-style:dashed;color:var(--faint);box-shadow:none}
+:root:not([data-skin]) .next{font:italic 400 12.5px var(--head);color:var(--faint)}
+:root:not([data-skin]) .next::before{content:"· "}
+:root:not([data-skin]) .det{font-size:13px;line-height:1.5;color:var(--muted)}
+
+/* the checklist: a notebook page with a red margin and ruled lines, no boxes */
+:root:not([data-skin]) .list{gap:0;position:relative}
+:root:not([data-skin]) #agenda::before,:root:not([data-skin]) #done::before{content:"";position:absolute;top:0;bottom:0;left:31px;width:1.5px;background:var(--margin);pointer-events:none}
+:root:not([data-skin]) .item{grid-template-columns:22px minmax(0,1fr) auto;gap:20px;padding:11px 4px 11px 4px;border:0;border-radius:0;background:transparent;border-bottom:1px solid var(--rule)}
+:root:not([data-skin]) .item.major{background:linear-gradient(90deg,color-mix(in srgb,var(--cc) 10%,transparent),transparent 75%)}
+:root:not([data-skin]) .item.overdue{background:linear-gradient(90deg,color-mix(in srgb,var(--bad) 11%,transparent),transparent 80%)}
+:root:not([data-skin]) .body{gap:3px 8px}
+:root:not([data-skin]) .title{font:500 16px/1.3 var(--head);letter-spacing:-.005em;background:linear-gradient(var(--fg),var(--fg)) 0 60%/0% 1.5px no-repeat;transition:background-size .3s cubic-bezier(.6,0,.2,1),color .3s}
+:root:not([data-skin]) .item.done .title{text-decoration:none;color:var(--done);background-size:100% 1.5px}
+:root:not([data-skin]) .item.done{opacity:.8}
+:root:not([data-skin]) .grp-h .rel,:root:not([data-skin]) .agenda-h b{font:650 17px var(--head)}
+:root:not([data-skin]) .agenda{border-top:1px solid var(--line);padding-top:14px;gap:8px}
+:root:not([data-skin]) .overdue-strip{background:color-mix(in srgb,var(--bad) 10%,var(--surface));border-radius:8px;padding:8px 12px;font-weight:700}
+:root:not([data-skin]) .hw-notes{border-style:dashed;border-color:var(--line);font-size:12.5px}
+
+/* checkbox: a drawn square; checking draws an ink tick that runs past the box */
+:root:not([data-skin]) .check{width:20px;height:20px;border:1.75px solid color-mix(in srgb,var(--fg) 55%,transparent);border-radius:3px 4px 3px 5px;background:var(--surface);position:relative;overflow:visible;transition:transform .3s var(--spring)}
+:root:not([data-skin]) .check:active{transform:scale(.86)}
+:root:not([data-skin]) .check:checked{background:var(--surface);border-color:color-mix(in srgb,var(--cc) 70%,transparent)}
+:root:not([data-skin]) .check::after{content:"";position:absolute;inset:-6px -7px -2px -1px;width:auto;height:auto;border:0;transform:none;opacity:1;background:var(--cc);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cpath d='M4 15.5c2.2 1.6 4 3.6 5.6 6.2C13 14.6 17.8 8.4 25 3.6' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cpath d='M4 15.5c2.2 1.6 4 3.6 5.6 6.2C13 14.6 17.8 8.4 25 3.6' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  clip-path:inset(0 100% 0 0);transition:clip-path .26s cubic-bezier(.55,0,.25,1)}
+:root:not([data-skin]) .check:checked::after{clip-path:inset(0 0 0 0)}
+
+/* calendar: one desk-calendar grid with ruled cells instead of boxes inside boxes */
+:root:not([data-skin]) .cal{gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;position:relative}
+:root:not([data-skin]) .cal .dow{background:var(--surface-2);padding:5px 0 4px;font:700 10.5px var(--sans);letter-spacing:.12em;color:var(--faint)}
+:root:not([data-skin]) .cell{background:var(--surface);border:0;border-radius:0;padding:6px 6px 7px;gap:3px;min-height:104px;transition:background .15s}
+:root:not([data-skin]) .cell:hover{border:0;background:var(--surface-2)}
+:root:not([data-skin]) .cell .top b{font:600 15px var(--head)}
+:root:not([data-skin]) .cell.today .top b{display:grid;place-items:center;width:25px;height:25px;margin:-3px 0 -2px -3px;padding:0;background:transparent;color:var(--accent);border:1.75px solid currentColor;border-radius:52% 46% 50% 48%}
+:root:not([data-skin]) .cell.sel{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent-soft) 45%,var(--surface))}
+:root:not([data-skin]) .cal.has-ring .cell.sel{box-shadow:none}
+:root:not([data-skin]) .cal-ring{position:absolute;z-index:1;pointer-events:none;border:2px solid var(--accent);border-radius:3px}
+:root:not([data-skin]) .cell.past{opacity:.5}
+:root:not([data-skin]) .cell.off{background:repeating-linear-gradient(-45deg,var(--surface) 0 7px,color-mix(in srgb,var(--line) 60%,var(--surface)) 7px 8px);border:0}
+:root:not([data-skin]) .chip2{font:500 11.5px/1.3 var(--sans);border:0;border-radius:2px 6px 3px 7px;padding:1px 5px;background:color-mix(in srgb,var(--cc) 20%,transparent);color:var(--fg)}
+:root:not([data-skin]) .chip2.major{font-weight:700;background:color-mix(in srgb,var(--cc) 34%,transparent)}
+:root:not([data-skin]) .chip2.done{background:transparent;color:var(--done)}
+
+/* schedule: ruled rows, block letters circled in the subject's ink, the live class highlighted */
+:root:not([data-skin]) .tl{gap:0}
+:root:not([data-skin]) .tl li{padding:8px 6px;border-radius:0;border-bottom:1px solid var(--rule);gap:12px;grid-template-columns:28px 1fr auto}
+:root:not([data-skin]) .tl li:last-child{border-bottom:0}
+:root:not([data-skin]) .tl .blk{width:27px;height:27px;background:transparent;color:var(--cc);border:1.75px solid var(--cc);border-radius:50% 46% 52% 48%;font:700 13px var(--head);box-shadow:none}
+:root:not([data-skin]) .tl li:is(.free,.ev) .blk{border:1.5px dashed var(--line);color:var(--faint);background:transparent}
+:root:not([data-skin]) .tl .cn{font:500 15px/1.25 var(--head)}
+:root:not([data-skin]) .tl li.ev .cn{font-style:italic;color:var(--muted)}
+:root:not([data-skin]) .tl li.ev{background:transparent}
+:root:not([data-skin]) .tl .who{font-family:var(--sans);font-size:12px;color:var(--faint)}
+:root:not([data-skin]) .tl .tm{font:400 11.5px/1.35 var(--mono);color:var(--muted)}
+:root:not([data-skin]) .tl li.now{background:linear-gradient(90deg,color-mix(in srgb,var(--cc) 22%,transparent),transparent 90%)}
+:root:not([data-skin]) .after{font-size:13px;border-top:1px dashed var(--line)}
+
+/* the now card: a note taped to the page */
+:root:not([data-skin]) .now-card{position:relative;background:var(--grain),color-mix(in srgb,var(--accent-soft) 70%,var(--surface));border-radius:4px 10px 5px 12px;padding:16px 16px 14px;box-shadow:0 1px 2px rgb(70 45 25 / .08),0 8px 16px -12px rgb(70 45 25 / .3)}
+:root:not([data-skin]) .now-card::before{content:"";position:absolute;top:-8px;left:50%;width:62px;height:17px;margin-left:-31px;background:var(--tape);transform:rotate(-3deg);border-radius:1px;box-shadow:0 1px 1px rgb(0 0 0 / .05)}
+:root:not([data-skin]) .now-card .lbl{font:650 19px/1.2 var(--head)}
+:root:not([data-skin]) .now-card .num{font:800 34px/1 var(--head);font-variant-numeric:tabular-nums}
+:root:not([data-skin]) .now-card .sub{font-size:13px;color:var(--muted)}
+
+/* slips under the schedule */
+:root:not([data-skin]) :is(.wx,.nextup,.qline){border:0;border-radius:8px;background-color:var(--surface);box-shadow:var(--ink-shadow);padding:10px 14px;font-size:13px}
+:root:not([data-skin]) .nu-k{font:700 10.5px var(--sans);letter-spacing:.12em;color:var(--faint)}
+:root:not([data-skin]) .nu{border:0;border-radius:3px 7px 4px 8px;background:color-mix(in srgb,var(--cc) 24%,transparent);font-size:12.5px}
+:root:not([data-skin]) .qline{font-family:var(--head);font-style:italic}
+
+/* game night: a ticket stub with a perforated edge */
+:root:not([data-skin]) .gn{background-image:var(--grain);border-bottom:0;box-shadow:inset 0 -3px 0 var(--gn2,var(--accent))}
+:root:not([data-skin]) .gn-when{padding-left:14px;border-left:2px dashed rgb(0 0 0 / .28)}
+
+/* music: a sticker on the page */
+:root:not([data-skin]) .sp{background:var(--surface-2);border:0;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line)}
+
+/* tabs and toggles: a highlighter swipe that slides to the picked one (app.js moves .ink) */
+:root:not([data-skin]) .tabs{border-bottom:1px solid var(--line);gap:2px;position:relative}
+:root:not([data-skin]) .tabs button{position:relative;z-index:1;font:600 13.5px var(--sans);color:var(--faint);padding:7px 10px 9px;border-bottom:0}
+:root:not([data-skin]) .tabs button[aria-selected="true"]{color:var(--fg);border-bottom:0}
+:root:not([data-skin]) .tabs:not(.has-ink) button[aria-selected="true"]{box-shadow:inset 0 -2.5px 0 var(--accent)}
+:root:not([data-skin]) .tabs > .ink{position:absolute;z-index:0;pointer-events:none;background:transparent}
+:root:not([data-skin]) .tabs > .ink::after{content:"";position:absolute;left:4px;right:4px;bottom:6px;height:44%;border-radius:3px 7px 4px 8px;background:color-mix(in srgb,var(--accent) 22%,transparent)}
+:root:not([data-skin]) .seg{position:relative;background:var(--surface-2);border-color:var(--line)}
+:root:not([data-skin]) .seg button{position:relative;z-index:1}
+:root:not([data-skin]) .seg.has-ink button[aria-pressed="true"]{background:transparent;box-shadow:none}
+:root:not([data-skin]) .seg > .ink{position:absolute;z-index:0;pointer-events:none;border-radius:6px;background:var(--surface);box-shadow:0 1px 2px rgb(70 45 25 / .14),0 0 0 1px var(--line)}
+:root:not([data-skin]) .tq{gap:0}
+:root:not([data-skin]) .tq li{border-radius:0;background:transparent;border-left:0;border-bottom:1px solid var(--rule);padding:7px 4px}
+:root:not([data-skin]) .tq-c{font-family:var(--sans)}
+:root:not([data-skin]) .tq-t{font:500 14.5px var(--head)}
+
+/* your day: one strip across the top on laptops (app.js renderRail). Phones and skins keep the Schedule panel. */
+.rail{display:none}
+@media (min-width:760px){
+  :root:not([data-skin]) .rail{grid-area:rail;display:grid;gap:14px;padding:16px 18px 14px}
+  :root:not([data-skin]) .p-sched{display:none}
+  :root:not([data-skin]) .dash{grid-template-areas:"rail" "hw" "a" "c"}
+}
+@media (min-width:900px){ :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-areas:"rail rail" "hw a" "c c"} }
+@media (min-width:1280px){
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.3fr) minmax(0,1.1fr) minmax(290px,.78fr);grid-template-areas:"rail rail rail" "hw c a";grid-template-rows:auto minmax(0,1fr)}
+}
+:root:not([data-skin]) .sbc{display:none!important}
+:root:not([data-skin]) .rail-h{display:flex;align-items:center;gap:18px;min-width:0}
+:root:not([data-skin]) .rail-h h2{flex:none}
+:root:not([data-skin]) .rail-now{flex:1;min-width:0}
+:root:not([data-skin]) .rail-now .now-card{background:none;box-shadow:none;padding:0;border-radius:0;display:flex;align-items:baseline;gap:4px 14px;flex-wrap:wrap}
+:root:not([data-skin]) .rail-now .now-card::before{display:none}
+:root:not([data-skin]) .rail-now .now-card .big{gap:8px}
+:root:not([data-skin]) .rail-now .now-card .lbl{font:600 16px/1.2 var(--head)}
+:root:not([data-skin]) .rail-now .now-card .num{font-size:26px}
+:root:not([data-skin]) .rail-now .now-card .prog{display:none}
+:root:not([data-skin]) .rail-now .now-card .sub{font-size:13px}
+:root:not([data-skin]) .rail-side{flex:none;display:flex;gap:8px}
+:root:not([data-skin]) .rail-side .wx{box-shadow:none;background:var(--surface-2);padding:6px 10px}
+:root:not([data-skin]) .rail-track{position:relative;list-style:none;margin:0;padding:0 0 2px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+:root:not([data-skin]) .rb{position:relative;flex:1 1 0;min-width:118px;display:flex;flex-direction:column;gap:3px;padding:9px 10px 10px;border-radius:8px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--cc,var(--line)) 14%,var(--surface)),var(--surface) 70%);box-shadow:inset 0 3px 0 var(--cc,var(--line)),inset 0 0 0 1px color-mix(in srgb,var(--cc,var(--line)) 22%,var(--line))}
+:root:not([data-skin]) .rb:is(.homeroom,.hall,.free){min-width:46px;flex-grow:0!important;flex-basis:46px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line)}
+:root:not([data-skin]) .rb:is(.homeroom,.hall,.free) :is(.rb-n,.rb-t){display:none}
+:root:not([data-skin]) .rb.lunch{min-width:104px;background:repeating-linear-gradient(-45deg,var(--surface) 0 7px,var(--surface-2) 7px 14px);box-shadow:inset 0 0 0 1px var(--line)}
+:root:not([data-skin]) .rb:is(.after,.extra){flex:0 0 auto;min-width:130px;max-width:200px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);border-left:0}
+:root:not([data-skin]) .rb.after{background:color-mix(in srgb,var(--c-msi) 10%,var(--surface))}
+:root:not([data-skin]) .rb.past{opacity:.5}
+:root:not([data-skin]) .rb.now{box-shadow:inset 0 3px 0 var(--cc,var(--accent)),0 0 0 2px var(--cc,var(--accent)),var(--ink-shadow)}
+:root:not([data-skin]) .rb-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+:root:not([data-skin]) .rb .blk{display:grid;place-items:center;width:24px;height:24px;flex:none;color:var(--cc,var(--faint));border:1.75px solid var(--cc,var(--line));border-radius:50% 46% 52% 48%;font:700 12px var(--head)}
+:root:not([data-skin]) .rb:is(.homeroom,.hall,.free,.lunch) .blk{border-style:dashed;border-color:var(--faint);color:var(--faint);font-size:10px}
+:root:not([data-skin]) .rb-t{font:400 11.5px var(--mono);color:var(--muted)}
+:root:not([data-skin]) .rb-n{font:600 15px/1.2 var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root:not([data-skin]) .rb-w{font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root:not([data-skin]) .rb-lunch{white-space:normal;font:italic 12.5px/1.3 var(--head);color:var(--muted)}
+:root:not([data-skin]) .rb-due{display:grid;gap:4px;margin-top:5px}
+:root:not([data-skin]) .rb-hw{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:5px;min-width:0;padding:3px 6px;border-radius:3px 7px 4px 8px;font:500 12px/1.3 var(--sans);
+  background:color-mix(in srgb,var(--cc) 18%,var(--surface));transition:transform .35s var(--spring)}
+:root:not([data-skin]) .rb-hw span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root:not([data-skin]) .rb-hw.major{background:color-mix(in srgb,var(--cc) 30%,var(--surface));font-weight:700}
+:root:not([data-skin]) .rb-hw .tag{flex:none;font-size:8.5px;padding:0 4px;transform:rotate(-3deg)}
+:root:not([data-skin]) .rb-hw:hover{transform:translateY(-1px)}
+:root:not([data-skin]) .rb-hw:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+:root:not([data-skin]) .rb.empty{min-width:0;flex:1;font:italic 14px var(--head);color:var(--muted);background:var(--surface-2);box-shadow:none}
+:root:not([data-skin]) .rail-line{position:absolute;top:-4px;bottom:-2px;width:2px;margin-left:-1px;background:var(--accent);border-radius:2px;pointer-events:none;z-index:2}
+:root:not([data-skin]) .rail-line::before{content:"";position:absolute;top:-3px;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* phones */
+@media (max-width:759px){
+  :root:not([data-skin]) .tabbar{background-color:var(--surface)}
+  :root:not([data-skin]) .dash{padding:14px 12px calc(88px + env(safe-area-inset-bottom,0px))}
+  :root:not([data-skin]) .panel{padding:14px}
+}
+@media (prefers-reduced-motion:reduce){ :root:not([data-skin]) *{transition:none!important} }
+.cal-wrap{position:relative}

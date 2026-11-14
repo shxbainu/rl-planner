@@ -9,8 +9,9 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a1a22'/%3E%3Ctext x='32' y='43' font-family='Helvetica,Arial,sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ERL%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..600&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Atkinson+Hyperlegible+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="paper.css">
 <script>
   // apply the saved skin and light/dark before first paint (?theme=name previews one without saving)
   (function () {
@@ -55,6 +56,14 @@
 <div class="gn" id="gn" hidden></div>
 
 <main class="dash">
+  <section class="panel rail" id="rail" aria-labelledby="rail-h">
+    <div class="rail-h">
+      <h2 id="rail-h">Today</h2>
+      <div class="rail-now" id="rail-now"></div>
+      <div class="rail-side" id="rail-side"></div>
+    </div>
+    <ol class="rail-track" id="rail-track"></ol>
+  </section>
   <div class="col col-a">
     <section class="panel p-sched" aria-labelledby="sched-h">
       <div class="panel-h"><h2 id="sched-h">Schedule</h2><span class="panel-meta" id="sched-meta"></span></div>
@@ -107,7 +116,7 @@
     </div>
     <div class="season" id="season"></div>
     <div id="overdue-bar"></div>
-    <div class="cal" id="cal" role="grid" aria-label="Homework calendar"></div>
+    <div class="cal-wrap"><div class="cal" id="cal" role="grid" aria-label="Homework calendar"></div></div>
     <div class="agenda">
       <div class="agenda-h"><b id="ag-h"></b><span class="panel-meta" id="hw-meta"></span></div>
       <ul class="list" id="agenda"></ul>
@@ -343,5 +352,11 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="app.js"></script>
+<!-- spring physics for the Ink & Paper look (motion.dev); the planner works the same without it -->
+<script type="module">
+  import { animate, stagger } from "https://cdn.jsdelivr.net/npm/motion@14.9.1/+esm";
+  window.Motion = { animate, stagger };
+  document.dispatchEvent(new Event("motion-ready"));
+</script>
 </body>
 </html>
