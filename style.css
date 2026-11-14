@@ -731,6 +731,7 @@ details .list{margin-top:6px}
 .chip2.major{background:color-mix(in srgb,var(--cc) 16%,var(--surface));font-weight:600}
 .chip2.done{text-decoration:line-through;color:var(--done)}
 .cell .more{font-size:11px;color:var(--muted);padding-left:4px}
+.cell .cnt{display:none}
 .overdue-strip{display:flex;align-items:center;gap:8px;background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;border:0;width:100%;text-align:left}
 .agenda{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}
 .agenda-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}

@@ -508,8 +508,10 @@
       const { letter } = letterFor(d);
       const chips = list.slice(0, cap).map((i) => `<span class="chip2${MAJOR.has(i.type) ? " major" : ""}${isDone(i) ? " done" : ""}" style="${cc(i.class)}" data-no="${pad4(i.id)}" title="${esc(i.class)}: ${esc(i.title)}">${esc(i.title)}</span>`).join("");
       const more = list.length > cap ? `<span class="more">+${list.length - cap} more</span>` : "";
+      const openList = list.filter((i) => !isDone(i)), big = openList.find((i) => MAJOR.has(i.type));
+      const cnt = `<span class="cnt">${openList.length ? `<b>${openList.length}</b> due` : list.length ? "all done" : ""}${big ? `<i style="${cc(big.class)}">${esc(cls(big.class).short || big.class)} ${esc(big.type)}</i>` : ""}</span>`;
       return `<button type="button" class="cell${d === t ? " today" : ""}${d === selDay && !showOverdue ? " sel" : ""}${d < t ? " past" : ""}" data-day="${d}" aria-label="${esc(fmt(d, { weekday: "long", month: "long", day: "numeric" }))}, ${list.length} due">
-        <div class="top"><b>${num}</b><span class="lt">${letter || ""}</span></div>${chips}${more}</button>`;
+        <div class="top"><b>${num}</b><span class="lt">${letter || ""}</span></div>${chips}${more}${cnt}</button>`;
     }).join("");
 
     $("#overdue-bar").innerHTML = overdue.length
@@ -2882,8 +2884,8 @@
   }
 
   // ---------- your day: one strip across the top on laptops ----------
-  // Every block of the day in order, as wide as it is long, with what's due in that class underneath, lunch's main
-  // dishes on the lunch block and after school at the end; a line marks now. The live countdown (the now-card) and the
+  // Where to be and when: every block of the day in order, as wide as it is long, with time and room, lunch's main
+  // dishes on the lunch block and after school at the end; a line marks now. Homework stays in the checklist. The live countdown (the now-card) and the
   // weather move up into its header. Phones and skins keep the Schedule panel instead.
   const railOn = () => !root.dataset.skin && matchMedia("(min-width:760px)").matches;
   function placeNow() {
@@ -2919,33 +2921,22 @@
     const shown = rows.filter((r, i) => !(r.kind === "free" && (i < first || i > last)));
     $("#rail-h").textContent = `${isToday ? "Today" : relDay(day)}${letter ? ` · ${letter} day` : ""}`;
 
-    const due = allItems().filter((i) => !isDone(i) && i.due === day).sort((a, b) => MAJOR.has(b.type) - MAJOR.has(a.type));
-    const meets = new Set(shown.filter((r) => r.name).map((r) => r.name));
-    const placed = new Set();
-    const hw = (list) => list.map((i) => `<button type="button" class="rb-hw${MAJOR.has(i.type) ? " major" : ""}" data-id="${esc(i.id)}" style="${cc(i.class)}" title="${esc(i.title)}">${MAJOR.has(i.type) ? `<span class="tag">${esc(i.type)}</span>` : ""}<span>${esc(i.title)}</span></button>`).join("");
+    $("#rail-now").hidden = !isToday; // before school days the header already says the day and letter
     const lunch = menu?.days?.[day]?.stations?.filter((st) => LUNCH_MAIN.includes(st.name)).flatMap((st) => st.items).slice(0, 2).map((it) => it.name) || [];
     const m = now().getHours() * 60 + now().getMinutes();
-
     const blocks = shown.map((r) => {
       const a = minutes(r.bell.start), b = minutes(r.bell.end), c = r.name && cls(r.name);
       const st = !isToday ? "" : m >= b ? " past" : m >= a ? " now" : "";
-      const mine = c && !placed.has(r.name) ? due.filter((i) => i.class === r.name) : [];
-      if (c) placed.add(r.name);
       const isEv = ["lunch", "homeroom", "hall"].includes(r.kind);
       const badge = { lunch: "L", homeroom: "HR", hall: "HL" }[r.kind] || (c ? c.block : "·");
       const label = isEv ? r.segs[0].label : c ? (c.short || c.name) : "Free";
-      return `<li class="rb ${r.kind}${st}" style="${r.name ? `${cc(r.name)};` : ""}flex-grow:${b - a}" data-a="${a}" data-b="${b}">
-        <span class="rb-top"><span class="blk">${badge}</span><span class="rb-t">${r.bell.start}</span></span>
-        <b class="rb-n" title="${esc(c ? c.name : label)}">${esc(label)}</b>
-        ${c?.room ? `<span class="rb-w">${esc(c.room)}</span>` : ""}
-        ${r.kind === "lunch" && lunch.length ? `<span class="rb-w rb-lunch">${lunch.map(esc).join(" · ")}</span>` : ""}
-        ${mine.length ? `<span class="rb-due">${hw(mine)}</span>` : ""}
+      const sub = [r.bell.start, c?.room, r.kind === "lunch" && lunch.length ? lunch.join(" · ") : ""].filter(Boolean).join(" · ");
+      return `<li class="rb ${r.kind}${st}" style="${r.name ? `${cc(r.name)};` : ""}flex-grow:${b - a}" data-a="${a}" data-b="${b}" title="${esc(`${c ? c.name : label} · ${r.bell.start}–${r.bell.end}${c?.room ? ` · ${c.room}` : ""}${c?.teacher ? ` · ${c.teacher}` : ""}`)}">
+        <span class="blk">${badge}</span><span class="rb-x"><b class="rb-n">${esc(label)}</b><span class="rb-w">${esc(sub)}</span></span>
       </li>`;
     });
-    const rest = due.filter((i) => !meets.has(i.class));
-    if (rest.length) blocks.push(`<li class="rb extra"><span class="rb-top"><span class="rb-t">Also due</span></span><span class="rb-due">${hw(rest)}</span></li>`);
     const af = schedule.after_school;
-    if (af) blocks.push(`<li class="rb after"><span class="rb-top"><span class="rb-t">After school</span></span><b class="rb-n">${esc(af.name)}</b><span class="rb-w">${esc(af.coach)}</span></li>`);
+    if (af) blocks.push(`<li class="rb after" title="${esc(`${af.name} · ${af.coach}`)}"><span class="blk">AS</span><span class="rb-x"><b class="rb-n">${esc(af.name)}</b><span class="rb-w">After school</span></span></li>`);
     $("#rail-track").innerHTML = rows.length ? blocks.join("") + `<span class="rail-line" aria-hidden="true" hidden></span>`
       : `<li class="rb empty">${special(day) ? "Special schedule: times for it aren't posted yet." : "Set the day letter (the stamp, top left) to see your classes."}</li>`;
     railLine();
@@ -2959,7 +2950,6 @@
     line.hidden = !li;
     if (li) line.style.left = `${li.offsetLeft + ((m - li.dataset.a) / (li.dataset.b - li.dataset.a)) * li.offsetWidth}px`;
   }
-  $("#rail-track").addEventListener("click", (e) => { const b = e.target.closest(".rb-hw[data-id]"); if (b) openItem(b.dataset.id); });
 
   // ---------- motion: spring physics from Motion (motion.dev), loaded as a module in index.html ----------
   // Only on the Ink & Paper look (skins have their own effects), never with reduced motion, and not in a hidden tab
@@ -3034,6 +3024,8 @@
     else { m.animate(r, to, { duration: 0 }); m.animate(r, { opacity: [0, 1] }, { duration: 0.18, delay: 0.1 }); }
     ringAt = key;
   }
+
+  new ResizeObserver(() => { ringAt = ""; ring($("#cal .cell.sel")); }).observe($("#cal")); // a new width moves the cells
 
   // switch what a panel shows: the old content slips out, the new springs in from the side you moved toward
   function swapIn(els, dir, update, dist = 14) {
