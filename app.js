@@ -371,7 +371,6 @@
   // once a second: update the number and bar in place; redraw the card when the block changes
   function tickNow() {
     renderScoreboard();
-    railLine();
     const day = schoolDay(), { letter } = letterFor(day);
     const num = $("#now-card .num");
     if (!num) return;
@@ -400,8 +399,6 @@
       $("#timeline").innerHTML = `<li class="empty">Times for this special schedule aren't posted yet.</li>`;
       skinSchedule();
       $("#after").innerHTML = "";
-      placeNow();
-      renderRail();
       return;
     }
 
@@ -434,8 +431,6 @@
     const af = schedule.after_school;
     $("#after").innerHTML = af ? `After school: <b>${esc(af.name)}</b>, ${esc(af.coach)}` : "";
     renderScoreboard();
-    placeNow();
-    renderRail();
     if (`${day}|${letter}` !== schedKey) { schedKey = `${day}|${letter}`; rowsIn(); }
   }
 
@@ -538,7 +533,6 @@
     $("#done").innerHTML = done.length ? done.map((i) => itemHTML(i, { showDue: true })).join("") : `<li class="empty-state">Checked-off assignments land here.</li>`;
     renderSeasonal();
     renderTests();
-    renderRail();
     ring($("#cal .cell.sel"));
   }
 
@@ -2883,18 +2877,6 @@
     });
   }
 
-  // ---------- your day: one strip across the top on laptops ----------
-  // Where to be and when: every block of the day in order, as wide as it is long, with time and room, lunch's main
-  // dishes on the lunch block and after school at the end; a line marks now. Homework stays in the checklist. The live countdown (the now-card) and the
-  // weather move up into its header. Phones and skins keep the Schedule panel instead.
-  const railOn = () => !root.dataset.skin && matchMedia("(min-width:760px)").matches;
-  function placeNow() {
-    const on = railOn(), nc = $("#now-card"), wx = $("#wx");
-    if (nc) { if (on) { if (nc.parentNode !== $("#rail-now")) $("#rail-now").append(nc); } else if (nc.parentNode === $("#rail-now")) $("#sbc").after(nc); }
-    if (wx) { if (on) { if (wx.parentNode !== $("#rail-side")) $("#rail-side").append(wx); } else if (wx.parentNode === $("#rail-side")) $(".p-sched").after(wx); }
-  }
-  matchMedia("(min-width:760px)").addEventListener("change", () => { placeNow(); renderRail(); inkAll(false); });
-
   // Sports, fantasy, news and countdowns as open cards in a row under everything (laptops, Ink & Paper), instead of
   // tabs nobody opens; the More panel keeps Week, Tests and Quotes. Phones and skins keep all seven tabs.
   const FEED = ["sports", "fantasy", "news", "count"];
@@ -2913,43 +2895,6 @@
     if (on && FEED.includes(state.pane)) showPane("week");
   }
   matchMedia("(min-width:900px)").addEventListener("change", placeFeed);
-  function renderRail() {
-    if (!schedule || !$("#rail")) return;
-    const t = today(), day = schoolDay(), isToday = day === t, { letter } = letterFor(day);
-    const rows = letter && !special(day) ? dayRows(letter, day) : [];
-    const first = rows.findIndex((r) => r.kind === "class"), last = rows.length - 1 - [...rows].reverse().findIndex((r) => r.kind === "class");
-    const shown = rows.filter((r, i) => !(r.kind === "free" && (i < first || i > last)));
-    $("#rail-h").textContent = `${isToday ? "Today" : relDay(day)}${letter ? ` · ${letter} day` : ""}`;
-
-    $("#rail-now").hidden = !isToday; // before school days the header already says the day and letter
-    const lunch = menu?.days?.[day]?.stations?.filter((st) => LUNCH_MAIN.includes(st.name)).flatMap((st) => st.items).slice(0, 2).map((it) => it.name) || [];
-    const m = now().getHours() * 60 + now().getMinutes();
-    const blocks = shown.map((r) => {
-      const a = minutes(r.bell.start), b = minutes(r.bell.end), c = r.name && cls(r.name);
-      const st = !isToday ? "" : m >= b ? " past" : m >= a ? " now" : "";
-      const isEv = ["lunch", "homeroom", "hall"].includes(r.kind);
-      const badge = { lunch: "L", homeroom: "HR", hall: "HL" }[r.kind] || (c ? c.block : "·");
-      const label = isEv ? r.segs[0].label : c ? (c.short || c.name) : "Free";
-      const sub = [r.bell.start, c?.room, r.kind === "lunch" && lunch.length ? lunch.join(" · ") : ""].filter(Boolean).join(" · ");
-      return `<li class="rb ${r.kind}${st}" style="${r.name ? `${cc(r.name)};` : ""}flex-grow:${b - a}" data-a="${a}" data-b="${b}" title="${esc(`${c ? c.name : label} · ${r.bell.start}–${r.bell.end}${c?.room ? ` · ${c.room}` : ""}${c?.teacher ? ` · ${c.teacher}` : ""}`)}">
-        <span class="blk">${badge}</span><span class="rb-x"><b class="rb-n">${esc(label)}</b><span class="rb-w">${esc(sub)}</span></span>
-      </li>`;
-    });
-    const af = schedule.after_school;
-    if (af) blocks.push(`<li class="rb after" title="${esc(`${af.name} · ${af.coach}`)}"><span class="blk">AS</span><span class="rb-x"><b class="rb-n">${esc(af.name)}</b><span class="rb-w">After school</span></span></li>`);
-    $("#rail-track").innerHTML = rows.length ? blocks.join("") + `<span class="rail-line" aria-hidden="true" hidden></span>`
-      : `<li class="rb empty">${special(day) ? "Special schedule: times for it aren't posted yet." : "Set the day letter (the stamp, top left) to see your classes."}</li>`;
-    railLine();
-  }
-  // the now line sits inside whichever block holds the time, at how far through it we are
-  function railLine() {
-    const line = $("#rail-track .rail-line");
-    if (!line) return;
-    const m = now().getHours() * 60 + now().getMinutes() + now().getSeconds() / 60;
-    const li = schoolDay() === today() && [...document.querySelectorAll("#rail-track .rb[data-a]")].find((x) => m >= +x.dataset.a && m < +x.dataset.b);
-    line.hidden = !li;
-    if (li) line.style.left = `${li.offsetLeft + ((m - li.dataset.a) / (li.dataset.b - li.dataset.a)) * li.offsetWidth}px`;
-  }
 
   // ---------- motion: spring physics from Motion (motion.dev), loaded as a module in index.html ----------
   // Only on the Ink & Paper look (skins have their own effects), never with reduced motion, and not in a hidden tab
@@ -3058,7 +3003,7 @@
   // schedule rows rise in one after another when the day or letter changes (not on the clock's own updates)
   let schedKey = "";
   function rowsIn() {
-    const m = mo(), li = [...document.querySelectorAll(railOn() ? "#rail-track .rb" : "#timeline li")].slice(0, 14);
+    const m = mo(), li = [...document.querySelectorAll("#timeline li")].slice(0, 12);
     if (m && li.length) m.animate(li, { opacity: [0, 1], y: [8, 0] }, { ...spring(0.4, 0.15), delay: m.stagger(0.035, { startDelay: 0.05 }) });
   }
   document.addEventListener("motion-ready", () => {
