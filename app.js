@@ -2877,22 +2877,36 @@
     });
   }
 
-  // Sports, fantasy, news and countdowns as open cards in a row under everything (laptops, Ink & Paper), instead of
-  // tabs nobody opens; the More panel keeps Week, Tests and Quotes. Phones and skins keep all seven tabs.
+  // Laptops (Ink & Paper): Homework on the left, the day on the right (schedule, weather, next up, quote, links, music),
+  // and everything else as open cards packed in columns underneath: lunch, the Week/Tests/Quotes box, sports,
+  // fantasy, news and countdowns. Nothing hides behind a tab nobody opens, and the two columns end near each other.
+  // Phones and skins keep the original arrangement; each moved element goes back to the exact spot it came from.
   const FEED = ["sports", "fantasy", "news", "count"];
   const feedOn = () => !root.dataset.skin && matchMedia("(min-width:900px)").matches;
+  function moveTo(el, parent) {
+    if (!el || el.parentNode === parent) return;
+    if (!el._home) { el._home = document.createComment("home"); el.before(el._home); }
+    parent.append(el);
+  }
+  const moveHome = (el) => { if (el?._home && el.previousSibling !== el._home) el._home.after(el); };
   function placeFeed() {
-    const on = feedOn(), feed = $("#feed"), more = $(".p-more");
-    if (!feed || !more) return;
-    FEED.forEach((name) => {
-      const pane = $(`.pane[data-pane="${name}"]`);
-      if (!pane) return;
+    const on = feedOn(), feed = $("#feed");
+    if (!feed) return;
+    const panes = FEED.map((name) => $(`.pane[data-pane="${name}"]`)).filter(Boolean);
+    panes.forEach((pane) => {
+      const name = pane.dataset.pane;
       if (!pane.querySelector(":scope > .feed-h")) pane.insertAdjacentHTML("afterbegin", `<h2 class="feed-h">${esc($(`[data-tab-pane="${name}"]`)?.textContent || name)}</h2>`);
-      const home = on ? feed : more;
-      if (pane.parentNode !== home) home.append(pane);
-      wake(pane);
     });
-    if (on && FEED.includes(state.pane)) showPane("week");
+    const cards = [$(".p-lunch"), $(".p-more"), ...panes];
+    if (on) {
+      cards.forEach((el) => moveTo(el, feed));
+      moveTo($(".p-music"), $(".col-a"));
+      panes.forEach(wake);
+      if (FEED.includes(state.pane)) showPane("week");
+    } else {
+      [...cards].reverse().forEach(moveHome);
+      moveHome($(".p-music"));
+    }
   }
   matchMedia("(min-width:900px)").addEventListener("change", placeFeed);
 
