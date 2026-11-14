@@ -2163,6 +2163,15 @@
     sel.value = skinNow();
     sel.onchange = () => { setSkin(sel.value); skinSels.forEach((o) => { o.value = sel.value; }); };
   });
+  // the Nov 2026 redesign lives in Ink & Paper, so every device lands there once (any skin can be picked again after);
+  // run after start-up so everything setSkin redraws exists. The pref it saves is newer, so sync carries it to other devices.
+  setTimeout(() => {
+    try {
+      if (localStorage.getItem("rlp-ink-paper-1")) return;
+      localStorage.setItem("rlp-ink-paper-1", "1");
+      if (skinNow() !== "original") { setSkin("original"); skinSels.forEach((o) => { o.value = "original"; }); }
+    } catch {}
+  }, 0);
 
   const reduced = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
   // a skin can hold a checked row on screen a moment for its stamp (--leave-ms in its CSS)
