@@ -850,17 +850,18 @@ dialog::backdrop{background:rgb(20 12 12 / .45)}
 /* study mode: full screen, the theme's colors over a scene drawn for the subject */
 .study-btn{width:auto;padding:0 11px;gap:6px;font-weight:600;font-size:13px;display:inline-flex;align-items:center}
 .study-btn svg{width:16px;height:16px}
-.study{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.8fr);grid-template-rows:auto minmax(0,1fr);
-  grid-template-areas:"top top" "left right";gap:16px;padding:14px 20px 20px;padding-top:calc(14px + env(safe-area-inset-top,0px));background:var(--bg);color:var(--fg);overflow:hidden}
+.study{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:minmax(300px,440px) minmax(0,1fr) minmax(270px,340px);grid-template-rows:auto minmax(0,1fr);
+  grid-template-areas:"top top top" "left . right";gap:16px;padding:14px 20px 20px;padding-top:calc(14px + env(safe-area-inset-top,0px));background:var(--bg);color:var(--fg);overflow:hidden}
 .study[hidden]{display:none}
 .st-scene{position:absolute;inset:0;pointer-events:none}
-.st-scene svg{display:block;width:100%;height:100%}
+.st-scene :is(svg,img){display:block;width:100%;height:100%;object-fit:cover}
 .study.has-scene{background:#0d111a}
 .study > :not(.st-scene,.st-nudge,.st-fx){position:relative}
 .st-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 html.studying body{overflow:hidden}
 .st-top{grid-area:top;display:flex;align-items:center;gap:12px;min-height:38px}
 .st-where{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.st-why{font-size:12.5px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .st-stats{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .study.has-scene .st-top,.study.has-scene .st-stats{color:#ece8de}
 .st-mo{height:38px;padding:0 14px 0 30px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 12.5px var(--ui,inherit);cursor:pointer;flex:none;position:relative}
@@ -879,7 +880,7 @@ html.studying body{overflow:hidden}
 #st-clock{flex:0 1 auto;display:flex;flex-direction:column;justify-content:safe center;gap:10px;padding:24px 28px;min-height:0;overflow:auto}
 #st-clock .lbl{font-size:clamp(20px,2.3vw,30px);font-weight:700;line-height:1.15}
 #st-clock .lbl small{display:block;font-size:14px;font-weight:500;color:inherit;opacity:.75;margin-top:3px}
-#st-clock .num{font-family:var(--digits,var(--mono));font-size:clamp(76px,12.5vw,190px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#st-clock .num{font-family:var(--digits,var(--mono));font-size:clamp(64px,7.4vw,128px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 #st-clock .prog{height:10px;max-width:none}
 #st-clock .sub{font-size:15px}
 .st-row{display:flex;align-items:center;gap:clamp(18px,3vw,44px);flex-wrap:wrap}
@@ -891,16 +892,17 @@ html.studying body{overflow:hidden}
 @keyframes st-breathe{0%,100%{transform:scale(.55);opacity:.4}50%{transform:scale(1);opacity:.9}}
 @keyframes st-say{0%,46%{opacity:1}50%,96%{opacity:0}100%{opacity:1}}
 /* the scene's own motion, only while Motion is on */
-.study.fx .fx-wave path{animation-name:st-wave;animation-timing-function:linear;animation-iteration-count:infinite}
+.study.fx.run .fx-wave path{animation-name:st-wave;animation-timing-function:linear;animation-iteration-count:infinite}
 @keyframes st-wave{to{transform:translateX(-80px)}}
-.study.fx .fx-bob{transform-box:fill-box;transform-origin:50% 100%;animation:st-bob 7s ease-in-out infinite alternate}
+.study.fx.run .fx-bob{transform-box:fill-box;transform-origin:50% 100%;animation:st-bob 7s ease-in-out infinite alternate}
 @keyframes st-bob{from{transform:translateY(0) rotate(-.9deg)}to{transform:translateY(5px) rotate(.9deg)}}
 .study.fx .fx-shim{animation:st-shim 5s ease-in-out infinite alternate}
 @keyframes st-shim{from{opacity:.03}to{opacity:.1}}
 .study.fx .fx-glow{transform-box:fill-box;transform-origin:center;animation:st-glow 9s ease-in-out infinite alternate}
 @keyframes st-glow{from{transform:scale(.92)}to{transform:scale(1.08)}}
-.study.fx .fx-win{animation-name:st-win;animation-iteration-count:infinite}
-@keyframes st-win{0%{opacity:1}38%{opacity:1}39%{opacity:.08}71%{opacity:.08}72%{opacity:1}}
+/* Paris: a window lights for each bit of the round */
+.st-scene .w{opacity:.09;transition:opacity 1.6s ease}
+.st-scene .w.on{opacity:1}
 .st-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
 /* the clock card can be light or dark depending on the theme, so its controls take the card's own text color */
 #st-clock .btn,#st-clock .seg{background:transparent;color:inherit;border:1.5px solid color-mix(in srgb,currentColor 35%,transparent)}
@@ -974,6 +976,7 @@ html.st-dock .st-music{display:none}
   .st-left,.st-right,.st-scroll{min-height:auto}
   #st-clock{padding:18px 20px;flex:none}
   .st-mo{width:38px;padding:0;font-size:0}
+  .st-why{display:none}
   .st-mo::before{left:50%;margin-left:-4.5px}
   #st-clock .num{font-size:clamp(68px,23vw,120px)}
 }
@@ -1070,3 +1073,48 @@ dialog.qp{width:min(680px,calc(100vw - 24px));max-width:none;max-height:calc(100
 }
 @media (pointer:coarse){.qp-f kbd{display:none}}
 @media (prefers-reduced-motion:reduce){.st-breathe span + span{display:none}}
+
+/* This week and Next break: strips like the weather in the skins, rows of the Today card in Ink & Paper */
+:is(.tw,.brk){flex:none;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:12.5px}
+.tw{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:end}
+.tw-bars{display:grid;grid-template-columns:repeat(7,18px);gap:5px;height:58px;align-items:end}
+.tw-d{display:grid;grid-template-rows:12px minmax(0,1fr) 12px;height:100%;justify-items:center;text-align:center}
+.tw-d b{font-size:10px;line-height:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.tw-d i{align-self:end;width:100%;border-radius:3px 3px 1px 1px;background:color-mix(in srgb,var(--accent) 70%,transparent);min-height:0}
+.tw-d small{font-size:9.5px;line-height:12px;font-weight:700;color:var(--faint,var(--muted))}
+.tw-d.now small{color:var(--accent-ink,var(--accent))}
+.tw-d.now i{background:var(--accent)}
+.tw-d.later{opacity:.45}
+.tw-d::after{content:"";grid-row:2;grid-column:1;align-self:end;width:100%;height:2px;border-radius:1px;background:var(--line)}
+.tw-d i{grid-row:2;grid-column:1;z-index:1}
+.tw-sum{margin:0;line-height:1.45;color:var(--muted)}
+.tw-sum b{color:var(--fg)}
+.tw-tip{font-size:11.5px;color:var(--faint,var(--muted))}
+.brk{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.brk-n{font-weight:700}
+.brk-left{margin-left:auto;color:var(--muted)}
+.brk-left b{color:var(--fg);font-variant-numeric:tabular-nums}
+
+/* daily chess puzzle */
+.chess{display:grid;gap:10px;justify-items:start}
+.pz-task{margin:0;font-size:13.5px;color:var(--muted)}
+.pz-task b{color:var(--fg)}
+.pz-board{display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,340px);aspect-ratio:1;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 6px 16px -10px rgb(0 0 0 / .4);user-select:none}
+.pz-board button{position:relative;display:grid;place-items:center;border:0;padding:0;margin:0;cursor:pointer;font:inherit;min-width:0;aspect-ratio:1}
+.pz-board .lt{background:#efe4cf}
+.pz-board .dk{background:#b58d68}
+.pz-board .last{box-shadow:inset 0 0 0 100px rgb(214 181 64 / .38)}
+.pz-board .sel{box-shadow:inset 0 0 0 3px #7a1a22,inset 0 0 0 100px rgb(122 26 34 / .14)}
+.pz-board .hint{box-shadow:inset 0 0 0 3px #2c7a4b}
+.pz-board .mine:hover{filter:brightness(1.06)}
+.pz-board .pc{font-size:clamp(22px,7.5vw,34px);line-height:1;pointer-events:none;font-family:"Segoe UI Symbol","Apple Symbols","DejaVu Sans",serif}
+.pz-board .pc.w{color:#fbf6ec;-webkit-text-stroke:1.1px #2a211c;text-shadow:0 1px 1px rgb(0 0 0 / .25)}
+.pz-board .pc.b{color:#231b17;text-shadow:0 1px 0 rgb(255 255 255 / .18)}
+.pz-board em{position:absolute;font:700 8.5px/1 var(--ui,system-ui);font-style:normal;opacity:.6;pointer-events:none}
+.pz-board .lt em{color:#8b6a4c}.pz-board .dk em{color:#f3e9d6}
+.pz-board .rk{left:2px;top:2px}.pz-board .fl{right:2px;bottom:2px}
+.pz-board.nope{animation:pz-no .32s}
+@keyframes pz-no{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pz-msg{margin:0;font-size:13px;font-weight:600}
+.pz-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pz-acts .link{font-size:13px}

@@ -21,7 +21,7 @@
   // deleted, lettersAt[date] when a day letter was set or cleared, prefs[name] = { v, t }. Quotes: quotes[id] is that quote's
   // practice progress { lv, step, due, seen, last, t }, myQuotes the ones Brian added, qlog[date] how many he practiced that day.
   function load() {
-    const empty = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {}, quotes: {}, myQuotes: [], qlog: {} };
+    const empty = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {}, quotes: {}, myQuotes: [], qlog: {}, focusLog: {} };
     try {
       const s = JSON.parse(localStorage.getItem(STORE) || "null");
       return s ? { ...empty, ...s } : empty;
@@ -37,11 +37,11 @@
 
   // what syncs (the rest, like the open tab, stays per device), and how two copies merge: for each check-off, item,
   // countdown, day letter and pref, the newer change wins; a delete or uncheck newer than the item undoes it
-  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs", "notes", "quotes", "myQuotes", "qlog"];
+  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs", "notes", "quotes", "myQuotes", "qlog", "focusLog"];
   const syncedPart = (s) => Object.fromEntries(SYNCED.map((k) => [k, s?.[k] ?? (Array.isArray(state[k]) ? [] : {})]));
   function mergeState(a, b) {
     const tm = (v) => (typeof v === "string" ? v : ""), max = (...xs) => xs.map(tm).sort().at(-1) || "";
-    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {}, quotes: {}, myQuotes: [], qlog: {} };
+    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {}, quotes: {}, myQuotes: [], qlog: {}, focusLog: {} };
     for (const k of new Set([a.done, b.done, a.undone, b.undone].flatMap((m) => Object.keys(m || {})))) {
       const on = a.done?.[k] ?? b.done?.[k], onT = max(a.done?.[k], b.done?.[k]), offT = max(a.undone?.[k], b.undone?.[k]);
       if (on != null && onT >= offT) out.done[k] = onT || on; // a check-off from before times were kept counts as oldest
@@ -57,6 +57,7 @@
     out.countdowns = list(a.countdowns, b.countdowns, "id");
     out.myQuotes = list(a.myQuotes, b.myQuotes, "id");
     for (const d of new Set([a.qlog, b.qlog].flatMap((m) => Object.keys(m || {})))) out.qlog[d] = Math.max(a.qlog?.[d] || 0, b.qlog?.[d] || 0);
+    for (const d of new Set([a.focusLog, b.focusLog].flatMap((m) => Object.keys(m || {})))) out.focusLog[d] = Math.max(a.focusLog?.[d] || 0, b.focusLog?.[d] || 0);
     for (const d of new Set([a.letters, b.letters, a.lettersAt, b.lettersAt].flatMap((m) => Object.keys(m || {})))) {
       const ta = tm(a.lettersAt?.[d]), tb = tm(b.lettersAt?.[d]), from = tb > ta ? b : ta > tb ? a : a.letters?.[d] ? a : b;
       if (from.letters?.[d]) out.letters[d] = from.letters[d];
@@ -527,6 +528,7 @@
       : `<li class="empty-state">Nothing due${offName(selDay) ? ` (${esc(offName(selDay))})` : ""}.</li>`;
     const notes = homework?.notes || [];
     // closed by default, one line like "Done"; stays open across re-renders once opened
+    renderWeek();
     $("#hw-notes").innerHTML = notes.length ? `<details class="hw-notes"${notesOpen ? " open" : ""}><summary>Notes <span class="count">${notes.length}</span></summary><ul>${notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></details>` : "";
 
     const done = items.filter(isDone).sort((a, b) => b.due.localeCompare(a.due));
@@ -1461,9 +1463,139 @@
     renderFantasy();
     renderNews();
     renderQuotes();
+    renderWeek();
+    renderBreak();
     placeFeed();
     inkWatch();
   }
+
+  // ---------- This week: focus minutes from study mode (bars) and check-offs (numbers), Monday to Sunday ----------
+  const hm = (m) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ""}` : `${m}m`);
+  function renderWeek() {
+    const el = $("#tw");
+    if (!el) return;
+    const t = today(), dow = (parse(t).getDay() + 6) % 7, mon = addDays(t, -dow);
+    const doneBy = {};
+    for (const v of Object.values(state.done || {})) if (typeof v === "string" && v.length > 10) { const d = iso(new Date(v)); doneBy[d] = (doneBy[d] || 0) + 1; }
+    const days = Array.from({ length: 7 }, (_, i) => { const d = addDays(mon, i); return { d, m: state.focusLog?.[d] || 0, n: doneBy[d] || 0 }; });
+    const top = Math.max(45, ...days.map((x) => x.m));
+    const mins = days.reduce((a, x) => a + x.m, 0), n = days.reduce((a, x) => a + x.n, 0);
+    // a streak: days in a row (ending today, or yesterday if today hasn't started) with a check-off or 10+ focus minutes
+    const active = (d) => (doneBy[d] || 0) > 0 || (state.focusLog?.[d] || 0) >= 10;
+    let streak = 0, d = active(t) ? t : addDays(t, -1);
+    while (active(d) && streak < 365) { streak++; d = addDays(d, -1); }
+    el.hidden = false;
+    el.innerHTML = `<div class="tw-bars" role="img" aria-label="This week: ${hm(mins)} focused in study mode, ${n} checked off">${days.map((x) => `<span class="tw-d${x.d === t ? " now" : ""}${x.d > t ? " later" : ""}" title="${esc(fmt(x.d))}: ${hm(x.m)} focused, ${x.n} checked off"><b>${x.n || ""}</b><i style="height:${x.m ? Math.max(8, Math.round((x.m / top) * 100)) : 0}%"></i><small>${"MTWTFSS"[days.indexOf(x)]}</small></span>`).join("")}</div>
+      <p class="tw-sum"><b>${hm(mins)}</b> focused · <b>${n}</b> checked off${streak > 1 ? ` · <b>${streak}</b>-day streak` : ""}${mins ? "" : `<br><span class="tw-tip">Bars fill from Study mode's focus timer.</span>`}</p>`;
+  }
+
+  // ---------- Next break: the next run of days off (from the holidays Muse posts), and school days until it ----------
+  function renderBreak() {
+    const el = $("#brk");
+    if (!el) return;
+    const t = today();
+    let d = addDays(t, 1), guard = 0;
+    while (!(offName(d) && !isWeekend(d)) && guard++ < 120) d = addDays(d, 1);
+    if (guard >= 120) { el.hidden = true; return; }
+    let start = d, end = d;
+    while (isWeekend(addDays(start, -1)) && addDays(start, -1) > t) start = addDays(start, -1);
+    while (offName(addDays(end, 1)) || isWeekend(addDays(end, 1))) end = addDays(end, 1);
+    let left = 0;
+    for (let x = t; x < start; x = addDays(x, 1)) if (isSchoolDay(x) && (x > t || now().getHours() < 15)) left++;
+    const name = offName(d).replace(/,.*$/, "");
+    el.hidden = false;
+    el.innerHTML = `<b class="brk-n">${esc(name)}</b> ${esc(fmt(start, { weekday: "short", month: "short", day: "numeric" }))} – ${esc(fmt(end, { weekday: "short", month: "short", day: "numeric" }))}
+      <span class="brk-left"><b>${left}</b> school day${left === 1 ? "" : "s"} to go</span>`;
+  }
+
+  // ---------- Daily chess puzzle: Lichess's puzzle of the day, solved right on the board ----------
+  const PZ = { d: null, b: null, step: 0, sel: null, last: null, msg: "", hint: false, busy: false };
+  const GLYPH = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
+  const pzSolved = () => { try { return JSON.parse(localStorage.getItem("rlp-pz-solved") || "{}"); } catch { return {}; } };
+  const sqRC = (sq) => [8 - +sq[1], "abcdefgh".indexOf(sq[0])];
+  const rcSq = (r, c) => "abcdefgh"[c] + (8 - r);
+  function pzParse(fen) { return fen.split(" ")[0].split("/").map((row) => [...row].flatMap((ch) => (/\d/.test(ch) ? Array(+ch).fill("") : [ch]))); }
+  function pzMove(b, uci) {
+    const [fr, fc] = sqRC(uci.slice(0, 2)), [tr, tc] = sqRC(uci.slice(2, 4));
+    let pc = b[fr][fc];
+    if (/k/i.test(pc) && Math.abs(tc - fc) === 2) { const [rf, rt] = tc > fc ? [7, 5] : [0, 3]; b[fr][rt] = b[fr][rf]; b[fr][rf] = ""; } // castling
+    if (/p/i.test(pc) && fc !== tc && !b[tr][tc]) b[fr][tc] = ""; // en passant
+    if (uci[4]) pc = pc === pc.toUpperCase() ? uci[4].toUpperCase() : uci[4];
+    b[tr][tc] = pc; b[fr][fc] = "";
+    PZ.last = [uci.slice(0, 2), uci.slice(2, 4)];
+  }
+  function pzReset() {
+    Object.assign(PZ, { b: pzParse(PZ.d.puzzle.fen), step: 0, sel: null, msg: "", hint: false, busy: false });
+    PZ.last = PZ.d.puzzle.lastMove ? [PZ.d.puzzle.lastMove.slice(0, 2), PZ.d.puzzle.lastMove.slice(2, 4)] : null;
+    renderChess();
+  }
+  function renderChess() {
+    const box = $("#chess-box"), el = $("#chess");
+    if (!PZ.d) { box.hidden = true; return; }
+    box.hidden = false;
+    const pz = PZ.d.puzzle, white = pz.fen.split(" ")[1] === "w", sol = pz.solution, done = PZ.step >= sol.length;
+    const theme = pz.themes.find((x) => /^mateIn\d$/.test(x))?.replace("mateIn", "Mate in ") || ({ crushing: "Win material", advantage: "Get the advantage", equality: "Hold the draw" })[pz.themes.find((x) => ["crushing", "advantage", "equality"].includes(x))] || "Find the best move";
+    $("#chess-meta").textContent = `Rated ${pz.rating}`;
+    const mine = (pc) => pc && (pc === pc.toUpperCase()) === white;
+    const hintSq = PZ.hint && !done ? sol[PZ.step].slice(0, 2) : "";
+    let cells = "";
+    for (let i = 0; i < 64; i++) {
+      const r = white ? Math.floor(i / 8) : 7 - Math.floor(i / 8), c = white ? i % 8 : 7 - (i % 8), sq = rcSq(r, c), pc = PZ.b[r][c];
+      const cls = [(r + c) % 2 ? "dk" : "lt", PZ.sel === sq && "sel", PZ.last?.includes(sq) && "last", hintSq === sq && "hint", mine(pc) && !done && "mine"].filter(Boolean).join(" ");
+      const name = pc ? `${pc === pc.toUpperCase() ? "white" : "black"} ${({ k: "king", q: "queen", r: "rook", b: "bishop", n: "knight", p: "pawn" })[pc.toLowerCase()]}` : "";
+      cells += `<button type="button" class="${cls}" data-sq="${sq}" aria-label="${sq}${name ? `, ${name}` : ""}">${pc ? `<span class="pc ${pc === pc.toUpperCase() ? "w" : "b"}">${GLYPH[pc.toLowerCase()]}\uFE0E</span>` : ""}${c === (white ? 0 : 7) ? `<em class="rk">${8 - r}</em>` : ""}${r === (white ? 7 : 0) ? `<em class="fl">${"abcdefgh"[c]}</em>` : ""}</button>`;
+    }
+    el.innerHTML = `<p class="pz-task"><b>${white ? "White" : "Black"} to move</b> · ${esc(theme)}</p>
+      <div class="pz-board${PZ.msg === "wrong" ? " nope" : ""}" role="grid" aria-label="Chess board">${cells}</div>
+      <p class="pz-msg" role="status">${done ? `Solved${pzSolved()[pz.id] === "shown" ? " (with the answer shown)" : ""}. Nice.` : PZ.msg === "wrong" ? "Not that one. Try another move." : PZ.msg === "good" ? "Yes! Keep going." : "Click a piece, then where it goes."}</p>
+      <div class="pz-acts">${done ? `<button class="btn" type="button" data-pz="reset">Play it again</button>` : `<button class="btn" type="button" data-pz="hint">Hint</button><button class="btn" type="button" data-pz="show">Show answer</button>`}<a class="link" href="https://lichess.org/training/${encodeURIComponent(pz.id)}" target="_blank" rel="noopener">On Lichess ↗</a></div>`;
+  }
+  function pzMark(how) { const m = pzSolved(); if (!m[PZ.d.puzzle.id]) { m[PZ.d.puzzle.id] = how; try { localStorage.setItem("rlp-pz-solved", JSON.stringify(m)); } catch {} } }
+  function pzReply() { // the other side answers from the solution
+    const sol = PZ.d.puzzle.solution;
+    if (PZ.step < sol.length) { PZ.busy = true; setTimeout(() => { pzMove(PZ.b, sol[PZ.step]); PZ.step++; PZ.busy = false; renderChess(); }, 450); }
+    else pzMark("solved");
+  }
+  $("#chess").addEventListener("click", (e) => {
+    const act = e.target.closest("[data-pz]")?.dataset.pz;
+    if (act === "reset") return pzReset();
+    if (act === "hint") { PZ.hint = true; return renderChess(); }
+    if (act === "show") {
+      pzMark("shown");
+      const run = () => { if (PZ.step < PZ.d.puzzle.solution.length) { pzMove(PZ.b, PZ.d.puzzle.solution[PZ.step]); PZ.step++; renderChess(); setTimeout(run, 650); } };
+      PZ.sel = null; return run();
+    }
+    const sq = e.target.closest("[data-sq]")?.dataset.sq;
+    const sol = PZ.d?.puzzle.solution;
+    if (!sq || PZ.busy || !sol || PZ.step >= sol.length) return;
+    const white = PZ.d.puzzle.fen.split(" ")[1] === "w", [r, c] = sqRC(sq), pc = PZ.b[r][c];
+    const mine = pc && (pc === pc.toUpperCase()) === white;
+    if (!PZ.sel || (mine && PZ.sel !== sq)) { PZ.sel = mine ? sq : null; PZ.msg = ""; return renderChess(); }
+    if (PZ.sel === sq) { PZ.sel = null; return renderChess(); }
+    const want = sol[PZ.step];
+    if (PZ.sel + sq === want.slice(0, 4)) { pzMove(PZ.b, want); PZ.step++; PZ.sel = null; PZ.hint = false; PZ.msg = "good"; renderChess(); pzReply(); }
+    else { PZ.sel = null; PZ.msg = "wrong"; renderChess(); }
+  });
+  async function loadChess() {
+    const t = today();
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem("rlp-pz") || "null"); } catch {}
+    if (cached?.date === t && cached.d?.puzzle) PZ.d = cached.d;
+    else {
+      try {
+        const r = await fetch("https://lichess.org/api/puzzle/daily", { headers: { Accept: "application/json" } });
+        if (r.ok) { const d = await r.json(); if (d?.puzzle?.fen && d.puzzle.solution?.length) { PZ.d = { puzzle: d.puzzle }; try { localStorage.setItem("rlp-pz", JSON.stringify({ date: t, d: PZ.d })); } catch {} } }
+      } catch {}
+      if (!PZ.d && cached?.d?.puzzle) PZ.d = cached.d; // offline: yesterday's is better than nothing
+    }
+    if (!PZ.d) return renderChess();
+    pzReset();
+    if (pzSolved()[PZ.d.puzzle.id]) { // already solved today: show the finished position
+      while (PZ.step < PZ.d.puzzle.solution.length) { pzMove(PZ.b, PZ.d.puzzle.solution[PZ.step]); PZ.step++; }
+      renderChess();
+    }
+  }
+  loadChess();
 
   // ---------- interactions ----------
   let toastTimer;
@@ -2277,57 +2409,22 @@
     return out.join("");
   }
 
-  // the background follows the subject: drawn scenes, kept dim so the cards stay easy to read
+  // ---------- study mode: an illustrated room for each subject, and the room is the timer ----------
+  // Each scene is a painted lofi room (scenes/*.webp, made with FLUX.1 Krea on Hugging Face) with a window in the middle.
+  // Over the round the room comes alive: it starts dim with the fairy lights off, and the lights come on one by one as the
+  // focus timer (or the class, during school) runs, so the string itself is the progress bar. A break holds the lit room.
+  // Every task checked off adds a gold star to the sky in the window; finishing a round sets off shooting stars (and the
+  // Eiffel Tower sparkles in Paris). Steam, rain, flames and twinkling stars are the only things that move on their own.
+  // Coordinates below are in each picture's own 1600×896 pixels; the canvas uses the same "cover" fit as the picture.
+  const SCENE_W = 1600, SCENE_H = 896;
+  const SCENES = {"French":{"file":"french","label":"Paris attic","why":"The string lights come on as you focus \u00b7 each finished task adds a star in the window","bulbs":[[404,117,14],[500,132,14],[597,117,14],[716,87,14],[878,88,14],[976,116,14],[1100,117,14],[1195,114,14],[449,196,14],[414,267,14],[390,310,14],[331,391,14],[300,436,14],[239,524,14],[224,560,14],[1155,218,14],[1215,331,14],[1268,397,14],[1295,450,14],[1362,548,14]],"win":[[610,198],[975,198],[1265,662],[330,662]],"sky":470,"tower":[910,270,520,40],"mug":[643,712],"lamps":[[512,560,240]]},"Latin":{"file":"latin","label":"The Forum at sunset","why":"The string lights come on as you focus \u00b7 each finished task adds a star in the sky","noStars":true,"bulbs":[[40,73,17],[138,84,17],[243,98,17],[351,105,17],[469,115,17],[585,123,17],[707,128,17],[835,129,17],[960,121,17],[1078,118,17],[1202,108,17],[1319,92,17],[1431,81,17],[1554,65,17]],"win":[[612,330],[625,265],[660,215],[720,188],[780,182],[840,188],[900,215],[935,265],[948,330],[948,660],[612,660]],"sky":470,"mug":[543,712],"flames":[[465,612,1.2]],"lamps":[[465,612,230]]},"English":{"file":"english","label":"The captain's cabin","why":"The string lights come on as you focus \u00b7 each finished task adds a star over the sea","bulbs":[[31,92,24],[180,79,24],[369,81,24],[583,111,24],[790,112,24],[1045,97,24],[1254,82,24],[1441,78,24],[1589,88,24]],"win":[[987,328],[982,370],[968,410],[946,446],[915,477],[879,499],[839,513],[797,518],[755,513],[715,499],[679,477],[648,446],[626,410],[612,370],[607,328],[612,286],[626,246],[648,210],[679,179],[715,157],[755,143],[797,138],[839,143],[879,157],[915,179],[946,210],[968,246],[982,286]],"sky":398,"mug":[1055,628],"flames":[[512,520,1.6]],"lamps":[[512,515,260]]},"MSI":{"file":"msi","label":"The workshop","why":"The string lights come on as you focus \u00b7 each finished task adds a star over the city","bulbs":[[232,111,24],[395,132,24],[550,142,24],[694,144,24],[816,154,24],[952,142,24],[1139,136,24],[1305,129,24]],"win":[[225,128],[1378,128],[1378,620],[225,620]],"sky":330,"screens":[[445,555,175,110],[873,578,130,95]],"mug":[1218,705],"lamps":[[350,455,220],[1140,470,220]]},"Forces":{"file":"forces","label":"The map room","why":"The string lights come on as you focus \u00b7 each finished task adds a star over the mountains","bulbs":[[30,122,13],[109,159,13],[229,162,13],[300,104,13],[399,153,13],[519,109,13],[607,148,13],[709,172,13],[790,174,13],[881,166,13],[960,113,13],[1059,150,13],[1167,153,13],[1287,147,13],[1408,124,13],[1533,45,13]],"win":[[410,205],[1158,205],[1158,668],[410,668]],"sky":470,"mug":[602,705],"lamps":[[1108,570,260]]},"default":{"file":"default","label":"The treehouse","why":"The string lights come on as you focus \u00b7 each finished task adds a star in the window","noStars":true,"rain":true,"bulbs":[[34,110,18],[125,109,18],[228,104,18],[333,69,18],[410,31,18],[617,94,18],[756,123,18],[884,130,18],[1006,94,18],[1217,35,18],[1316,73,18],[1414,103,18],[1518,105,18]],"win":[[1072,415],[1065,476],[1045,533],[1013,585],[970,628],[918,660],[861,680],[800,687],[739,680],[682,660],[630,628],[587,585],[555,533],[535,476],[528,415],[535,354],[555,297],[587,245],[630,202],[682,170],[739,150],[800,143],[861,150],[918,170],[970,202],[1013,245],[1045,297],[1065,354]],"mug":[815,665],"flames":[[512,650,1.3]],"lamps":[[512,640,220]]}};
   function stScene(name) {
-    const W = 1600, H = 900, svg = (body) => `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
-    const rnd = ((s) => () => (s = (s * 16807) % 2147483647) / 2147483647)(7);
-    const stars = (n, h) => Array.from({ length: n }, () => `<circle cx="${(rnd() * W) | 0}" cy="${(rnd() * h) | 0}" r="${(0.6 + rnd() * 1.2).toFixed(1)}" fill="#fff" opacity="${(0.25 + rnd() * 0.5).toFixed(2)}"/>`).join("");
-    if (name === "English") {
-      const waves = Array.from({ length: 16 }, (_, i) => { const y = 560 + i * 22 + i * i; let d = `M0 ${y}`; for (let x = 0; x < W + 160; x += 80) d += ` q40 ${-4 - i * 0.5} 80 0`; return `<path d="${d}" stroke="#9fb1cf" stroke-opacity="${(0.05 + i * 0.008).toFixed(3)}" fill="none" stroke-width="1.4" style="animation-duration:${(34 - i * 1.6).toFixed(1)}s"/>`; }).join("");
-      return { label: "The wine-dark sea", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#101729"/><stop offset=".55" stop-color="#2a2c46"/><stop offset="1" stop-color="#5a3a47"/></linearGradient><linearGradient id="w" x2="0" y2="1"><stop offset="0" stop-color="#3a2a3c"/><stop offset=".25" stop-color="#1b2136"/><stop offset="1" stop-color="#0c111d"/></linearGradient><radialGradient id="g"><stop offset="0" stop-color="#efe6cf" stop-opacity=".18"/><stop offset="1" stop-color="#efe6cf" stop-opacity="0"/></radialGradient></defs>
-        <rect width="${W}" height="540" fill="url(#s)"/>${stars(70, 420)}<circle cx="1180" cy="230" r="150" fill="url(#g)"/><circle cx="1180" cy="230" r="42" fill="#ece3cc" opacity=".9"/>
-        <rect y="540" width="${W}" height="${H - 540}" fill="url(#w)"/><rect class="fx-shim" x="1150" y="545" width="60" height="300" fill="#ece3cc" opacity=".05"/><g class="fx-wave">${waves}</g>
-        <g class="fx-bob" fill="#0a0d16"><path d="M380 548h150l-22 16H404z"/><rect x="452" y="470" width="4" height="80"/><path d="M420 482h68l-6 48h-56z" opacity=".92"/></g>`) };
-    }
-    if (name === "Latin") {
-      const cols = [180, 260, 340, 420, 980, 1060, 1300].map((x, i) => { const h = [300, 300, 300, 300, 230, 160, 270][i]; return `<rect x="${x}" y="${720 - h}" width="38" height="${h}"/><rect x="${x - 7}" y="${720 - h - 14}" width="52" height="14"/><rect x="${x - 9}" y="704" width="56" height="16"/>`; }).join("");
-      return { label: "The Forum at dusk", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#1f2034"/><stop offset=".55" stop-color="#5a4152"/><stop offset=".85" stop-color="#b9805f"/><stop offset="1" stop-color="#cf9a6c"/></linearGradient></defs>
-        <rect width="${W}" height="${H}" fill="url(#s)"/>${stars(30, 260)}<circle class="fx-glow" cx="760" cy="640" r="70" fill="#f1c08a" opacity=".55"/>
-        <path d="M0 650 C200 600 380 640 560 610 S900 590 1100 620 1450 600 1600 630V900H0z" fill="#3a2b36"/>
-        <g fill="#1a1520">${cols}<rect x="166" y="392" width="300" height="26"/><path d="M1130 720V520a110 110 0 0 1 220 0v200h-46V530a64 64 0 0 0-128 0v190z"/><rect y="718" width="${W}" height="${H - 718}"/></g>`) };
-    }
-    if (name === "French") {
-      let roofs = "M0 900V640", win = "";
-      for (let x = 0; x < W; x += 0) { const w = 90 + ((rnd() * 90) | 0), top = 560 + ((rnd() * 90) | 0); roofs += ` L${x} ${top + 30} L${x + 14} ${top} L${x + w - 14} ${top} L${x + w} ${top + 30}`; if (rnd() > 0.5) roofs += ` L${x + w - 30} ${top + 30} L${x + w - 30} ${top - 22} L${x + w - 18} ${top - 22} L${x + w - 18} ${top + 30}`;
-        for (let r = 0; r < 4; r++) for (let c = 0; c < Math.floor(w / 28); c++) if (rnd() > 0.62) win += `<rect${rnd() > 0.86 ? ` class="fx-win" style="animation-delay:-${(rnd() * 30).toFixed(1)}s;animation-duration:${(16 + rnd() * 22).toFixed(1)}s"` : ""} x="${x + 10 + c * 28}" y="${top + 48 + r * 54}" width="12" height="20" rx="1"/>`; x += w; }
-      roofs += ` L${W} 640 V900z`;
-      return { label: "Paris at night", svg: svg(`<defs><linearGradient id="s" x2="0" y2="1"><stop offset="0" stop-color="#0d1326"/><stop offset="1" stop-color="#232b47"/></linearGradient><radialGradient id="l"><stop offset="0" stop-color="#f3cd86" stop-opacity=".45"/><stop offset="1" stop-color="#f3cd86" stop-opacity="0"/></radialGradient></defs>
-        <rect width="${W}" height="${H}" fill="url(#s)"/>${stars(90, 520)}
-        <path d="M1150 150l7 70h-14zM1143 220h14l22 170h-58zM1121 390h58l40 140h-138zM1081 530h138l60 200h-60c-10-70-40-110-69-110s-59 40-69 110h-60z" fill="#0a0e1b"/><circle cx="1150" cy="148" r="4" fill="#f3cd86"/>
-        <path d="${roofs}" fill="#0b0f1c"/><g fill="#e9bb6e" opacity=".75">${win}</g>
-        <rect x="300" y="560" width="6" height="340" fill="#06080f"/><circle class="fx-glow" cx="303" cy="560" r="90" fill="url(#l)"/><circle cx="303" cy="556" r="9" fill="#f6d79c"/>`) };
-    }
-    if (name === "MSI") {
-      let traces = "", nodes = "";
-      const pts = [];
-      for (let i = 0; i < 26; i++) { let x = ((rnd() * 16) | 0) * 100, y = ((rnd() * 9) | 0) * 100, d = `M${x} ${y}`; const tr = [[x, y]]; for (let k = 0; k < 5; k++) { if (rnd() > 0.5) x += (rnd() > 0.5 ? 1 : -1) * 100; else y += (rnd() > 0.5 ? 1 : -1) * 100; d += ` L${x} ${y}`; tr.push([x, y]); } pts.push(tr); traces += `<path d="${d}"/>`; nodes += `<circle cx="${x}" cy="${y}" r="5"/>`; }
-      return { label: "Circuit board", data: { traces: pts }, svg: svg(`<defs><radialGradient id="b" cx=".7" cy=".4" r=".9"><stop offset="0" stop-color="#14302a"/><stop offset="1" stop-color="#0a1311"/></radialGradient><filter id="f"><feGaussianBlur stdDeviation="6"/></filter></defs>
-        <rect width="${W}" height="${H}" fill="url(#b)"/><g fill="none" stroke="#5fc4a4" stroke-width="2" opacity=".18" filter="url(#f)">${traces}</g><g fill="none" stroke="#5fc4a4" stroke-width="1.6" opacity=".28">${traces}</g><g fill="#7fdcbf" opacity=".45">${nodes}</g>
-        <g fill="#0d1b18" stroke="#5fc4a4" stroke-opacity=".35"><rect x="1080" y="300" width="240" height="240" rx="10"/></g><g stroke="#5fc4a4" stroke-opacity=".3" stroke-width="3">${Array.from({ length: 8 }, (_, i) => `<path d="M${1100 + i * 28} 300v-30M${1100 + i * 28} 540v30M1080 ${320 + i * 28}h-30M1320 ${320 + i * 28}h30"/>`).join("")}</g>`) };
-    }
-    if (name === "Forces") {
-      const par = Array.from({ length: 7 }, (_, i) => { const y = 470 + (i - 3) * 112, w = Math.sqrt(Math.max(0, 400 ** 2 - (y - 470) ** 2)); return `<path d="M${800 - w} ${y}H${800 + w}"/>`; }).join("");
-      return { label: "The world at night", data: { globe: { cx: 800, cy: 470, r: 400 } }, svg: svg(`<defs><radialGradient id="b" cx=".5" cy=".52" r=".8"><stop offset="0" stop-color="#18263b"/><stop offset="1" stop-color="#0c121d"/></radialGradient></defs>
-        <rect width="${W}" height="${H}" fill="url(#b)"/>${stars(60, H)}<circle cx="800" cy="470" r="400" fill="#122036" stroke="#6f8fb8" stroke-opacity=".35"/><g fill="none" stroke="#6f8fb8" stroke-opacity=".22">${par}</g>`) };
-    }
-    return { label: "", svg: "" };
+    const m = SCENES[name] || SCENES.default;
+    return { label: m.label, why: m.why, img: `scenes/${m.file}.webp${V ? `?v=${V}` : ""}`, meta: m };
   }
 
-  // ---------- study mode: ambient motion over the drawn scene ----------
-  // One canvas at about 30 frames a second, drawn in the scene's own 1600×900 space so it lines up with the SVG
-  // (same "slice" fit). Slow and dim on purpose: it slows further on a break, sleeps in a hidden tab, and the
-  // Motion button turns it off (off by default with reduced motion). The SVG bits (waves, windows) are CSS, gated by .fx.
-  const fx = { raf: 0, on: false, ctx: null, dpr: 1, k: 1, ox: 0, oy: 0, last: 0, t: 0, speed: 1, p: null };
+  const fx = { raf: 0, on: false, ctx: null, dpr: 1, k: 1, ox: 0, oy: 0, last: 0, rt: 0, p: null,
+    prog: 0, shown: 0, run: false, wins: 0, winsAt: [], cele: 0 };
   function stMotionPref() {
     let v = null;
     try { v = localStorage.getItem("rlp-st-motion"); } catch {}
@@ -2338,149 +2435,167 @@
     fx.dpr = Math.min(1.5, devicePixelRatio || 1);
     cv.width = Math.max(1, Math.round(r.width * fx.dpr));
     cv.height = Math.max(1, Math.round(r.height * fx.dpr));
-    fx.k = Math.max(r.width / 1600, r.height / 900);
-    fx.ox = (r.width - 1600 * fx.k) / 2;
-    fx.oy = (r.height - 900 * fx.k) / 2;
+    fx.k = Math.max(r.width / SCENE_W, r.height / SCENE_H);
+    fx.ox = (r.width - SCENE_W * fx.k) / 2;
+    fx.oy = (r.height - SCENE_H * fx.k) / 2;
     fx.ctx = cv.getContext("2d");
   }
-  // a theme color as r,g,b, whatever syntax the theme wrote it in
-  function fxRGB(cssVar) {
-    const probe = document.createElement("i");
-    probe.style.color = `var(${cssVar})`;
-    study.append(probe);
-    const c = getComputedStyle(probe).color;
-    probe.remove();
-    const x = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-    x.fillStyle = c; x.fillRect(0, 0, 1, 1);
-    return [...x.getImageData(0, 0, 1, 1).data.slice(0, 3)];
-  }
-  const fxEmber = (rnd, scatter) => ({ x: 380 + rnd() * 840, y: scatter ? 420 + rnd() * 420 : 700 + rnd() * 140, vy: -(9 + rnd() * 16), ph: rnd() * 6.28, r: 1 + rnd() * 1.7, top: 260 + rnd() * 240 });
-  function fxSetup(name, data) {
+  function fxSetup(meta) {
     const rnd = ((s) => () => (s = (s * 16807) % 2147483647) / 2147483647)(11);
-    const sky = { English: 420, Latin: 260, French: 520, Forces: 900 }[name] || 0;
-    const p = { name, data, sky, rnd, stars: [], parts: [], shoot: null, nextShoot: 5 + rnd() * 8 };
-    for (let i = 0; i < (sky ? 46 : 0); i++) p.stars.push({ x: rnd() * 1600, y: rnd() * sky, r: 0.7 + rnd() * 1.3, ph: rnd() * 6.28, sp: 0.4 + rnd() * 1.1 });
-    if (name === "Latin") for (let i = 0; i < 40; i++) p.parts.push(fxEmber(rnd, true));
-    if (name === "English") for (let i = 0; i < 28; i++) p.parts.push({ x: 1120 + rnd() * 120, y: 560 + rnd() * 320, w: 8 + rnd() * 26, ph: rnd() * 6.28, sp: 0.5 + rnd() * 1.3 });
-    if (name === "MSI" && data?.traces) for (let i = 0; i < 16; i++) p.parts.push({ tr: (rnd() * data.traces.length) | 0, at: rnd(), sp: 0.05 + rnd() * 0.07 });
-    if (name === "Forces") for (let i = 0; i < 110; i++) p.parts.push({ lat: Math.asin(2 * rnd() - 1) * 0.85, lon: rnd() * 6.283, r: 0.8 + rnd() * 1.5 });
-    if (!name) { // no subject scene: soft washes of the theme's own colors drifting, and a little dust
-      p.blobs = ["--accent", "--c-latin", "--c-fr", "--c-msi"].map((v) => {
-        const [r, g, b] = fxRGB(v), img = document.createElement("canvas");
-        img.width = img.height = 256;
-        const x = img.getContext("2d"), gr = x.createRadialGradient(128, 128, 0, 128, 128, 128);
-        gr.addColorStop(0, `rgba(${r},${g},${b},.2)`); gr.addColorStop(0.6, `rgba(${r},${g},${b},.07)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
-        x.fillStyle = gr; x.fillRect(0, 0, 256, 256);
-        return { img, ax: 300 + rnd() * 1000, ay: 200 + rnd() * 500, rx: 180 + rnd() * 260, ry: 120 + rnd() * 160, sx: 0.025 + rnd() * 0.03, sy: 0.02 + rnd() * 0.03, ph: rnd() * 6.28, r: 380 + rnd() * 240 };
-      });
-      p.ink = `rgb(${fxRGB("--fg").join(",")})`;
-      for (let i = 0; i < 36; i++) p.parts.push({ x: rnd() * 1600, y: rnd() * 900, r: 0.8 + rnd() * 1.7, vy: -(4 + rnd() * 8), ph: rnd() * 6.28 });
+    const p = { meta, rnd, stars: [], steam: [], rain: [], shoot: [], spots: [], win: null };
+    if (meta.win) {
+      p.win = new Path2D(`M${meta.win.map((q) => q.join(" ")).join("L")}Z`);
+      const xs = meta.win.map((q) => q[0]), ys = meta.win.map((q) => q[1]);
+      p.box = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+      const sky = meta.sky || p.box[3];
+      const probe = document.createElement("canvas").getContext("2d");
+      const inside = (x, y) => probe.isPointInPath(p.win, x, y) && y < sky;
+      for (let i = 0, n = 0, want = meta.noStars ? 0 : 34; i < 400 && n < want; i++) { const x = p.box[0] + rnd() * (p.box[2] - p.box[0]), y = p.box[1] + rnd() * (sky - p.box[1]); if (inside(x, y)) { p.stars.push({ x, y, r: 0.6 + rnd() * 1.1, ph: rnd() * 6.28, sp: 0.4 + rnd() * 1.1 }); n++; } }
+      for (let i = 0; i < 600 && p.spots.length < 30; i++) {
+        const x = p.box[0] + 30 + rnd() * (p.box[2] - p.box[0] - 60), y = p.box[1] + 20 + rnd() * (sky - p.box[1] - 40);
+        if (inside(x, y) && p.spots.every(([a, b]) => Math.hypot(a - x, b - y) > 46)) p.spots.push([x, y]);
+      }
+      if (meta.rain) for (let i = 0; i < 60; i++) p.rain.push({ x: p.box[0] + rnd() * (p.box[2] - p.box[0]), y: p.box[1] + rnd() * (p.box[3] - p.box[1]), v: 40 + rnd() * 90, l: 6 + rnd() * 14, a: 0.12 + rnd() * 0.2 });
     }
+    if (meta.mug) for (let i = 0; i < 14; i++) p.steam.push({ age: rnd() * 4, life: 3 + rnd() * 1.5, ph: rnd() * 6.28, dx: (rnd() - 0.5) * 6 });
+    // the string lights in order, left to right
+    p.bulbs = [...(meta.bulbs || [])].sort((a, b) => a[0] - b[0]);
     fx.p = p;
   }
-  function fxAlong(tr, f) {
-    const n = tr.length - 1, at = Math.min(n - 1e-6, Math.max(0, f * n)), i = Math.floor(at), u = at - i;
-    return [tr[i][0] + (tr[i + 1][0] - tr[i][0]) * u, tr[i][1] + (tr[i + 1][1] - tr[i][1]) * u];
-  }
+  const clamp01 = (v) => Math.max(0, Math.min(1, v));
   function fxDot(ctx, x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); }
+  function fxGlow(ctx, x, y, r, rgb, a) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  function fxGlint(ctx, x, y, r) { // a four-point star
+    ctx.beginPath();
+    ctx.moveTo(x, y - r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.quadraticCurveTo(x, y, x, y + r);
+    ctx.quadraticCurveTo(x, y, x - r, y); ctx.quadraticCurveTo(x, y, x, y - r); ctx.fill();
+  }
   function fxDraw(dt) {
-    const { ctx, p } = fx, t = fx.t;
+    const { ctx, p } = fx;
     if (!ctx || !p) return;
+    const m = p.meta, rt = fx.rt;
+    fx.shown += (fx.prog - fx.shown) * (dt ? Math.min(1, dt * 2.5) : 1); // glide between the once-a-second clock updates
+    const g = fx.shown, cele = fx.cele > 0 ? clamp01(fx.cele / 1.5) : 0;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.setTransform(fx.k * fx.dpr, 0, 0, fx.k * fx.dpr, fx.ox * fx.dpr, fx.oy * fx.dpr);
-    if (p.blobs) {
-      for (const b of p.blobs) { ctx.globalAlpha = 1; ctx.drawImage(b.img, b.ax + Math.sin(t * b.sx + b.ph) * b.rx - b.r, b.ay + Math.cos(t * b.sy + b.ph * 1.3) * b.ry - b.r, b.r * 2, b.r * 2); }
-      ctx.fillStyle = p.ink;
-      for (const m of p.parts) {
-        m.y += m.vy * dt; m.x += Math.sin(t * 0.5 + m.ph) * 4 * dt;
-        if (m.y < -10) { m.y = 910; m.x = p.rnd() * 1600; }
-        ctx.globalAlpha = 0.1 + 0.07 * Math.sin(t + m.ph); fxDot(ctx, m.x, m.y, m.r);
-      }
-      return;
-    }
-    // twinkling stars and, now and then, a shooting star
-    ctx.fillStyle = "#fff";
-    for (const s of p.stars) { ctx.globalAlpha = 0.1 + 0.5 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph)); fxDot(ctx, s.x, s.y, s.r); }
-    if (p.stars.length && p.name !== "Forces") {
-      p.nextShoot -= dt;
-      if (p.nextShoot <= 0 && !p.shoot) { p.shoot = { x: 400 + p.rnd() * 1100, y: 30 + p.rnd() * p.sky * 0.45, life: 0 }; p.nextShoot = 12 + p.rnd() * 18; }
-      if (p.shoot) {
-        const s = p.shoot, k = (s.life += dt / fx.speed) / 1.1;
-        if (k >= 1) p.shoot = null;
-        else {
-          const hx = s.x - k * 360, hy = s.y + k * 140, g = ctx.createLinearGradient(hx, hy, hx + 130, hy - 50);
-          g.addColorStop(0, "rgba(255,255,255,.9)"); g.addColorStop(1, "rgba(255,255,255,0)");
-          ctx.globalAlpha = Math.sin(k * Math.PI); ctx.strokeStyle = g; ctx.lineWidth = 1.8;
-          ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + 130, hy - 50); ctx.stroke();
+
+    // 1. the room starts dim and warms up as the round goes
+    ctx.fillStyle = `rgba(10,9,22,${(0.38 * (1 - g)).toFixed(3)})`;
+    ctx.fillRect(0, 0, SCENE_W, SCENE_H);
+
+    // 2. the window: twinkling stars, rain on the glass, the session's stars, shooting stars, the tower's sparkle
+    if (p.win) {
+      ctx.save();
+      ctx.clip(p.win);
+      ctx.fillStyle = "#fff";
+      for (const s of p.stars) { ctx.globalAlpha = 0.15 + 0.5 * (0.5 + 0.5 * Math.sin(rt * s.sp + s.ph)); fxDot(ctx, s.x, s.y, s.r); }
+      if (p.rain.length) {
+        ctx.strokeStyle = "#cfe3ff"; ctx.lineWidth = 1.1;
+        for (const d of p.rain) {
+          d.y += d.v * dt;
+          if (d.y > p.box[3]) { d.y = p.box[1] - d.l; d.x = p.box[0] + p.rnd() * (p.box[2] - p.box[0]); }
+          ctx.globalAlpha = d.a; ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - 0.6, d.y + d.l); ctx.stroke();
         }
       }
-    }
-    if (p.name === "Latin") { // embers drifting up out of the sunset
+      if (m.tower && cele) { // the Eiffel Tower sparkles, as it does on the hour
+        const [tx, top, bottom, half] = m.tower;
+        ctx.fillStyle = "#fff";
+        for (let i = 0; i < 60; i++) {
+          const y = top + p.rnd() * (bottom - top), w = 2 + ((y - top) / (bottom - top)) * half;
+          ctx.globalAlpha = cele * (p.rnd() > 0.5 ? 0.95 : 0.4);
+          fxDot(ctx, tx + (p.rnd() * 2 - 1) * w, y, 0.8 + p.rnd() * 1.2);
+        }
+      }
+      if (fx.cele > 0 && p.shoot.length < 2 && p.rnd() < dt * 1.6) p.shoot.push({ x: p.box[0] + (0.4 + p.rnd() * 0.6) * (p.box[2] - p.box[0]), y: p.box[1] + p.rnd() * 60, life: 0 });
+      p.shoot = p.shoot.filter((s) => {
+        const k = (s.life += dt) / 1;
+        if (k >= 1) return false;
+        const hx = s.x - k * 200, hy = s.y + k * 80, gr = ctx.createLinearGradient(hx, hy, hx + 90, hy - 36);
+        gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.globalAlpha = Math.sin(k * Math.PI); ctx.strokeStyle = gr; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + 90, hy - 36); ctx.stroke();
+        return true;
+      });
+      while (fx.winsAt.length < fx.wins) fx.winsAt.push(rt);
+      fx.winsAt.length = Math.min(fx.winsAt.length, fx.wins);
       ctx.globalCompositeOperation = "lighter";
-      ctx.fillStyle = "#ffb26b";
-      for (const e of p.parts) {
-        e.y += e.vy * dt; e.x += Math.sin(t * 0.7 + e.ph) * 7 * dt;
-        if (e.y < e.top) Object.assign(e, fxEmber(p.rnd));
-        const a = Math.max(0, Math.min(0.7, (e.y - e.top) / 260)) * (0.75 + 0.25 * Math.sin(t * 3 + e.ph));
-        ctx.globalAlpha = a * 0.18; fxDot(ctx, e.x, e.y, e.r * 3.2);
-        ctx.globalAlpha = a; fxDot(ctx, e.x, e.y, e.r);
-      }
-      ctx.globalCompositeOperation = "source-over";
+      fx.winsAt.forEach((born, i) => {
+        if (!p.spots.length) return;
+        const [x, y] = p.spots[i % p.spots.length], age = rt - born, grow = clamp01(age / 0.8);
+        if (age < 1.6) { ctx.globalAlpha = (1 - age / 1.6) * 0.5; ctx.strokeStyle = "#ffd98a"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, 6 + age * 36, 0, 6.283); ctx.stroke(); }
+        ctx.globalAlpha = grow; fxGlow(ctx, x, y, 24, "255,217,138", 0.4);
+        ctx.fillStyle = "#ffe8b0"; ctx.globalAlpha = (0.85 + 0.15 * Math.sin(rt * 1.5 + i)) * grow; fxGlint(ctx, x, y, 12 * grow);
+      });
+      ctx.restore();
     }
-    if (p.name === "English") { // moonlight glinting on the water
-      ctx.fillStyle = "#f3ead2";
-      for (const g of p.parts) { ctx.globalAlpha = Math.max(0, Math.sin(t * g.sp + g.ph)) * 0.32; ctx.fillRect(g.x + Math.sin(t * 0.3 + g.ph) * 10, g.y, g.w * (0.6 + (0.4 * (g.y - 560)) / 320), 1.6); }
-    }
-    if (p.name === "MSI") { // pulses of current running along the traces
-      ctx.globalCompositeOperation = "lighter";
-      ctx.fillStyle = "#86ffd8";
-      for (const q of p.parts) {
-        const tr = p.data.traces[q.tr];
-        q.at += q.sp * dt;
-        if (q.at >= 1) { q.at = 0; q.tr = (p.rnd() * p.data.traces.length) | 0; }
-        const a = Math.sin(q.at * Math.PI);
-        for (let j = 3; j >= 0; j--) { const [x, y] = fxAlong(tr, q.at - j * 0.012); ctx.globalAlpha = a * (j ? 0.18 / j : 0.85); fxDot(ctx, x, y, j ? 2.4 : 3.2); }
-        const [x, y] = fxAlong(tr, q.at); ctx.globalAlpha = a * 0.14; fxDot(ctx, x, y, 13);
+
+    // 3. the string lights: off at the start of a round, on one by one as it runs
+    const lit = g * p.bulbs.length;
+    p.bulbs.forEach(([x, y, r], i) => {
+      const on = clamp01(lit - i);
+      if (on < 1) { // an unlit bulb: dark glass, and none of the glow the painting gives it
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1 - on;
+        fxGlow(ctx, x, y, r * 3.2, "26,20,18", 0.62);
+        ctx.fillStyle = "#3a302a"; fxDot(ctx, x, y, r * 1.05);
+        ctx.fillStyle = "rgba(255,240,220,.35)"; fxDot(ctx, x - r * 0.35, y - r * 0.35, r * 0.25);
       }
-      ctx.globalCompositeOperation = "source-over";
-    }
-    if (p.name === "Forces") { // the globe turns: meridians and city lights
-      const { cx, cy, r } = p.data.globe, ph = t * 0.05;
-      ctx.strokeStyle = "#8fb0d8"; ctx.lineWidth = 1.2;
-      for (let i = 0; i < 12; i++) {
-        const lon = ph + (i * Math.PI) / 6, c = Math.cos(lon), sn = Math.sin(lon);
-        if (c <= 0) continue;
-        ctx.globalAlpha = 0.06 + 0.2 * c;
-        ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(0.5, Math.abs(sn) * r), r, 0, -Math.PI / 2, Math.PI / 2, sn < 0); ctx.stroke();
+      if (on > 0) {
+        ctx.globalCompositeOperation = "lighter";
+        const flick = 0.85 + 0.15 * Math.sin(rt * 2.3 + i * 1.9) + (cele ? 0.35 * Math.max(0, Math.sin(rt * 9 - i * 0.7)) : 0);
+        ctx.globalAlpha = on;
+        fxGlow(ctx, x, y, r * 5, "255,196,120", 0.16 * flick);
       }
-      ctx.fillStyle = "#ffd28a";
-      for (const d of p.parts) {
-        const lon = d.lon + ph, z = Math.cos(d.lat) * Math.cos(lon);
-        if (z <= 0) continue;
-        ctx.globalAlpha = (0.2 + 0.6 * z) * (0.8 + 0.2 * Math.sin(t * 2 + d.lon * 9));
-        fxDot(ctx, cx + r * Math.cos(d.lat) * Math.sin(lon), cy - r * Math.sin(d.lat), d.r);
+    });
+    ctx.globalCompositeOperation = "lighter";
+
+    // 4. the lamps breathe a little; the room's light grows with the round
+    for (const [x, y, r] of m.lamps || []) { ctx.globalAlpha = 1; fxGlow(ctx, x, y, r, "255,190,110", (0.06 + 0.1 * g) * (0.9 + 0.1 * Math.sin(rt * 1.7 + x))); }
+    for (const [x, y, s] of m.flames || []) { // small flames flicker
+      const f = 0.75 + 0.25 * Math.sin(rt * 11 + x) * Math.sin(rt * 7.3 + y);
+      ctx.globalAlpha = 1; fxGlow(ctx, x, y, 26 * s * f, "255,170,80", 0.35);
+    }
+    for (const [x, y, w, h] of m.screens || []) { ctx.globalAlpha = 0.1 + 0.1 * g + 0.06 * Math.sin(rt * 3 + x); ctx.fillStyle = "#7dffb5"; ctx.fillRect(x, y, w, h); } // scopes brighten as the circuit powers up
+    ctx.globalCompositeOperation = "source-over";
+
+    // 5. steam off the mug
+    if (m.mug) {
+      const [mx, my] = m.mug;
+      for (const s of p.steam) {
+        s.age += dt;
+        if (s.age > s.life) { s.age = 0; s.ph = p.rnd() * 6.28; }
+        const k = s.age / s.life, y = my - k * 70, x = mx + s.dx + Math.sin(k * 5 + s.ph) * 8 * k;
+        ctx.globalAlpha = Math.sin(k * Math.PI) * 0.16;
+        fxGlow(ctx, x, y, 6 + k * 14, "255,250,240", 0.9);
       }
     }
+    ctx.globalAlpha = 1;
+    if (fx.cele > 0) fx.cele -= dt;
   }
   function fxFrame(ts) {
     fx.raf = requestAnimationFrame(fxFrame);
     if (document.hidden || ts - fx.last < 32) return;
-    const dt = Math.min(0.1, (ts - fx.last) / 1000) * fx.speed;
+    const dt = Math.min(0.1, (ts - fx.last) / 1000);
     fx.last = ts;
-    fx.t += dt;
+    fx.rt += dt;
     fxDraw(dt);
   }
+  // with Motion off the room still follows the clock: one still frame a second
+  function fxStill() { if (st.open && !fx.raf && fx.p) { if (!fx.ctx) fxSize(); fxDraw(0); } }
   function fxRun() {
     const want = st.open && fx.on;
     study.classList.toggle("fx", want);
     $("#st-motion").setAttribute("aria-pressed", String(fx.on));
     if (want && !fx.raf) { fxSize(); fx.last = 0; fx.raf = requestAnimationFrame(fxFrame); }
-    if (!want && fx.raf) {
-      cancelAnimationFrame(fx.raf); fx.raf = 0;
-      fx.ctx?.setTransform(1, 0, 0, 1, 0, 0); fx.ctx?.clearRect(0, 0, fx.ctx.canvas.width, fx.ctx.canvas.height);
-    }
+    if (!want && fx.raf) { cancelAnimationFrame(fx.raf); fx.raf = 0; }
+    if (!want) fxStill();
   }
   $("#st-motion").onclick = () => {
     fx.on = !fx.on;
@@ -2516,12 +2631,12 @@
       if (f.phase === "focus") f.round++;
       f.left = (f.phase === "focus" ? fo : br) * 60e3;
       f.endsAt = Date.now() + f.left;
+      if (f.phase === "break") fx.cele = 6;
       stNudge(f.phase === "break" ? `Round ${f.round} done. Take ${br} minutes: stand up, water, look away from the screen.` : "Break's over. Back to it.");
     }
     const label = s.mode === "class" ? (s.seg.name ? cls(s.seg.name).name : s.seg.label) : s.mode === "passing" ? `Passing · next ${s.next.name ? cls(s.next.name).name : s.next.label}` : s.mode === "before" ? "Until school" : f.phase;
     const key = `${s.mode}|${label}|${f.preset}`;
     const el = $("#st-clock");
-    fx.speed = s.mode === "focus" && f.phase === "break" ? 0.4 : 1;
     if (key !== st.key) {
       st.key = key;
       const room = (seg) => seg?.name ? where(seg.name) : "";
@@ -2544,6 +2659,11 @@
     const num = $("#st-num"), txt = clock(left);
     if (num.textContent !== txt) num.textContent = txt;
     $("#st-bar").style.width = `${Math.round(Math.min(1, Math.max(0, pct)) * 100)}%`;
+    // the scene is the timer: progress through the round (or the class) moves it; a break holds the finished picture
+    fx.prog = s.mode === "focus" ? (f.phase === "break" ? 1 : Math.min(1, Math.max(0, pct))) : s.mode === "class" ? Math.min(1, Math.max(0, s.pct)) : 0;
+    fx.run = s.mode === "class" || (s.mode === "focus" && !!f.endsAt);
+    study.classList.toggle("run", fx.run);
+    fxStill();
     const go = el.querySelector('[data-st="go"]');
     if (go) go.textContent = f.endsAt ? "Pause" : f.left < ST_PRESETS[f.preset][f.phase === "focus" ? 0 : 1] * 60e3 ? "Resume" : "Start";
   }
@@ -2576,10 +2696,12 @@
     if (scene !== stSceneName) {
       stSceneName = scene;
       const sc = stScene(scene);
-      $("#st-scene").innerHTML = sc.svg;
-      study.classList.toggle("has-scene", !!sc.svg);
-      fxSetup(sc.svg ? scene : "", sc.data);
-      $("#st-where").textContent = sc.label || "Study mode";
+      $("#st-scene").innerHTML = `<img src="${sc.img}" alt="" decoding="async">`;
+      study.classList.add("has-scene");
+      fxSetup(sc.meta);
+      $("#st-where").textContent = sc.label;
+      $("#st-why").textContent = sc.why;
+      fxStill();
     }
     $("#st-work").innerHTML = it ? `<div class="st-k">Now working on</div>
       <label class="st-now" style="${cc(it.class)}"><input type="checkbox" class="st-check" data-id="${esc(it.id)}"><span class="st-title">${esc(it.title)}</span></label>
@@ -2598,10 +2720,11 @@
     const redraw = () => { stRenderWork(); stRenderStats(); renderHomework(); };
     setDone(id, true);
     st.done++;
+    fx.wins = st.done;
     st.pick = null;
     e.target.closest(".st-now").classList.add("done");
     setTimeout(redraw, 450);
-    toast("Done. Next one up.", () => { setDone(id, false); st.done--; redraw(); });
+    toast("Done. Next one up.", () => { setDone(id, false); st.done--; fx.wins = st.done; redraw(); });
   });
   study.addEventListener("click", (e) => {
     const p = e.target.closest("[data-pick]");
@@ -2622,13 +2745,25 @@
   function stTick() {
     clearTimeout(stTimer);
     if (!st.open) return;
+    // focus minutes: real elapsed time while the focus timer runs (a background tab ticks slowly, so ticks can't be counted)
+    const f = st.focus, ms = Date.now(), gap = Math.min(Math.max(0, ms - (st.lastMs || ms)), 30 * 60e3);
+    st.lastMs = ms;
+    if (stClockState().mode === "focus" && f.phase === "focus" && f.endsAt) st.acc += gap;
+    if (st.acc >= 60e3) {
+      const add = Math.floor(st.acc / 60e3), d = today();
+      st.acc -= add * 60e3;
+      state.focusLog = { ...state.focusLog, [d]: (state.focusLog?.[d] || 0) + add };
+      save();
+      renderWeek();
+    }
     stRenderClock();
     stRenderStats();
     stTimer = setTimeout(stTick, 1000 - (now().getTime() % 1000) + 15);
   }
   function openStudy() {
     if (st.open) return;
-    Object.assign(st, { open: true, t0: Date.now(), done: 0, key: "", nudged: 0, pick: null });
+    Object.assign(st, { open: true, t0: Date.now(), done: 0, key: "", nudged: 0, pick: null, acc: 0, lastMs: Date.now() });
+    Object.assign(fx, { wins: 0, winsAt: [], cele: 0, prog: 0 });
     stSceneName = null;
     fx.on = stMotionPref();
     study.hidden = false;
@@ -3080,13 +3215,15 @@
       if (!pane.querySelector(":scope > .feed-h")) pane.insertAdjacentHTML("afterbegin", `<h2 class="feed-h">${esc($(`[data-tab-pane="${name}"]`)?.textContent || name)}</h2>`);
     });
     // Music rides with the cards below so the two columns above end together
-    const cards = [$(".p-lunch"), $(".p-more"), $(".p-music"), ...panes];
+    const cards = [$(".p-lunch"), $(".p-more"), $(".p-music"), $(".p-chess"), ...panes];
     if (on) {
       cards.forEach((el) => moveTo(el, feed));
+      moveTo($(".dock"), $(".dash")); // the links sit under Homework, where that column would otherwise end early
       panes.forEach(wake);
       if (FEED.includes(state.pane)) showPane("week");
     } else {
       [...cards].reverse().forEach(moveHome);
+      moveHome($(".dock"));
     }
   }
   matchMedia("(min-width:900px)").addEventListener("change", placeFeed);

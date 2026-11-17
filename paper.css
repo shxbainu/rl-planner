@@ -127,13 +127,18 @@
    text that wraps instead of getting cut off */
 :root:not([data-skin]) .today{display:grid;padding:2px 16px;border-radius:8px;background:var(--surface) var(--grain);box-shadow:var(--ink-shadow)}
 :root:not([data-skin]) .today:not(:has(> :not([hidden]))){display:none}
-:root:not([data-skin]) .today > :is(.wx,.nextup,.qline){position:relative;width:100%;box-sizing:border-box;margin:0;padding:12px 0 12px 84px;border:0;border-radius:0;
+:root:not([data-skin]) .today > :is(.wx,.nextup,.qline,.tw,.brk){position:relative;width:100%;box-sizing:border-box;margin:0;padding:12px 0 12px 84px;border:0;border-radius:0;
   background:none;box-shadow:none;font-size:13.5px;line-height:1.45;min-height:0}
 :root:not([data-skin]) .today > :not([hidden]) ~ :not([hidden]){border-top:1px solid var(--rule)}
-:root:not([data-skin]) .today > :is(.wx,.nextup,.qline):hover{background:none}
+:root:not([data-skin]) .today > :is(.wx,.nextup,.qline,.tw,.brk):hover{background:none}
 :root:not([data-skin]) .today > :hover :is(.wx-s,.ql-t){color:var(--fg)}
 :root:not([data-skin]) .today > *::before,:root:not([data-skin]) .today :is(.nu-k,.ql-k){position:absolute;left:0;top:14px;margin:0;font:700 10.5px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 :root:not([data-skin]) .today > .wx::before{content:"Weather"}
+:root:not([data-skin]) .today > .tw::before{content:"This week"}
+:root:not([data-skin]) .today > .brk::before{content:"Next break"}
+:root:not([data-skin]) .today > :is(.tw,.brk){font-size:13.5px}
+:root:not([data-skin]) .today .tw-d i{background:color-mix(in srgb,var(--accent) 55%,transparent)}
+:root:not([data-skin]) .today .brk-n{font-family:var(--head);font-weight:650}
 :root:not([data-skin]) .today .ql-k.due{color:var(--accent-ink,var(--accent))}
 /* weather: icon, temp, then the forecast wraps */
 :root:not([data-skin]) .today .wx{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
@@ -184,7 +189,10 @@
 /* laptops: the page scrolls like a page; Homework left, the day right, and the rest as cards packed into columns below
    (app.js placeFeed moves them), so neither column runs on alone and the bottom row has no holes */
 @media (min-width:900px){
-  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);grid-template-areas:"hw a" "feed feed";grid-template-rows:auto auto;align-items:start}
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);grid-template-areas:"hw a" "lk a" "feed feed";grid-template-rows:auto auto auto;align-items:start}
+  :root:not([data-skin]) .dash > .dock{grid-area:lk}
+  :root:not([data-skin]) .dash > .dock .dock-main{grid-template-columns:repeat(7,minmax(0,1fr))}
+  :root:not([data-skin]) .dash > .dock .dock-classes{grid-template-columns:repeat(8,minmax(0,1fr))}
   :root:not([data-skin]) .col-c{display:none}
   :root:not([data-skin]) .feed{grid-area:feed;display:block;columns:330px auto;column-gap:18px}
   :root:not([data-skin]) .feed > *{break-inside:avoid;margin:0 0 18px;width:100%}
@@ -259,6 +267,6 @@
 :root:not([data-skin]) .study.has-scene #st-clock{-webkit-backdrop-filter:blur(7px) saturate(1.2);backdrop-filter:blur(7px) saturate(1.2)}
 /* phones: the Today labels sit above each row so the text gets the full width */
 @media (max-width:559px){
-  :root:not([data-skin]) .today > :is(.wx,.nextup,.qline){padding:30px 0 12px}
+  :root:not([data-skin]) .today > :is(.wx,.nextup,.qline,.tw,.brk){padding:30px 0 12px}
   :root:not([data-skin]) .today > *::before,:root:not([data-skin]) .today :is(.nu-k,.ql-k){top:12px}
 }

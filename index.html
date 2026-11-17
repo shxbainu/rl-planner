@@ -68,6 +68,8 @@
     <a class="wx" id="wx" href="https://forecast.weather.gov/MapClick.php?lat=42.2793&amp;lon=-71.1495" target="_blank" rel="noopener" hidden></a>
     <button type="button" class="nextup" id="nextup" aria-label="Upcoming tests and quizzes: open the Tests tab" hidden></button>
     <button type="button" class="qline" id="qline" hidden></button>
+    <div class="tw" id="tw" hidden></div>
+    <div class="brk" id="brk" hidden></div>
     </div>
     <section class="panel p-lunch" aria-labelledby="lunch-h">
       <div class="panel-h"><h2 id="lunch-h">Lunch</h2>
@@ -79,6 +81,10 @@
       </div>
       <div class="lunch" id="lunch"></div>
       <a class="lunch-src" href="https://www.sagedining.com/sites/roxburylatin/menu" target="_blank" rel="noopener">Full menu on SAGE ↗</a>
+    </section>
+    <section class="panel p-chess" id="chess-box" aria-labelledby="chess-h" hidden>
+      <div class="panel-h"><h2 id="chess-h">Daily puzzle</h2><span class="panel-meta" id="chess-meta"></span></div>
+      <div class="chess" id="chess"></div>
     </section>
     <button class="brief-peek" id="brief-peek" type="button" hidden></button>
     <section class="panel p-snow" id="snow-box" aria-labelledby="snow-h" hidden>
@@ -319,6 +325,7 @@
   <canvas class="st-fx" id="st-fx" aria-hidden="true"></canvas>
   <header class="st-top">
     <span class="st-where" id="st-where">Study mode</span>
+    <span class="st-why" id="st-why"></span>
     <span class="st-stats" id="st-stats"></span>
     <button class="st-mo" id="st-motion" type="button" aria-pressed="true" title="Background motion on or off">Motion</button>
     <button class="st-x" id="st-close" type="button" aria-label="Close study mode (Esc)">✕</button>
