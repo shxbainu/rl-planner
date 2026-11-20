@@ -12,9 +12,9 @@
   --accent:#1b1a17; --accent-fg:#fbf8ef; --accent-soft:#ece6d6; --done:#8f897b; --bad:#c8321f; --bad-soft:#f7e2dc;
   --on-board:#f6f2e7; --on-board-2:rgb(246 242 231 / .74);
   --leaf-shadow:3px 3px 0 rgb(0 0 0 / .2),0 10px 24px -14px rgb(0 0 0 / .45);
-  --sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --head:"Archivo",system-ui,sans-serif;
-  --narrow:"Archivo Narrow","Archivo",sans-serif;
+  --sans:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --head:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
+  --narrow:"Figtree",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --pop:linear(0, .32 12%, .78 26%, 1.08 40%, 1.12 48%, 1.04 62%, .99 78%, 1);
   accent-color:var(--fg);
@@ -41,10 +41,11 @@
 :root:not([data-skin]) ::selection{background:color-mix(in srgb,var(--board) 30%,transparent)}
 :root:not([data-skin]) :focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 :root:not([data-skin]) .bar :focus-visible,:root:not([data-skin]) .tabrail :focus-visible{outline-color:var(--on-board)}
-:root:not([data-skin]) h2{font:700 16px/1.2 var(--narrow);letter-spacing:.06em;text-transform:uppercase;color:var(--fg)}
+:root:not([data-skin]) h2{font:700 21px/1.15 var(--head);letter-spacing:-.01em;text-transform:none;color:var(--fg)}
+:root:not([data-skin]) #hw-h{font-size:30px;letter-spacing:-.02em}
 :root:not([data-skin]) .panel-h h2::before{display:none}
 :root:not([data-skin]) .panel-meta,:root:not([data-skin]) .panel-foot{font:500 12px var(--sans);color:var(--faint)}
-:root:not([data-skin]) .feed-h{font:700 16px var(--narrow);letter-spacing:.06em;text-transform:uppercase}
+:root:not([data-skin]) .feed-h{font:700 21px var(--head);letter-spacing:-.01em;text-transform:none}
 :root:not([data-skin]) .p-more .feed-h{display:none}
 :root:not([data-skin]) a{text-underline-offset:3px}
 :root:not([data-skin]) svg.ext{width:12px;height:12px;vertical-align:-1px}
@@ -54,7 +55,7 @@
 :root:not([data-skin]) .bar{background:url("assets/cloth.png") 0 0/128px var(--board);background-blend-mode:soft-light;border:0;box-shadow:none;padding:14px 22px;color:var(--on-board)}
 /* the board only fades at a bell, never on page load (app.js sets data-sect-ready after the first paint) */
 :root:not([data-skin])[data-sect-ready] :is(body,.bar){transition:background-color .6s ease-out}
-:root:not([data-skin]) .bar-date{font:800 22px/1.15 var(--head);letter-spacing:-.015em;color:var(--on-board)}
+:root:not([data-skin]) .bar-date{font:800 26px/1.1 var(--head);letter-spacing:-.02em;color:var(--on-board)}
 :root:not([data-skin]) .bar-sub{font-size:13px;color:var(--on-board-2)}
 :root:not([data-skin]) .bar-sub :is(b,strong){color:var(--on-board)}
 :root:not([data-skin]) .letter-pick select{font:800 24px/1 var(--head);background:var(--surface);color:var(--fg);border:0;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / .18),0 6px 14px -8px rgb(0 0 0 / .45);transition:transform .2s steps(2)}
@@ -67,7 +68,7 @@
 :root:not([data-skin]) .almanac{color:var(--on-board-2)}
 
 /* buttons: leaf-white with an ink rule; primary is solid ink. They step, they don't ease. */
-:root:not([data-skin]) :is(.btn,.icon-btn){border-radius:4px;background:var(--surface);border:1.5px solid var(--fg);color:var(--fg);font-weight:700;transition:transform .09s steps(2),box-shadow .09s steps(2)}
+:root:not([data-skin]) :is(.btn,.icon-btn){border-radius:9px;background:var(--surface);border:1.5px solid var(--fg);color:var(--fg);font-weight:700;transition:transform .09s steps(2),box-shadow .09s steps(2)}
 :root:not([data-skin]) :is(.btn,.icon-btn):active{transform:translate(1px,1px)}
 :root:not([data-skin]) .btn.primary{background:var(--fg);color:var(--surface);border-color:var(--fg)}
 :root:not([data-skin]) .icon-btn.sm{border-width:1px;border-color:var(--line)}
@@ -78,39 +79,40 @@
 /* leaves: milk-white, two punch holes down the bound edge showing the board through, one short hard shadow */
 :root:not([data-skin]) .dash{gap:18px;padding:6px 22px 28px}
 :root:not([data-skin]) .col{gap:18px}
-:root:not([data-skin]) :is(.panel,#today,.feed > .pane){position:relative;background:var(--surface);border:0;border-radius:3px;padding:16px 18px 16px 34px;gap:12px;box-shadow:var(--leaf-shadow)}
+:root:not([data-skin]) :is(.panel,#today,.feed > .pane){position:relative;background:var(--surface);border:0;border-radius:10px;padding:18px 20px 18px 36px;gap:12px;box-shadow:var(--leaf-shadow)}
 :root:not([data-skin]) :is(.panel,#today,.feed > .pane)::before,:root:not([data-skin]) :is(.panel,#today,.feed > .pane)::after{content:"";position:absolute;left:10px;top:54px;width:14px;height:14px;border-radius:50%;
   background:radial-gradient(circle at 60% 62%,transparent 52%,rgb(0 0 0 / .35) 100%) ,url("assets/cloth.png") 0 0/128px var(--board);background-blend-mode:normal,soft-light;
   box-shadow:inset 2px 2px 3px rgb(0 0 0 / .5),0 0 0 2px var(--surface-2),0 0 0 3px var(--line);pointer-events:none}
 :root:not([data-skin]) :is(.panel,#today,.feed > .pane)::after{top:122px}
 
 /* subject chips: the tab's own colour, solid, like a coloured tab edge */
-:root:not([data-skin]) .chip{font:700 11px/1.5 var(--narrow);letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--cc);padding:0 6px;border-radius:2px}
+:root:not([data-skin]) .chip{font:700 11px/1.5 var(--narrow);letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--cc);padding:1px 8px;border-radius:999px}
 :root:not([data-skin])[data-mode="dark"] .chip{color:#14130f}
 :root:not([data-skin]) .tag{display:inline-block;background:transparent;color:var(--fg);border:1.5px solid currentColor;border-radius:2px;padding:0 5px;font:700 10px/1.6 var(--narrow);letter-spacing:.08em;text-transform:uppercase}
 :root:not([data-skin]) .tag.bad{color:var(--bad)}
 :root:not([data-skin]) .tag.unsure{border-style:dashed;color:var(--faint)}
 :root:not([data-skin]) .next{font-size:12.5px;color:var(--faint)}
 :root:not([data-skin]) .next::before{content:"· "}
-:root:not([data-skin]) .det{font-size:13px;line-height:1.5;color:var(--muted)}
+:root:not([data-skin]) .det{font-size:14px;line-height:1.5;color:var(--muted)}
 
 /* base left-border callouts become plain rows here */
 :root:not([data-skin]) :is(.tq li,.ad-det,.moves li,.ldr,.plays li,.chip2,.item){border-left:0}
 
 /* the checklist: ruled rows; checking punches the box out so the board shows through, and the row strikes in place */
 :root:not([data-skin]) .list{gap:0;position:relative}
-:root:not([data-skin]) .item{grid-template-columns:22px minmax(0,1fr) auto;gap:14px;padding:11px 2px;border-radius:0;background:transparent;border-bottom:1px solid var(--line)}
+:root:not([data-skin]) .item{grid-template-columns:24px minmax(0,1fr) auto;gap:14px;padding:14px 10px;border-radius:10px;background:transparent;border-bottom:1px solid var(--line);transition:background .12s}
+:root:not([data-skin]) .item:hover{background:color-mix(in srgb,var(--cc) 9%,transparent)}
 :root:not([data-skin]) .item:last-child{border-bottom:0}
 :root:not([data-skin]) .item.major .title::after{content:"";display:inline-block;width:7px;height:7px;margin-left:8px;border-radius:50%;background:var(--cc);vertical-align:2px}
 :root:not([data-skin]) .item.overdue .next{color:var(--bad);font-weight:600}
 :root:not([data-skin]) .body{gap:3px 8px}
-:root:not([data-skin]) .title{font:600 15.5px/1.3 var(--head);letter-spacing:-.005em;background:linear-gradient(var(--fg),var(--fg)) 0 58%/0% 1.5px no-repeat;transition:background-size .18s steps(3),color .18s}
+:root:not([data-skin]) .title{font:650 17.5px/1.3 var(--sans);letter-spacing:-.005em;background:linear-gradient(var(--fg),var(--fg)) 0 58%/0% 1.5px no-repeat;transition:background-size .18s steps(3),color .18s}
 :root:not([data-skin]) .item.done .title{text-decoration:none;color:var(--done);background-size:100% 1.5px}
-:root:not([data-skin]) .grp-h .rel,:root:not([data-skin]) .agenda-h b{font:700 15px var(--narrow);letter-spacing:.06em;text-transform:uppercase}
+:root:not([data-skin]) .grp-h .rel,:root:not([data-skin]) .agenda-h b{font:700 22px var(--head);letter-spacing:-.01em;text-transform:none}
 :root:not([data-skin]) .agenda{border-top:2px solid var(--fg);padding-top:12px;gap:6px}
 :root:not([data-skin]) .hw-notes summary,:root:not([data-skin]) .done-box summary{font:700 13px var(--sans)}
 :root:not([data-skin]) .hw-notes ul{color:var(--fg);font-size:13px}
-:root:not([data-skin]) .check{width:20px;height:20px;border:2px solid var(--fg);border-radius:2px;background:var(--surface);position:relative;overflow:visible;transition:border-radius .12s steps(2),transform .3s}
+:root:not([data-skin]) .check{width:24px;height:24px;border:2.5px solid var(--cc);border-radius:7px;background:var(--surface);position:relative;overflow:visible;transition:border-radius .12s steps(2),transform .3s}
 :root:not([data-skin]) .check::after{display:none}
 :root:not([data-skin]) .check:hover{border-color:var(--cc)}
 :root:not([data-skin]) .check:checked{border-radius:50%;border-color:transparent;background:var(--board);box-shadow:inset 2px 2px 3px rgb(0 0 0 / .5);animation:punch .42s var(--pop)}
@@ -241,7 +243,7 @@
 :root:not([data-skin]) .tabrail:not([hidden]){display:flex;gap:4px;padding:0 22px 12px;overflow-x:auto}
 :root:not([data-skin]) .tabrail .tab{flex-basis:0;min-width:64px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;padding:6px 10px;border:0;cursor:pointer;
   background:var(--cc,#7d776a);color:#fff;font:inherit;text-align:left;border-radius:3px 3px 0 0;box-shadow:inset 0 -3px 0 rgb(0 0 0 / .18);transform:translateY(5px);transition:transform .09s steps(2)}
-:root:not([data-skin]) .tabrail .tab b{font:700 13px/1.15 var(--narrow);letter-spacing:.06em;text-transform:uppercase}
+:root:not([data-skin]) .tabrail .tab b{font:700 16px/1.1 var(--head);letter-spacing:-.01em;text-transform:none}
 :root:not([data-skin]) .tabrail .tab small{font:500 11px/1.2 var(--mono);opacity:.85}
 :root:not([data-skin]) .tabrail .tab.past{filter:saturate(.35) brightness(.85)}
 :root:not([data-skin]) .tabrail .tab.now{transform:none;box-shadow:0 -3px 0 var(--on-board) inset,0 4px 10px -4px rgb(0 0 0 / .5)}
@@ -254,8 +256,7 @@
   /* fore edge: tabs hang down the right side of the binder */
   :root:not([data-skin])[data-rail] body{padding-right:96px}
   :root:not([data-skin])[data-rail] .dash{padding-right:0}
-  :root:not([data-skin])[data-rail] .bar{max-width:1560px;margin-inline:auto;padding-right:0}
-  :root:not([data-skin]) .tabrail:not([hidden]){position:fixed;z-index:6;top:0;bottom:0;width:96px;right:max(0px,calc((100vw - 96px - 1560px) / 2));flex-direction:column;gap:4px;padding:16px 0;overflow:visible}
+  :root:not([data-skin]) .tabrail:not([hidden]){position:fixed;z-index:6;top:0;bottom:0;width:96px;right:0;flex-direction:column;gap:4px;padding:16px 0;overflow:visible}
   :root:not([data-skin]) .tabrail .tab{flex-basis:0;min-height:44px;width:auto;margin-left:0;margin-right:12px;border-radius:0 6px 6px 0;transform:none;padding:6px 10px 6px 12px;box-shadow:inset 3px 0 0 rgb(0 0 0 / .15),2px 2px 0 rgb(0 0 0 / .18)}
   :root:not([data-skin]) .tabrail .tab:not(:disabled):hover{margin-right:6px;transform:none}
   :root:not([data-skin]) .tabrail .tab.now{margin-right:0;box-shadow:3px 3px 0 rgb(0 0 0 / .22)}
@@ -275,21 +276,22 @@
 /* laptops: the page scrolls like a page; Homework left, the day right, and the rest as leaves packed into columns below
    (app.js placeFeed moves them), so neither column runs on alone and the bottom row has no holes */
 @media (min-width:900px){
-  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);grid-template-areas:"hw a" "lk a" "feed feed";grid-template-rows:auto 1fr auto;align-items:start}
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.9fr) minmax(330px,1fr);grid-template-areas:"hw a" "lk a" "feed feed";grid-template-rows:auto 1fr auto;align-items:start}
   :root:not([data-skin]) .dash > .dock{grid-area:lk}
   :root:not([data-skin]) .dash > .dock .dock-main{grid-template-columns:repeat(7,minmax(0,1fr))}
   :root:not([data-skin]) .dash > .dock .dock-classes{grid-template-columns:repeat(8,minmax(0,1fr))}
   :root:not([data-skin]) .col-c{display:none}
-  /* masonry on a grid: 2px rows, each card spans its own height (app.js sets --rows), dense fills the holes.
-     Not CSS columns: Safari drops the background of scrolling cards inside columns. */
-  :root:not([data-skin]) .feed{grid-area:feed;display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));grid-auto-rows:2px;grid-auto-flow:row dense;column-gap:18px;align-items:start}
-  :root:not([data-skin]) .feed > *{grid-row-end:span var(--rows,160);margin:0;min-width:0}
-  :root:not([data-skin]) .feed > .pane,:root:not([data-skin]) .feed > .pane[hidden]{display:grid!important;align-content:start;gap:10px;min-width:0;max-height:640px;overflow:auto;scrollbar-width:thin}
+  /* the cards below: an even grid of same-height tiles, so every row lines up; long cards scroll inside */
+  :root:not([data-skin]) .feed{grid-area:feed;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:500px;gap:28px 18px;padding-top:10px}
+  :root:not([data-skin]) .feed > *{margin:0;min-width:0;height:100%;overflow:auto;scrollbar-width:thin}
+  :root:not([data-skin]) .feed > .pane,:root:not([data-skin]) .feed > .pane[hidden]{display:grid!important;align-content:start;gap:10px}
+  /* the heading stays at the top of its card while the rest scrolls */
+  :root:not([data-skin]) .feed > * > :is(.panel-h,.feed-h,.tabs){position:sticky;top:-18px;z-index:2;background:var(--surface);margin:-18px 0 0;padding-top:18px}
   :root:not([data-skin]) .p-more .tabs :is([data-tab-pane="sports"],[data-tab-pane="news"],[data-tab-pane="fantasy"],[data-tab-pane="count"]){display:none}
 }
 @media (min-width:1280px){
   :root:not([data-skin]) body{height:auto;display:block}
-  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.5fr) minmax(360px,1fr);max-width:1560px;flex:none}
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.9fr) minmax(380px,1fr);max-width:none;flex:none}
   :root:not([data-skin]) :is(.col,.p-hw){overflow:visible}
   :root:not([data-skin]) .p-more .pane:not([hidden]){flex:none;overflow:visible}
   :root:not([data-skin]) .p-week .rot-scroll{flex:none;display:block}
@@ -371,3 +373,26 @@
   :root:not([data-skin]) .bar-status .pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   :root:not([data-skin]) .bar-actions{order:2}
 }
+
+/* each leaf carries a coloured divider tab above its heading, so the page isn't just ink on cream */
+:root:not([data-skin]) .p-hw{--tab:var(--c-eng)}
+:root:not([data-skin]) .p-sched{--tab:var(--c-msi)}
+:root:not([data-skin]) .p-lunch{--tab:var(--c-fgc)}
+:root:not([data-skin]) .p-more{--tab:var(--c-glee)}
+:root:not([data-skin]) .p-music{--tab:var(--c-arts)}
+:root:not([data-skin]) .p-chess{--tab:var(--c-latin)}
+:root:not([data-skin]) .pane[data-pane="sports"]{--tab:var(--c-eng)}
+:root:not([data-skin]) .pane[data-pane="fantasy"]{--tab:var(--c-health)}
+:root:not([data-skin]) .pane[data-pane="news"]{--tab:var(--c-fr)}
+:root:not([data-skin]) .pane[data-pane="count"]{--tab:var(--c-arts)}
+:root:not([data-skin]) .panel-h h2{position:static}
+:root:not([data-skin]) :is(.panel-h h2,.feed > .pane > .feed-h)::before{content:"";display:block;position:absolute;top:-10px;left:36px;width:72px;height:10px;border-radius:8px 8px 0 0;background:var(--tab,var(--c-other))}
+:root:not([data-skin]) .tabrail .tab{border-radius:0 12px 12px 0}
+:root:not([data-skin]) #today > :is(.wx,.nextup,.qline,.tw,.brk)::before{color:var(--c-fr)}
+/* in the card grid the cards scroll, so the colour tab hangs down from the card's top edge instead of sticking up */
+:root:not([data-skin]) .feed :is(.panel-h h2,.feed > .pane > .feed-h)::before{top:0;left:0;border-radius:0 0 8px 8px}
+:root:not([data-skin]) .feed > * > .feed-h{padding-top:26px}
+:root:not([data-skin]) .feed > * > .panel-h{padding-top:26px}
+/* full rows only: 8 cards make 2 rows of 4 on wide screens, or 3 rows of 3 with News across two columns */
+@media (min-width:1180px){ :root:not([data-skin]) .feed{grid-template-columns:repeat(3,minmax(0,1fr))} :root:not([data-skin]) .feed > .pane[data-pane="news"]{grid-column:span 2} }
+@media (min-width:1600px){ :root:not([data-skin]) .feed{grid-template-columns:repeat(4,minmax(0,1fr))} :root:not([data-skin]) .feed > .pane[data-pane="news"]{grid-column:auto} }

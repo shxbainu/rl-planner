@@ -170,6 +170,8 @@ components:
 
 # Design System: Brian's RL Planner
 
+> **Update (Nov 19, 2026):** At Brian's request the look got more life and less rigidity. Headings, the date, the countdown and tab labels are now **Bricolage Grotesque** in sentence case, and body, labels and item titles are **Figtree**. Archivo and Archivo Narrow caps are retired, and IBM Plex Mono is still for times only. Homework is the focus: titles are 17.5px, checkboxes are 24px rounded and outlined in the subject colour, and rows get a subject-colour wash on hover. Every leaf carries a coloured divider tab above its heading (`--tab`), so the palette goes beyond ink on cream. The page fills the full width (no 1560px cap) with the tab rail on the screen edge, and leaves and buttons have softer 9–10px corners. Where this note conflicts with the sections below, this note wins.
+
 ## Overview
 
 **Creative North Star: "The Open Binder"**

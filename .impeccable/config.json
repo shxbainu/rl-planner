@@ -9,6 +9,18 @@
         "value": "lora",
         "createdAt": "2026-11-19T23:49:07.785Z",
         "reason": "Claude: base style.css fallback font used by optional skins in themes/, not the Tab Board default look"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "figtree",
+        "createdAt": "2026-11-20T00:45:24.708Z",
+        "reason": "Brian asked for a less rigid font on Nov 19; Figtree is the new body face, recorded in DESIGN.md's update note"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "bricolage grotesque",
+        "createdAt": "2026-11-20T00:45:24.721Z",
+        "reason": "Brian asked for a livelier font on Nov 19; Bricolage Grotesque is the new display face, recorded in DESIGN.md's update note"
       }
     ]
   }
