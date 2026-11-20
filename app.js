@@ -3240,6 +3240,8 @@
     parent.append(el);
   }
   const moveHome = (el) => { if (el?._home && el.previousSibling !== el._home) el._home.after(el); };
+  // each feed card spans as many 2px grid rows as it is tall (+18px gap), so the grid packs like masonry
+  const feedSizer = new ResizeObserver((es) => es.forEach(({ target: el }) => el.style.setProperty("--rows", Math.ceil((el.offsetHeight + 18) / 2))));
   function placeFeed() {
     const on = feedOn(), feed = $("#feed");
     if (!feed) return;
@@ -3251,11 +3253,12 @@
     // Music rides with the cards below so the two columns above end together
     const cards = [$(".p-lunch"), $(".p-more"), $(".p-music"), $(".p-chess"), ...panes];
     if (on) {
-      cards.forEach((el) => moveTo(el, feed));
+      cards.forEach((el) => { moveTo(el, feed); feedSizer.observe(el); });
       moveTo($(".dock"), $(".dash")); // the links sit under Homework, where that column would otherwise end early
       panes.forEach(wake);
       if (FEED.includes(state.pane)) showPane("week");
     } else {
+      cards.forEach((el) => { feedSizer.unobserve(el); el.style.removeProperty("--rows"); });
       [...cards].reverse().forEach(moveHome);
       moveHome($(".dock"));
     }

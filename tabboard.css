@@ -280,11 +280,11 @@
   :root:not([data-skin]) .dash > .dock .dock-main{grid-template-columns:repeat(7,minmax(0,1fr))}
   :root:not([data-skin]) .dash > .dock .dock-classes{grid-template-columns:repeat(8,minmax(0,1fr))}
   :root:not([data-skin]) .col-c{display:none}
-  :root:not([data-skin]) .feed{grid-area:feed;display:block;columns:330px auto;column-gap:18px}
-  /* inline boxes never split across columns; Safari otherwise spills a scrolling card into the next column */
-  :root:not([data-skin]) .feed > *{break-inside:avoid;margin:0 0 18px;width:100%;vertical-align:top}
-  :root:not([data-skin]) .feed > .panel:not([hidden]){display:inline-flex}
-  :root:not([data-skin]) .feed > .pane,:root:not([data-skin]) .feed > .pane[hidden]{display:inline-grid!important;align-content:start;gap:10px;min-width:0;max-height:640px;overflow:auto;scrollbar-width:thin}
+  /* masonry on a grid: 2px rows, each card spans its own height (app.js sets --rows), dense fills the holes.
+     Not CSS columns: Safari drops the background of scrolling cards inside columns. */
+  :root:not([data-skin]) .feed{grid-area:feed;display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));grid-auto-rows:2px;grid-auto-flow:row dense;column-gap:18px;align-items:start}
+  :root:not([data-skin]) .feed > *{grid-row-end:span var(--rows,160);margin:0;min-width:0}
+  :root:not([data-skin]) .feed > .pane,:root:not([data-skin]) .feed > .pane[hidden]{display:grid!important;align-content:start;gap:10px;min-width:0;max-height:640px;overflow:auto;scrollbar-width:thin}
   :root:not([data-skin]) .p-more .tabs :is([data-tab-pane="sports"],[data-tab-pane="news"],[data-tab-pane="fantasy"],[data-tab-pane="count"]){display:none}
 }
 @media (min-width:1280px){
