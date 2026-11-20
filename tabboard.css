@@ -1,0 +1,373 @@
+/* Tab Board: the planner's own look (the "Original" choice in the theme menu). An open binder at today's section:
+   every work area is a punched leaf on one cloth board, the board takes the colour of the class you're in
+   (app.js sets data-sect), and today's classes are the binder's tabs down the fore edge (#tabrail).
+   Skins in themes/ replace all of this, so every rule is scoped to pages with no skin (:root:not([data-skin])). */
+
+:root:not([data-skin]){
+  /* board cloth per subject: deep and low-chroma so white leaves sit calmly on it all day (no bright yellow) */
+  --b-latin:#77612b; --b-eng:#2b4f7c; --b-msi:#2b6650; --b-fr:#55407e; --b-fgc:#86472a; --b-arts:#7a3960;
+  --b-glee:#21676c; --b-health:#5b6526; --b-other:#3b4250; --b-off:#3b4250;
+  --board:var(--b-off);
+  --bg:var(--board); --surface:#fbf8ef; --surface-2:#f2eee2; --fg:#1b1a17; --muted:#4f4b42; --faint:#6f6a5e; --line:#ddd6c4;
+  --accent:#1b1a17; --accent-fg:#fbf8ef; --accent-soft:#ece6d6; --done:#8f897b; --bad:#c8321f; --bad-soft:#f7e2dc;
+  --on-board:#f6f2e7; --on-board-2:rgb(246 242 231 / .74);
+  --leaf-shadow:3px 3px 0 rgb(0 0 0 / .2),0 10px 24px -14px rgb(0 0 0 / .45);
+  --sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --head:"Archivo",system-ui,sans-serif;
+  --narrow:"Archivo Narrow","Archivo",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --pop:linear(0, .32 12%, .78 26%, 1.08 40%, 1.12 48%, 1.04 62%, .99 78%, 1);
+  accent-color:var(--fg);
+}
+:root:not([data-skin])[data-sect="latin"]{--board:var(--b-latin)}
+:root:not([data-skin])[data-sect="eng"]{--board:var(--b-eng)}
+:root:not([data-skin])[data-sect="msi"]{--board:var(--b-msi)}
+:root:not([data-skin])[data-sect="fr"]{--board:var(--b-fr)}
+:root:not([data-skin])[data-sect="fgc"]{--board:var(--b-fgc)}
+:root:not([data-skin])[data-sect="arts"]{--board:var(--b-arts)}
+:root:not([data-skin])[data-sect="glee"]{--board:var(--b-glee)}
+:root:not([data-skin])[data-sect="health"]{--board:var(--b-health)}
+:root:not([data-skin])[data-sect="other"]{--board:var(--b-other)}
+:root:not([data-skin])[data-mode="dark"]{
+  --b-latin:#3d3219; --b-eng:#192c45; --b-msi:#173628; --b-fr:#2b2143; --b-fgc:#45261a; --b-arts:#3f1d31;
+  --b-glee:#123638; --b-health:#2f3516; --b-other:#22262e; --b-off:#22262e;
+  --surface:#1f1e1b; --surface-2:#282723; --fg:#efe9db; --muted:#c5bfaf; --faint:#9d9789; --line:#3a3832;
+  --accent:#efe9db; --accent-fg:#1b1a17; --accent-soft:#2e2c27; --done:#7e796d; --bad:#f07b62; --bad-soft:#3a231d;
+  --leaf-shadow:3px 3px 0 rgb(0 0 0 / .35),0 12px 26px -14px rgb(0 0 0 / .7);
+}
+
+/* the board */
+:root:not([data-skin]) body{background:url("assets/cloth.png") 0 0/128px var(--board);background-blend-mode:soft-light;font:14.5px/1.5 var(--sans);-webkit-font-smoothing:antialiased;color:var(--fg)}
+:root:not([data-skin]) ::selection{background:color-mix(in srgb,var(--board) 30%,transparent)}
+:root:not([data-skin]) :focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+:root:not([data-skin]) .bar :focus-visible,:root:not([data-skin]) .tabrail :focus-visible{outline-color:var(--on-board)}
+:root:not([data-skin]) h2{font:700 16px/1.2 var(--narrow);letter-spacing:.06em;text-transform:uppercase;color:var(--fg)}
+:root:not([data-skin]) .panel-h h2::before{display:none}
+:root:not([data-skin]) .panel-meta,:root:not([data-skin]) .panel-foot{font:500 12px var(--sans);color:var(--faint)}
+:root:not([data-skin]) .feed-h{font:700 16px var(--narrow);letter-spacing:.06em;text-transform:uppercase}
+:root:not([data-skin]) .p-more .feed-h{display:none}
+:root:not([data-skin]) a{text-underline-offset:3px}
+:root:not([data-skin]) svg.ext{width:12px;height:12px;vertical-align:-1px}
+:root:not([data-skin]) * {scrollbar-color:var(--line) transparent}
+
+/* top bar sits on the board: the day letter is an ink block, the date in leaf white */
+:root:not([data-skin]) .bar{background:url("assets/cloth.png") 0 0/128px var(--board);background-blend-mode:soft-light;border:0;box-shadow:none;padding:14px 22px;color:var(--on-board)}
+/* the board only fades at a bell, never on page load (app.js sets data-sect-ready after the first paint) */
+:root:not([data-skin])[data-sect-ready] :is(body,.bar){transition:background-color .6s ease-out}
+:root:not([data-skin]) .bar-date{font:800 22px/1.15 var(--head);letter-spacing:-.015em;color:var(--on-board)}
+:root:not([data-skin]) .bar-sub{font-size:13px;color:var(--on-board-2)}
+:root:not([data-skin]) .bar-sub :is(b,strong){color:var(--on-board)}
+:root:not([data-skin]) .letter-pick select{font:800 24px/1 var(--head);background:var(--surface);color:var(--fg);border:0;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / .18),0 6px 14px -8px rgb(0 0 0 / .45);transition:transform .2s steps(2)}
+:root:not([data-skin]) .letter-pick select:hover{transform:translate(-1px,-1px)}
+:root:not([data-skin]) .bar-status{color:var(--on-board-2)}
+:root:not([data-skin]) .bar-status span.pill{background:rgb(0 0 0 / .18);color:var(--on-board);font-size:12.5px;border:0}
+:root:not([data-skin]) .bar :is(.icon-btn,.skin-pick){color:var(--on-board);background:rgb(0 0 0 / .16);border:1px solid rgb(255 255 255 / .18)}
+:root:not([data-skin]) .bar .btn.primary{background:var(--surface);color:var(--fg);border:0;box-shadow:0 1px 2px rgb(0 0 0 / .18),0 6px 14px -8px rgb(0 0 0 / .45)}
+:root:not([data-skin]) .bar .skin-select{color:var(--on-board)}
+:root:not([data-skin]) .almanac{color:var(--on-board-2)}
+
+/* buttons: leaf-white with an ink rule; primary is solid ink. They step, they don't ease. */
+:root:not([data-skin]) :is(.btn,.icon-btn){border-radius:4px;background:var(--surface);border:1.5px solid var(--fg);color:var(--fg);font-weight:700;transition:transform .09s steps(2),box-shadow .09s steps(2)}
+:root:not([data-skin]) :is(.btn,.icon-btn):active{transform:translate(1px,1px)}
+:root:not([data-skin]) .btn.primary{background:var(--fg);color:var(--surface);border-color:var(--fg)}
+:root:not([data-skin]) .icon-btn.sm{border-width:1px;border-color:var(--line)}
+:root:not([data-skin]) .icon-btn.sm:hover{border-color:var(--fg)}
+:root:not([data-skin]) .icon-btn svg{width:16px;height:16px}
+:root:not([data-skin]) .link{font-weight:600;color:var(--fg)}
+
+/* leaves: milk-white, two punch holes down the bound edge showing the board through, one short hard shadow */
+:root:not([data-skin]) .dash{gap:18px;padding:6px 22px 28px}
+:root:not([data-skin]) .col{gap:18px}
+:root:not([data-skin]) :is(.panel,#today,.feed > .pane){position:relative;background:var(--surface);border:0;border-radius:3px;padding:16px 18px 16px 34px;gap:12px;box-shadow:var(--leaf-shadow)}
+:root:not([data-skin]) :is(.panel,#today,.feed > .pane)::before,:root:not([data-skin]) :is(.panel,#today,.feed > .pane)::after{content:"";position:absolute;left:10px;top:54px;width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 60% 62%,transparent 52%,rgb(0 0 0 / .35) 100%) ,url("assets/cloth.png") 0 0/128px var(--board);background-blend-mode:normal,soft-light;
+  box-shadow:inset 2px 2px 3px rgb(0 0 0 / .5),0 0 0 2px var(--surface-2),0 0 0 3px var(--line);pointer-events:none}
+:root:not([data-skin]) :is(.panel,#today,.feed > .pane)::after{top:122px}
+
+/* subject chips: the tab's own colour, solid, like a coloured tab edge */
+:root:not([data-skin]) .chip{font:700 11px/1.5 var(--narrow);letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--cc);padding:0 6px;border-radius:2px}
+:root:not([data-skin])[data-mode="dark"] .chip{color:#14130f}
+:root:not([data-skin]) .tag{display:inline-block;background:transparent;color:var(--fg);border:1.5px solid currentColor;border-radius:2px;padding:0 5px;font:700 10px/1.6 var(--narrow);letter-spacing:.08em;text-transform:uppercase}
+:root:not([data-skin]) .tag.bad{color:var(--bad)}
+:root:not([data-skin]) .tag.unsure{border-style:dashed;color:var(--faint)}
+:root:not([data-skin]) .next{font-size:12.5px;color:var(--faint)}
+:root:not([data-skin]) .next::before{content:"· "}
+:root:not([data-skin]) .det{font-size:13px;line-height:1.5;color:var(--muted)}
+
+/* base left-border callouts become plain rows here */
+:root:not([data-skin]) :is(.tq li,.ad-det,.moves li,.ldr,.plays li,.chip2,.item){border-left:0}
+
+/* the checklist: ruled rows; checking punches the box out so the board shows through, and the row strikes in place */
+:root:not([data-skin]) .list{gap:0;position:relative}
+:root:not([data-skin]) .item{grid-template-columns:22px minmax(0,1fr) auto;gap:14px;padding:11px 2px;border-radius:0;background:transparent;border-bottom:1px solid var(--line)}
+:root:not([data-skin]) .item:last-child{border-bottom:0}
+:root:not([data-skin]) .item.major .title::after{content:"";display:inline-block;width:7px;height:7px;margin-left:8px;border-radius:50%;background:var(--cc);vertical-align:2px}
+:root:not([data-skin]) .item.overdue .next{color:var(--bad);font-weight:600}
+:root:not([data-skin]) .body{gap:3px 8px}
+:root:not([data-skin]) .title{font:600 15.5px/1.3 var(--head);letter-spacing:-.005em;background:linear-gradient(var(--fg),var(--fg)) 0 58%/0% 1.5px no-repeat;transition:background-size .18s steps(3),color .18s}
+:root:not([data-skin]) .item.done .title{text-decoration:none;color:var(--done);background-size:100% 1.5px}
+:root:not([data-skin]) .grp-h .rel,:root:not([data-skin]) .agenda-h b{font:700 15px var(--narrow);letter-spacing:.06em;text-transform:uppercase}
+:root:not([data-skin]) .agenda{border-top:2px solid var(--fg);padding-top:12px;gap:6px}
+:root:not([data-skin]) .hw-notes summary,:root:not([data-skin]) .done-box summary{font:700 13px var(--sans)}
+:root:not([data-skin]) .hw-notes ul{color:var(--fg);font-size:13px}
+:root:not([data-skin]) .check{width:20px;height:20px;border:2px solid var(--fg);border-radius:2px;background:var(--surface);position:relative;overflow:visible;transition:border-radius .12s steps(2),transform .3s}
+:root:not([data-skin]) .check::after{display:none}
+:root:not([data-skin]) .check:hover{border-color:var(--cc)}
+:root:not([data-skin]) .check:checked{border-radius:50%;border-color:transparent;background:var(--board);box-shadow:inset 2px 2px 3px rgb(0 0 0 / .5);animation:punch .42s var(--pop)}
+@keyframes punch{0%{transform:scale(.55)}100%{transform:scale(1)}}
+
+/* overdue: a vermilion errata slip tucked onto the leaf */
+:root:not([data-skin]) .overdue-strip{justify-self:start;width:auto;background:var(--bad);color:#fff;border:0;border-radius:1px;padding:5px 14px 5px 12px;font:700 13px var(--sans);
+  transform:rotate(-1.2deg);filter:drop-shadow(0 2px 2px rgb(0 0 0 / .2));clip-path:polygon(0 0,100% 0,calc(100% - 6px) 50%,100% 100%,0 100%)}
+:root:not([data-skin]) .overdue-strip:hover{transform:rotate(0)}
+
+/* calendar: a ruled grid; today is cut from the board's cloth, the picked day gets an ink frame */
+:root:not([data-skin]) .cal{gap:0;background:transparent;border:0;border-top:2px solid var(--fg);border-radius:0;overflow:hidden;position:relative}
+:root:not([data-skin]) .cal .dow{background:transparent;padding:6px 0 5px 9px;text-align:left;font:700 11px var(--narrow);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--fg)}
+:root:not([data-skin]) .cell{background:var(--surface);border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;min-height:0;padding:8px 9px 9px;gap:6px;transition:background .1s steps(2)}
+:root:not([data-skin]) .cell:nth-child(5n+5){border-right:0}
+:root:not([data-skin]) .cell:hover{border-color:var(--line);background:var(--surface-2)}
+:root:not([data-skin]) .cell .top b{font:700 15px var(--head)}
+:root:not([data-skin]) .cell.today{background:var(--board);color:var(--on-board)}
+:root:not([data-skin]) .cell.today :is(.top b,.cnt,.cnt b,small){color:var(--on-board)}
+:root:not([data-skin]) .cell.today .top b{background:none;border:0}
+:root:not([data-skin]) .cell.sel{box-shadow:inset 0 0 0 2px var(--fg);background:var(--surface-2)}
+:root:not([data-skin]) .cell.today.sel{box-shadow:inset 0 0 0 2px var(--fg),inset 0 0 0 4px var(--surface);background:var(--board)}
+:root:not([data-skin]) .cal.has-ring .cell.sel{box-shadow:none}
+:root:not([data-skin]) .cal.has-ring .cell.today.sel{box-shadow:inset 0 0 0 4px var(--surface)}
+:root:not([data-skin]) .cal-ring{position:absolute;z-index:1;pointer-events:none;border:2px solid var(--fg);border-radius:0}
+:root:not([data-skin]) .cell.past{opacity:.5}
+:root:not([data-skin]) .cell.off{background:var(--surface-2)}
+:root:not([data-skin]) .cell :is(.chip2,.more){display:none}
+:root:not([data-skin]) .cell .cnt{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:12px;color:var(--muted);min-height:20px}
+:root:not([data-skin]) .cell .cnt b{font:800 20px/1 var(--head);color:var(--fg)}
+:root:not([data-skin]) .cell .cnt i{font-style:normal;font:700 10px/1.6 var(--narrow);letter-spacing:.06em;text-transform:uppercase;padding:0 5px;color:#fff;background:var(--cc);border-radius:1px}
+:root:not([data-skin]) .cell.off .offn{margin-top:0;font-size:12px;color:var(--faint)}
+:root:not([data-skin]) .cal-wrap{position:relative}
+
+/* schedule: the now plate is solid ink with the class colour running along it; rows are ruled, the subject a small tab */
+:root:not([data-skin]) .now-card{position:relative;background:#1b1a17;color:#f6f2e7;border-radius:2px;padding:14px 16px 14px;box-shadow:none;--cc:#f6f2e7}
+:root:not([data-skin])[data-mode="dark"] .now-card{background:#0f0e0c}
+:root:not([data-skin]) .now-card .big:has(.num){align-items:baseline;justify-content:space-between;flex-direction:row-reverse}
+:root:not([data-skin]) .now-card .lbl{font:700 15px/1.25 var(--head);color:#f6f2e7}
+:root:not([data-skin]) .now-card .num{font:800 46px/.95 var(--head);letter-spacing:-.02em;color:#f6f2e7;font-variant-numeric:tabular-nums}
+:root:not([data-skin]) .now-card .sub{font-size:13px;color:#c9c3b3}
+:root:not([data-skin]) .now-card .sub b{color:#f6f2e7}
+:root:not([data-skin]) .now-card .prog{height:6px;background:rgb(255 255 255 / .14);border-radius:0}
+:root:not([data-skin]) .now-card .prog i{background:var(--cc);border-radius:0;transition:width 1s linear}
+:root:not([data-skin]) .now-card .big[style] .num{color:#f6f2e7}
+:root:not([data-skin]) .tl{gap:0}
+:root:not([data-skin]) .tl li{padding:8px 4px;border-radius:0;border-bottom:1px solid var(--line);gap:12px;grid-template-columns:30px 1fr auto}
+:root:not([data-skin]) .tl li:last-child{border-bottom:0}
+:root:not([data-skin]) .tl .blk{width:30px;height:22px;background:var(--cc);color:#fff;border:0;border-radius:2px 0 0 2px;font:700 12px var(--narrow);box-shadow:none}
+:root:not([data-skin])[data-mode="dark"] .tl .blk{color:#14130f}
+:root:not([data-skin]) .tl li:is(.free,.ev) .blk{background:transparent;color:var(--faint);border:1px dashed var(--line)}
+:root:not([data-skin]) .tl .cn{font:600 14.5px/1.25 var(--head)}
+:root:not([data-skin]) .tl li.ev .cn{color:var(--muted);font-weight:500}
+:root:not([data-skin]) .tl li.ev{background:transparent}
+:root:not([data-skin]) .tl .who{font-size:12px;color:var(--faint)}
+:root:not([data-skin]) .tl .tm{font:400 12px/1.35 var(--mono);color:var(--muted)}
+:root:not([data-skin]) .tl li.past{opacity:.48}
+:root:not([data-skin]) .tl li.now{background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--fg)}
+:root:not([data-skin]) .tl li.now .prog{background:var(--line)}
+:root:not([data-skin]) .tl li.now .prog i{background:var(--cc)}
+:root:not([data-skin]) .after{font-size:13px;border-top:1px solid var(--line)}
+
+/* Today: one leaf, label column on the left in narrow caps, each row ruled */
+:root:not([data-skin]) #today{display:grid;padding:4px 18px 4px 34px}
+:root:not([data-skin]) #today:not(:has(> :not([hidden]))){display:none}
+:root:not([data-skin]) #today > :is(.wx,.nextup,.qline,.tw,.brk){position:relative;width:100%;box-sizing:border-box;margin:0;padding:12px 0 12px 88px;border:0;border-radius:0;
+  background:none;box-shadow:none;font-size:13.5px;line-height:1.45;min-height:0;color:var(--fg);text-align:left}
+:root:not([data-skin]) #today > :not([hidden]) ~ :not([hidden]){border-top:1px solid var(--line)}
+:root:not([data-skin]) #today > :is(.wx,.nextup,.qline,.tw,.brk):hover{background:none}
+:root:not([data-skin]) #today > :is(button,a):hover{box-shadow:inset 3px 0 0 -1px var(--fg)}
+:root:not([data-skin]) #today > *::before,:root:not([data-skin]) #today :is(.nu-k,.ql-k){position:absolute;left:0;top:14px;margin:0;font:700 11px/1.2 var(--narrow);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+:root:not([data-skin]) #today > .wx::before{content:"Weather"}
+:root:not([data-skin]) #today > .tw::before{content:"This week"}
+:root:not([data-skin]) #today > .brk::before{content:"Next break"}
+:root:not([data-skin]) #today .tw-d i{background:var(--board);border-radius:0}
+:root:not([data-skin]) #today .brk-n{font-weight:800}
+:root:not([data-skin]) #today .ql-k.due{color:var(--bad)}
+:root:not([data-skin]) #today .wx{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+:root:not([data-skin]) #today .wx svg{align-self:center;width:18px;height:18px}
+:root:not([data-skin]) #today .wx-t{font:800 18px/1 var(--head)}
+:root:not([data-skin]) #today .wx-s{white-space:normal;overflow:visible;flex:1 1 200px}
+:root:not([data-skin]) #today .nextup{display:flex;flex-wrap:wrap;gap:6px;overflow:visible}
+:root:not([data-skin]) #today .nu{border:1.5px solid var(--fg);border-radius:2px;background:transparent;font-size:12.5px;font-weight:600;padding:2px 8px}
+:root:not([data-skin]) #today .nu:first-of-type{background:var(--fg);color:var(--surface)}
+:root:not([data-skin]) #today .qline{display:grid;gap:3px}
+:root:not([data-skin]) #today .qline svg{display:none}
+:root:not([data-skin]) #today .ql-t{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;font-size:14px;line-height:1.4;font-weight:500}
+:root:not([data-skin]) #today .ql-by{max-width:none;font-size:12.5px;color:var(--muted)}
+
+/* links: index tabs in a row on the board */
+:root:not([data-skin]) .dock{gap:8px}
+:root:not([data-skin]) .dock a{background:var(--surface);color:var(--fg);border:0;border-radius:2px;box-shadow:0 1px 2px rgb(0 0 0 / .18),0 6px 14px -8px rgb(0 0 0 / .45);font-weight:600;transition:transform .09s steps(2)}
+:root:not([data-skin]) .dock a:hover{transform:translateY(-1px)}
+:root:not([data-skin]) .dock-classes a{border-top:3px solid var(--cc,var(--fg))}
+@media (min-width:760px){
+  :root:not([data-skin]) .dock-main{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:6px;overflow:visible}
+  :root:not([data-skin]) .dock-main a{flex-direction:row;justify-content:flex-start;gap:8px;padding:10px 12px;font-size:13px}
+  :root:not([data-skin]) .dock-main a svg{width:18px;height:18px;flex:none}
+  :root:not([data-skin]) .dock-classes{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;overflow:visible}
+  :root:not([data-skin]) .dock-classes a{padding:5px 6px}
+}
+
+/* game night: a strip of the board in the team's colours */
+:root:not([data-skin]) .gn{background:var(--gn1,#1b1a17);color:#fff;border:0;margin:0 22px 12px;border-radius:3px;padding:8px 14px;font-size:13.5px;box-shadow:inset 0 -3px 0 var(--gn2,#fff),var(--leaf-shadow)}
+:root:not([data-skin]) .gn-tag{font:700 11px var(--narrow);letter-spacing:.08em;background:rgb(255 255 255 / .2)}
+:root:not([data-skin]) .gn-when{font:500 12.5px var(--mono)}
+:root:not([data-skin]) .gn-when{padding-left:14px;border-left:1px solid rgb(255 255 255 / .25)}
+
+/* music, tabs and toggles */
+:root:not([data-skin]) .sp{background:var(--surface-2);border:0;border-radius:2px;box-shadow:inset 0 0 0 1px var(--line)}
+:root:not([data-skin]) .tabs{border-bottom:2px solid var(--fg);gap:2px;position:relative}
+:root:not([data-skin]) .tabs button{position:relative;z-index:1;font:700 13px var(--sans);color:var(--faint);padding:7px 10px 8px;border-bottom:0}
+:root:not([data-skin]) .tabs button[aria-selected="true"]{color:var(--surface);border-bottom:0}
+:root:not([data-skin]) .tabs:not(.has-ink) button[aria-selected="true"]{background:var(--fg)}
+:root:not([data-skin]) .tabs > .ink{position:absolute;z-index:0;pointer-events:none;background:var(--fg);border-radius:2px 2px 0 0}
+:root:not([data-skin]) .tabs > .ink::after{display:none}
+:root:not([data-skin]) .seg{position:relative;background:var(--surface-2);border-color:var(--line);border-radius:3px;padding:2px}
+:root:not([data-skin]) .seg button{position:relative;z-index:1}
+:root:not([data-skin]) .seg.has-ink button[aria-pressed="true"]{background:transparent;box-shadow:none;color:var(--surface)}
+:root:not([data-skin]) .seg > .ink{position:absolute;z-index:0;pointer-events:none;border-radius:2px;background:var(--fg)}
+:root:not([data-skin]) .tq{gap:0}
+:root:not([data-skin]) .tq li{border-radius:0;background:transparent;border-bottom:1px solid var(--line);padding:7px 2px}
+:root:not([data-skin]) .tq-t{font:600 14.5px var(--head)}
+:root:not([data-skin]) .pz-board .sq{transition:background .1s}
+
+/* the tab rail: today's classes as divider tabs, height by length, the live one pulled out; pick one to filter */
+.tabrail{display:none}
+:root:not([data-skin]) .tabrail:not([hidden]){display:flex;gap:4px;padding:0 22px 12px;overflow-x:auto}
+:root:not([data-skin]) .tabrail .tab{flex-basis:0;min-width:64px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;padding:6px 10px;border:0;cursor:pointer;
+  background:var(--cc,#7d776a);color:#fff;font:inherit;text-align:left;border-radius:3px 3px 0 0;box-shadow:inset 0 -3px 0 rgb(0 0 0 / .18);transform:translateY(5px);transition:transform .09s steps(2)}
+:root:not([data-skin]) .tabrail .tab b{font:700 13px/1.15 var(--narrow);letter-spacing:.06em;text-transform:uppercase}
+:root:not([data-skin]) .tabrail .tab small{font:500 11px/1.2 var(--mono);opacity:.85}
+:root:not([data-skin]) .tabrail .tab.past{filter:saturate(.35) brightness(.85)}
+:root:not([data-skin]) .tabrail .tab.now{transform:none;box-shadow:0 -3px 0 var(--on-board) inset,0 4px 10px -4px rgb(0 0 0 / .5)}
+:root:not([data-skin]) .tabrail .tab.now small::after{content:" · now"}
+:root:not([data-skin]) .tabrail .tab:not(:disabled):hover{transform:translateY(2px)}
+:root:not([data-skin]) .tabrail .tab.now:hover{transform:none}
+:root:not([data-skin]) .tabrail .tab.on{outline:2px solid var(--on-board);outline-offset:-4px}
+:root:not([data-skin]) .tabrail .tab:disabled{cursor:default;background:rgb(0 0 0 / .24)}
+@media (min-width:1180px){
+  /* fore edge: tabs hang down the right side of the binder */
+  :root:not([data-skin])[data-rail] body{padding-right:96px}
+  :root:not([data-skin])[data-rail] .dash{padding-right:0}
+  :root:not([data-skin])[data-rail] .bar{max-width:1560px;margin-inline:auto;padding-right:0}
+  :root:not([data-skin]) .tabrail:not([hidden]){position:fixed;z-index:6;top:0;bottom:0;width:96px;right:max(0px,calc((100vw - 96px - 1560px) / 2));flex-direction:column;gap:4px;padding:16px 0;overflow:visible}
+  :root:not([data-skin]) .tabrail .tab{flex-basis:0;min-height:44px;width:auto;margin-left:0;margin-right:12px;border-radius:0 6px 6px 0;transform:none;padding:6px 10px 6px 12px;box-shadow:inset 3px 0 0 rgb(0 0 0 / .15),2px 2px 0 rgb(0 0 0 / .18)}
+  :root:not([data-skin]) .tabrail .tab:not(:disabled):hover{margin-right:6px;transform:none}
+  :root:not([data-skin]) .tabrail .tab.now{margin-right:0;box-shadow:3px 3px 0 rgb(0 0 0 / .22)}
+  :root:not([data-skin]) .tabrail .tab.now small::after{content:"\A now";white-space:pre;font-weight:700}
+}
+/* a picked tab shows only that class's homework */
+:root:not([data-skin])[data-only="latin"] #agenda .item:not([data-c="latin"]),
+:root:not([data-skin])[data-only="eng"] #agenda .item:not([data-c="eng"]),
+:root:not([data-skin])[data-only="msi"] #agenda .item:not([data-c="msi"]),
+:root:not([data-skin])[data-only="fr"] #agenda .item:not([data-c="fr"]),
+:root:not([data-skin])[data-only="fgc"] #agenda .item:not([data-c="fgc"]),
+:root:not([data-skin])[data-only="arts"] #agenda .item:not([data-c="arts"]),
+:root:not([data-skin])[data-only="glee"] #agenda .item:not([data-c="glee"]),
+:root:not([data-skin])[data-only="health"] #agenda .item:not([data-c="health"]),
+:root:not([data-skin])[data-only="other"] #agenda .item:not([data-c="other"]){display:none}
+
+/* laptops: the page scrolls like a page; Homework left, the day right, and the rest as leaves packed into columns below
+   (app.js placeFeed moves them), so neither column runs on alone and the bottom row has no holes */
+@media (min-width:900px){
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr);grid-template-areas:"hw a" "lk a" "feed feed";grid-template-rows:auto 1fr auto;align-items:start}
+  :root:not([data-skin]) .dash > .dock{grid-area:lk}
+  :root:not([data-skin]) .dash > .dock .dock-main{grid-template-columns:repeat(7,minmax(0,1fr))}
+  :root:not([data-skin]) .dash > .dock .dock-classes{grid-template-columns:repeat(8,minmax(0,1fr))}
+  :root:not([data-skin]) .col-c{display:none}
+  :root:not([data-skin]) .feed{grid-area:feed;display:block;columns:330px auto;column-gap:18px}
+  /* inline boxes never split across columns; Safari otherwise spills a scrolling card into the next column */
+  :root:not([data-skin]) .feed > *{break-inside:avoid;margin:0 0 18px;width:100%;vertical-align:top}
+  :root:not([data-skin]) .feed > .panel:not([hidden]){display:inline-flex}
+  :root:not([data-skin]) .feed > .pane,:root:not([data-skin]) .feed > .pane[hidden]{display:inline-grid!important;align-content:start;gap:10px;min-width:0;max-height:640px;overflow:auto;scrollbar-width:thin}
+  :root:not([data-skin]) .p-more .tabs :is([data-tab-pane="sports"],[data-tab-pane="news"],[data-tab-pane="fantasy"],[data-tab-pane="count"]){display:none}
+}
+@media (min-width:1280px){
+  :root:not([data-skin]) body{height:auto;display:block}
+  :root:not([data-skin]) .dash{grid-template-columns:minmax(0,1.5fr) minmax(360px,1fr);max-width:1560px;flex:none}
+  :root:not([data-skin]) :is(.col,.p-hw){overflow:visible}
+  :root:not([data-skin]) .p-more .pane:not([hidden]){flex:none;overflow:visible}
+  :root:not([data-skin]) .p-week .rot-scroll{flex:none;display:block}
+  :root:not([data-skin]) .p-week .rot{height:auto}
+}
+.feed{display:none}
+:root:not([data-skin]) .sbc{display:none!important}
+
+/* phones */
+@media (max-width:759px){
+  :root:not([data-skin]) .tabbar{background:var(--surface);border-top:2px solid var(--fg)}
+  :root:not([data-skin]) .bar{padding:12px 14px}
+  :root:not([data-skin]) .tabrail:not([hidden]){padding:0 12px 10px}
+  :root:not([data-skin]) .dash{padding:6px 12px calc(88px + env(safe-area-inset-bottom,0px))}
+  :root:not([data-skin]) :is(.panel,#today){padding:14px 14px 14px 30px}
+  :root:not([data-skin]) :is(.panel,#today)::after{left:9px}
+  :root:not([data-skin]) .cell{padding:6px 5px 7px}
+  :root:not([data-skin]) .cell .cnt{font-size:11px;gap:0 3px}
+  :root:not([data-skin]) .cell .cnt b{font-size:17px}
+  :root:not([data-skin]) .cell .cnt i{display:none}
+  :root:not([data-skin]) .cell:has(.cnt i) .top b{text-decoration:underline 2px var(--bad);text-underline-offset:3px}
+  :root:not([data-skin]) .cell.off .offn{font-size:10.5px;line-height:1.25}
+}
+@media (max-width:559px){
+  :root:not([data-skin]) #today > :is(.wx,.nextup,.qline,.tw,.brk){padding:30px 0 12px}
+  :root:not([data-skin]) #today > *::before,:root:not([data-skin]) #today :is(.nu-k,.ql-k){top:12px}
+}
+@media (prefers-reduced-motion:reduce){ :root:not([data-skin]) *{transition:none!important;animation:none!important} }
+
+/* ===== study mode ===== */
+:root:not([data-skin]) #st-clock .num{font-family:var(--head);font-weight:800;letter-spacing:-.025em}
+:root:not([data-skin]) #st-clock::before{display:none}
+/* over a painted room every card turns to dark glass so the scene (and its lights) shows through */
+:root:not([data-skin]) .study.has-scene :is(.st-card,.st-mo,.st-x),
+:root:not([data-skin]).studying:has(.study.has-scene:not([hidden])) .p-music{
+  --fg:#f1eadf; --muted:rgb(241 234 223 / .7); --faint:rgb(241 234 223 / .52); --done:rgb(241 234 223 / .45);
+  --surface:rgb(255 255 255 / .07); --surface-2:rgb(255 255 255 / .05); --line:rgb(255 255 255 / .14);
+  --accent-soft:rgb(255 255 255 / .08);
+  color:var(--fg);background:rgb(13 15 26 / .5);background-image:none;border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(16px) saturate(1.25);backdrop-filter:blur(16px) saturate(1.25);box-shadow:0 22px 44px -22px rgb(0 0 0 / .7)}
+:root:not([data-skin]) .study.has-scene :is(.st-card,.st-mo,.st-x)::after,:root:not([data-skin]).studying .p-music::after{display:none}
+:root:not([data-skin]) .study.has-scene .st-card{border-radius:14px}
+:root:not([data-skin]) .study.has-scene #st-clock{background:rgb(13 15 26 / .34);padding:26px 30px;-webkit-backdrop-filter:blur(7px) saturate(1.2);backdrop-filter:blur(7px) saturate(1.2)}
+:root:not([data-skin]) .study.has-scene #st-clock .prog{background:rgb(255 255 255 / .12)}
+:root:not([data-skin]) .study.has-scene #st-clock .prog i{background:var(--fg)}
+:root:not([data-skin]) .study.has-scene .st-queue button:hover{background:rgb(255 255 255 / .12)}
+:root:not([data-skin]) .study.has-scene .st-check{background:transparent}
+:root:not([data-skin]) .study.has-scene .chip{color:#fff}
+:root:not([data-skin]).studying:has(.study.has-scene:not([hidden])) .p-music{border-radius:14px}
+:root:not([data-skin]) .study.has-scene #st-clock :is(.num,.lbl){color:var(--fg)}
+:root:not([data-skin])[data-only] .agenda-h::after{content:"Filtered to one class · click its tab again to show all";grid-column:1/-1;font:600 12px var(--sans);order:3;width:100%;color:var(--fg)}
+:root:not([data-skin]) .agenda-h{flex-wrap:wrap}
+
+/* chess: the dark squares are cut from the board's cloth, so the puzzle changes colour with the class too */
+:root:not([data-skin]) .pz-board{border-radius:2px;box-shadow:0 0 0 2px var(--fg)}
+:root:not([data-skin]) .pz-board .lt{background:#efe8d6}
+:root:not([data-skin]) .pz-board .dk{background:color-mix(in srgb,var(--board) 62%,#d8cfb8)}
+:root:not([data-skin]) .pz-board .lt em{color:color-mix(in srgb,var(--board) 70%,#000)}
+:root:not([data-skin]) .pz-board .sel{box-shadow:inset 0 0 0 3px var(--fg),inset 0 0 0 100px rgb(0 0 0 / .1)}
+:root:not([data-skin]) .pz-board .last{box-shadow:inset 0 0 0 100px color-mix(in srgb,var(--board) 30%,transparent),inset 0 0 0 2px color-mix(in srgb,var(--board) 70%,#000)}
+
+/* fantasy: moves are ruled rows led by their own headline; the type folds in front of it, no boxes or kicker lines */
+:root:not([data-skin]) :is(.sub-h,.lunch-k){font:700 12px var(--narrow);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+:root:not([data-skin]) .moves{gap:0}
+:root:not([data-skin]) .moves li{display:block;background:none;border-radius:0;padding:9px 0;border-bottom:1px solid var(--line);font:600 13.5px/1.4 var(--sans)}
+:root:not([data-skin]) .moves li:last-child{border-bottom:0}
+:root:not([data-skin]) .moves .by{display:inline;font:700 11px var(--narrow);letter-spacing:.04em;color:#fff;background:var(--cc);padding:1px 5px;border-radius:1px;margin-right:6px;vertical-align:1px}
+:root:not([data-skin]) .moves .by i{color:inherit}
+:root:not([data-skin]) .moves .why{display:block;margin-top:3px;font-weight:400}
+:root:not([data-skin]) .ff-match{background:none;border:0;border-top:2px solid var(--fg);border-bottom:1px solid var(--line);border-radius:0;box-shadow:none}
+
+/* phones: the date gets its own line rather than an ellipsis */
+@media (max-width:559px){
+  :root:not([data-skin]) .bar{flex-wrap:wrap}
+  :root:not([data-skin]) .bar-day{flex:1 1 100%}
+  :root:not([data-skin]) .bar-date{white-space:normal;overflow:visible;font-size:20px}
+  :root:not([data-skin]) .bar{position:relative;row-gap:10px}
+  :root:not([data-skin]) .bar-status{order:3;flex:1 1 100%;min-width:0;overflow:hidden}
+  :root:not([data-skin]) .bar-status .pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  :root:not([data-skin]) .bar-actions{order:2}
+}

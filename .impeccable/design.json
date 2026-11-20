@@ -1,0 +1,1121 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-19T00:14:44+00:00",
+  "title": "Design System: Brian's RL Planner",
+  "extensions": {
+    "colorMeta": {
+      "board-latin": {
+        "role": "primary",
+        "displayName": "Board Latin",
+        "canonical": "#77612b",
+        "tonalRamp": [
+          "#120a00",
+          "#2f2304",
+          "#504018",
+          "#735f2e",
+          "#95804f",
+          "#b5a379",
+          "#d7c8a5",
+          "#f9eed2"
+        ]
+      },
+      "board-eng": {
+        "role": "primary",
+        "displayName": "Board Eng",
+        "canonical": "#2b4f7c",
+        "tonalRamp": [
+          "#010b1c",
+          "#11263f",
+          "#284365",
+          "#41638e",
+          "#6185b2",
+          "#89a8cf",
+          "#b2cced",
+          "#dcf1ff"
+        ]
+      },
+      "board-msi": {
+        "role": "primary",
+        "displayName": "Board Msi",
+        "canonical": "#2b6650",
+        "tonalRamp": [
+          "#001008",
+          "#092c20",
+          "#204c3b",
+          "#386d59",
+          "#5a8f79",
+          "#84b19d",
+          "#aed3c2",
+          "#d9f7e9"
+        ]
+      },
+      "board-fr": {
+        "role": "primary",
+        "displayName": "Board Fr",
+        "canonical": "#55407e",
+        "tonalRamp": [
+          "#0e061d",
+          "#291d40",
+          "#473867",
+          "#685590",
+          "#8976b4",
+          "#aa9bd1",
+          "#cdc1ef",
+          "#f2e8ff"
+        ]
+      },
+      "board-fgc": {
+        "role": "primary",
+        "displayName": "Board Fgc",
+        "canonical": "#86472a",
+        "tonalRamp": [
+          "#1a0400",
+          "#3d1a09",
+          "#62341e",
+          "#8b5035",
+          "#af7155",
+          "#ce967f",
+          "#ecbda9",
+          "#ffe5d5"
+        ]
+      },
+      "board-arts": {
+        "role": "primary",
+        "displayName": "Board Arts",
+        "canonical": "#7a3960",
+        "tonalRamp": [
+          "#190210",
+          "#3b162c",
+          "#5f2f4c",
+          "#87496d",
+          "#ab6a8f",
+          "#ca91b0",
+          "#eab9d3",
+          "#ffe2f6"
+        ]
+      },
+      "board-glee": {
+        "role": "primary",
+        "displayName": "Board Glee",
+        "canonical": "#21676c",
+        "tonalRamp": [
+          "#000f11",
+          "#022b2e",
+          "#174a4e",
+          "#2e6c70",
+          "#518e92",
+          "#7dafb3",
+          "#a9d2d5",
+          "#d6f6f8"
+        ]
+      },
+      "board-health": {
+        "role": "primary",
+        "displayName": "Board Health",
+        "canonical": "#5b6526",
+        "tonalRamp": [
+          "#0a0d00",
+          "#232804",
+          "#3f4718",
+          "#5e672e",
+          "#7e894f",
+          "#a1ab7a",
+          "#c6cfa6",
+          "#ecf3d3"
+        ]
+      },
+      "board-slate": {
+        "role": "primary",
+        "displayName": "Board Slate",
+        "canonical": "#3b4250",
+        "tonalRamp": [
+          "#090b11",
+          "#21252d",
+          "#3d424d",
+          "#5a616f",
+          "#7b8391",
+          "#9fa5b2",
+          "#c4c9d4",
+          "#eaeff7"
+        ]
+      },
+      "board-latin-dark": {
+        "role": "primary",
+        "displayName": "Board Latin Dark",
+        "canonical": "#3d3219",
+        "tonalRamp": [
+          "#0f0b03",
+          "#2b2416",
+          "#4a412e",
+          "#6b6048",
+          "#8d8168",
+          "#aea48e",
+          "#d1c8b6",
+          "#f5eedf"
+        ]
+      },
+      "board-eng-dark": {
+        "role": "primary",
+        "displayName": "Board Eng Dark",
+        "canonical": "#192c45",
+        "tonalRamp": [
+          "#050b16",
+          "#1a2635",
+          "#334358",
+          "#4f637d",
+          "#6f84a0",
+          "#95a7bf",
+          "#bbcbdf",
+          "#e3f0ff"
+        ]
+      },
+      "board-msi-dark": {
+        "role": "primary",
+        "displayName": "Board Msi Dark",
+        "canonical": "#173628",
+        "tonalRamp": [
+          "#030e08",
+          "#182a21",
+          "#31483c",
+          "#4b695a",
+          "#6c8b7b",
+          "#92ac9e",
+          "#b9cfc4",
+          "#e2f3ea"
+        ]
+      },
+      "board-fr-dark": {
+        "role": "primary",
+        "displayName": "Board Fr Dark",
+        "canonical": "#2b2143",
+        "tonalRamp": [
+          "#0c0816",
+          "#272136",
+          "#443d59",
+          "#645b7f",
+          "#857ca1",
+          "#a79fc1",
+          "#cbc5e1",
+          "#f0ebff"
+        ]
+      },
+      "board-fgc-dark": {
+        "role": "primary",
+        "displayName": "Board Fgc Dark",
+        "canonical": "#45261a",
+        "tonalRamp": [
+          "#140804",
+          "#332018",
+          "#553b31",
+          "#79584c",
+          "#9c796c",
+          "#bc9d92",
+          "#ddc3b9",
+          "#fee9e2"
+        ]
+      },
+      "board-arts-dark": {
+        "role": "primary",
+        "displayName": "Board Arts Dark",
+        "canonical": "#3f1d31",
+        "tonalRamp": [
+          "#14060e",
+          "#321d29",
+          "#543848",
+          "#795468",
+          "#9c758a",
+          "#bc9aac",
+          "#ddc0cf",
+          "#fee7f3"
+        ]
+      },
+      "board-glee-dark": {
+        "role": "primary",
+        "displayName": "Board Glee Dark",
+        "canonical": "#123638",
+        "tonalRamp": [
+          "#020e0e",
+          "#15292a",
+          "#2d4749",
+          "#47686a",
+          "#688a8b",
+          "#8eabad",
+          "#b7cfd0",
+          "#e0f3f4"
+        ]
+      },
+      "board-health-dark": {
+        "role": "primary",
+        "displayName": "Board Health Dark",
+        "canonical": "#2f3516",
+        "tonalRamp": [
+          "#0a0d03",
+          "#232715",
+          "#40452d",
+          "#5e6547",
+          "#7f8767",
+          "#a2a98d",
+          "#c7ccb5",
+          "#ecf1df"
+        ]
+      },
+      "board-slate-dark": {
+        "role": "primary",
+        "displayName": "Board Slate Dark",
+        "canonical": "#22262e",
+        "tonalRamp": [
+          "#090b0f",
+          "#23252a",
+          "#3f4249",
+          "#5d616a",
+          "#7e828c",
+          "#a1a5ad",
+          "#c6c9d0",
+          "#eceef4"
+        ]
+      },
+      "on-board": {
+        "role": "neutral",
+        "displayName": "On Board",
+        "canonical": "#f6f2e7",
+        "tonalRamp": [
+          "#0c0b08",
+          "#272520",
+          "#44423b",
+          "#646158",
+          "#858279",
+          "#a8a59d",
+          "#cbc9c2",
+          "#f0eee9"
+        ]
+      },
+      "leaf": {
+        "role": "neutral",
+        "displayName": "Leaf",
+        "canonical": "#fbf8ef",
+        "tonalRamp": [
+          "#0c0b08",
+          "#262521",
+          "#44423c",
+          "#63615a",
+          "#85827b",
+          "#a7a59e",
+          "#cbc9c3",
+          "#f0eeea"
+        ]
+      },
+      "leaf-2": {
+        "role": "neutral",
+        "displayName": "Leaf 2",
+        "canonical": "#f2eee2",
+        "tonalRamp": [
+          "#0c0b08",
+          "#27251f",
+          "#44423a",
+          "#646158",
+          "#868278",
+          "#a8a59c",
+          "#cbc9c2",
+          "#f0eee8"
+        ]
+      },
+      "leaf-rule": {
+        "role": "neutral",
+        "displayName": "Leaf Rule",
+        "canonical": "#ddd6c4",
+        "tonalRamp": [
+          "#0d0b06",
+          "#28251c",
+          "#464236",
+          "#676152",
+          "#888273",
+          "#aaa597",
+          "#cdc9be",
+          "#f2eee5"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#1b1a17",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262523",
+          "#43423f",
+          "#62615e",
+          "#83827f",
+          "#a6a5a2",
+          "#cac9c6",
+          "#efeeec"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "#4f4b42",
+        "tonalRamp": [
+          "#0d0b08",
+          "#272520",
+          "#45423b",
+          "#656158",
+          "#868279",
+          "#a8a59d",
+          "#ccc9c2",
+          "#f1eee9"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Ink Faint",
+        "canonical": "#6f6a5e",
+        "tonalRamp": [
+          "#0d0b07",
+          "#27251e",
+          "#454239",
+          "#656156",
+          "#878276",
+          "#a9a59b",
+          "#ccc9c0",
+          "#f1eee7"
+        ]
+      },
+      "ink-done": {
+        "role": "neutral",
+        "displayName": "Ink Done",
+        "canonical": "#8f897b",
+        "tonalRamp": [
+          "#0d0b06",
+          "#28251e",
+          "#464238",
+          "#666155",
+          "#878275",
+          "#a9a599",
+          "#cdc9bf",
+          "#f1eee7"
+        ]
+      },
+      "leaf-dark": {
+        "role": "neutral",
+        "displayName": "Leaf Dark",
+        "canonical": "#1f1e1b",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262523",
+          "#43423f",
+          "#62615e",
+          "#83827f",
+          "#a6a5a2",
+          "#cac9c6",
+          "#efeeec"
+        ]
+      },
+      "leaf-2-dark": {
+        "role": "neutral",
+        "displayName": "Leaf 2 Dark",
+        "canonical": "#282723",
+        "tonalRamp": [
+          "#0c0b09",
+          "#262523",
+          "#43423f",
+          "#62615d",
+          "#83827e",
+          "#a6a5a1",
+          "#cac9c6",
+          "#efeeec"
+        ]
+      },
+      "leaf-rule-dark": {
+        "role": "neutral",
+        "displayName": "Leaf Rule Dark",
+        "canonical": "#3a3832",
+        "tonalRamp": [
+          "#0c0b09",
+          "#262521",
+          "#43423d",
+          "#63615b",
+          "#84827c",
+          "#a7a59f",
+          "#cbc9c4",
+          "#f0eeeb"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Ink Dark",
+        "canonical": "#efe9db",
+        "tonalRamp": [
+          "#0d0b07",
+          "#28251e",
+          "#454239",
+          "#666156",
+          "#878276",
+          "#a9a59a",
+          "#ccc9c0",
+          "#f1eee7"
+        ]
+      },
+      "ink-muted-dark": {
+        "role": "neutral",
+        "displayName": "Ink Muted Dark",
+        "canonical": "#c5bfaf",
+        "tonalRamp": [
+          "#0d0b06",
+          "#28251d",
+          "#464237",
+          "#666154",
+          "#878274",
+          "#a9a599",
+          "#cdc9bf",
+          "#f1eee6"
+        ]
+      },
+      "ink-faint-dark": {
+        "role": "neutral",
+        "displayName": "Ink Faint Dark",
+        "canonical": "#9d9789",
+        "tonalRamp": [
+          "#0d0b07",
+          "#28251e",
+          "#464238",
+          "#666155",
+          "#878275",
+          "#a9a59a",
+          "#cdc9bf",
+          "#f1eee7"
+        ]
+      },
+      "plate": {
+        "role": "neutral",
+        "displayName": "Plate",
+        "canonical": "#1b1a17",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262523",
+          "#43423f",
+          "#62615e",
+          "#83827f",
+          "#a6a5a2",
+          "#cac9c6",
+          "#efeeec"
+        ]
+      },
+      "plate-dark": {
+        "role": "neutral",
+        "displayName": "Plate Dark",
+        "canonical": "#0f0e0c",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262523",
+          "#434240",
+          "#62615f",
+          "#838280",
+          "#a6a5a3",
+          "#cac9c7",
+          "#efeeed"
+        ]
+      },
+      "plate-sub": {
+        "role": "neutral",
+        "displayName": "Plate Sub",
+        "canonical": "#c9c3b3",
+        "tonalRamp": [
+          "#0d0b06",
+          "#28251d",
+          "#464237",
+          "#666154",
+          "#878274",
+          "#a9a599",
+          "#cdc9bf",
+          "#f1eee6"
+        ]
+      },
+      "errata": {
+        "role": "tertiary",
+        "displayName": "Errata",
+        "canonical": "#c8321f",
+        "tonalRamp": [
+          "#270000",
+          "#510000",
+          "#7e0b00",
+          "#af2615",
+          "#d74e3b",
+          "#f37e6a",
+          "#ffab99",
+          "#ffd8c9"
+        ]
+      },
+      "errata-soft": {
+        "role": "tertiary",
+        "displayName": "Errata Soft",
+        "canonical": "#f7e2dc",
+        "tonalRamp": [
+          "#100908",
+          "#2c2320",
+          "#4c3f3b",
+          "#6d5d58",
+          "#8f7e79",
+          "#b1a19d",
+          "#d3c6c2",
+          "#f6ece9"
+        ]
+      },
+      "errata-dark": {
+        "role": "tertiary",
+        "displayName": "Errata Dark",
+        "canonical": "#f07b62",
+        "tonalRamp": [
+          "#220000",
+          "#490a01",
+          "#732212",
+          "#a13c27",
+          "#c75f49",
+          "#e48974",
+          "#ffb3a1",
+          "#ffdecf"
+        ]
+      },
+      "tab-latin": {
+        "role": "secondary",
+        "displayName": "Tab Latin",
+        "canonical": "#8a5a00",
+        "tonalRamp": [
+          "#180600",
+          "#381e00",
+          "#5c3900",
+          "#83570c",
+          "#a67837",
+          "#c59d68",
+          "#e5c398",
+          "#ffeac8"
+        ]
+      },
+      "tab-eng": {
+        "role": "secondary",
+        "displayName": "Tab Eng",
+        "canonical": "#1f5fa8",
+        "tonalRamp": [
+          "#000925",
+          "#00244d",
+          "#134278",
+          "#2962a5",
+          "#4b84cb",
+          "#77a8e5",
+          "#a4ccff",
+          "#d1f2ff"
+        ]
+      },
+      "tab-msi": {
+        "role": "secondary",
+        "displayName": "Tab Msi",
+        "canonical": "#2c7a4b",
+        "tonalRamp": [
+          "#001102",
+          "#002e15",
+          "#144e2c",
+          "#2b7146",
+          "#4e9466",
+          "#7bb58d",
+          "#a8d7b5",
+          "#d5f9df"
+        ]
+      },
+      "tab-fr": {
+        "role": "secondary",
+        "displayName": "Tab Fr",
+        "canonical": "#5b3fa6",
+        "tonalRamp": [
+          "#0e0128",
+          "#281751",
+          "#45317d",
+          "#644dac",
+          "#856fd2",
+          "#a696ec",
+          "#c9beff",
+          "#eee6ff"
+        ]
+      },
+      "tab-fgc": {
+        "role": "secondary",
+        "displayName": "Tab Fgc",
+        "canonical": "#b4471a",
+        "tonalRamp": [
+          "#220000",
+          "#490b00",
+          "#732400",
+          "#a03d14",
+          "#c7603a",
+          "#e48a6a",
+          "#ffb499",
+          "#ffdfc9"
+        ]
+      },
+      "tab-arts": {
+        "role": "secondary",
+        "displayName": "Tab Arts",
+        "canonical": "#a2357a",
+        "tonalRamp": [
+          "#1f0012",
+          "#440630",
+          "#6d1d51",
+          "#993574",
+          "#bf5896",
+          "#dd83b6",
+          "#faaed8",
+          "#ffdafa"
+        ]
+      },
+      "tab-glee": {
+        "role": "secondary",
+        "displayName": "Tab Glee",
+        "canonical": "#0f7c84",
+        "tonalRamp": [
+          "#001013",
+          "#002d31",
+          "#004c52",
+          "#0a6e76",
+          "#3b9198",
+          "#6fb2b8",
+          "#9ed5d9",
+          "#cef8fb"
+        ]
+      },
+      "tab-health": {
+        "role": "secondary",
+        "displayName": "Tab Health",
+        "canonical": "#6b7a1f",
+        "tonalRamp": [
+          "#090e00",
+          "#222900",
+          "#3e4800",
+          "#5c6914",
+          "#7c8b3c",
+          "#9fad6c",
+          "#c4d09b",
+          "#eaf4ca"
+        ]
+      },
+      "tab-other": {
+        "role": "secondary",
+        "displayName": "Tab Other",
+        "canonical": "#5f6b73",
+        "tonalRamp": [
+          "#080c0f",
+          "#20262a",
+          "#3b4349",
+          "#58636a",
+          "#79848c",
+          "#9da7ad",
+          "#c2cbd0",
+          "#e9f0f4"
+        ]
+      },
+      "tab-latin-dark": {
+        "role": "secondary",
+        "displayName": "Tab Latin Dark",
+        "canonical": "#e0b25a",
+        "tonalRamp": [
+          "#170700",
+          "#372000",
+          "#5a3b00",
+          "#805900",
+          "#a37b27",
+          "#c29f5f",
+          "#e2c591",
+          "#ffebc3"
+        ]
+      },
+      "tab-eng-dark": {
+        "role": "secondary",
+        "displayName": "Tab Eng Dark",
+        "canonical": "#7fb2ee",
+        "tonalRamp": [
+          "#000b1f",
+          "#0a2644",
+          "#20436b",
+          "#376396",
+          "#5885ba",
+          "#81a8d7",
+          "#acccf3",
+          "#d7f1ff"
+        ]
+      },
+      "tab-msi-dark": {
+        "role": "secondary",
+        "displayName": "Tab Msi Dark",
+        "canonical": "#79cf9b",
+        "tonalRamp": [
+          "#001103",
+          "#002f15",
+          "#064f2d",
+          "#207247",
+          "#469568",
+          "#76b68e",
+          "#a4d8b6",
+          "#d2fadf"
+        ]
+      },
+      "tab-fr-dark": {
+        "role": "secondary",
+        "displayName": "Tab Fr Dark",
+        "canonical": "#b7a2f0",
+        "tonalRamp": [
+          "#0e051f",
+          "#291c43",
+          "#47376b",
+          "#675395",
+          "#8875b9",
+          "#aa9ad6",
+          "#cdc0f3",
+          "#f1e8ff"
+        ]
+      },
+      "tab-fgc-dark": {
+        "role": "secondary",
+        "displayName": "Tab Fgc Dark",
+        "canonical": "#f0925f",
+        "tonalRamp": [
+          "#1f0100",
+          "#431400",
+          "#6c2d00",
+          "#974714",
+          "#bc693b",
+          "#da916b",
+          "#f7b999",
+          "#ffe2c9"
+        ]
+      },
+      "tab-arts-dark": {
+        "role": "secondary",
+        "displayName": "Tab Arts Dark",
+        "canonical": "#e98bc6",
+        "tonalRamp": [
+          "#1c0012",
+          "#3f0f30",
+          "#662751",
+          "#8f4074",
+          "#b46296",
+          "#d38ab7",
+          "#f1b3d8",
+          "#ffdefb"
+        ]
+      },
+      "tab-glee-dark": {
+        "role": "secondary",
+        "displayName": "Tab Glee Dark",
+        "canonical": "#6fd0d6",
+        "tonalRamp": [
+          "#001013",
+          "#002d31",
+          "#004d51",
+          "#006f75",
+          "#369297",
+          "#6cb3b7",
+          "#9cd5d9",
+          "#ccf8fb"
+        ]
+      },
+      "tab-health-dark": {
+        "role": "secondary",
+        "displayName": "Tab Health Dark",
+        "canonical": "#c3d36a",
+        "tonalRamp": [
+          "#0a0d00",
+          "#232900",
+          "#3f4800",
+          "#5e6900",
+          "#7e8b28",
+          "#a1ad60",
+          "#c5d192",
+          "#ebf5c4"
+        ]
+      },
+      "tab-other-dark": {
+        "role": "secondary",
+        "displayName": "Tab Other Dark",
+        "canonical": "#a9b4bb",
+        "tonalRamp": [
+          "#080c0e",
+          "#202629",
+          "#3c4348",
+          "#5a6369",
+          "#7a848a",
+          "#9ea6ac",
+          "#c3cacf",
+          "#eaeff3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The date on the board; day letter at 24px."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Now-plate countdown; tabular heavy Archivo."
+      },
+      "headline": {
+        "displayName": "Section Head",
+        "purpose": "Leaf heads in Archivo Narrow caps."
+      },
+      "title": {
+        "displayName": "Item Title",
+        "purpose": "Checklist item titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Leaf text."
+      },
+      "label": {
+        "displayName": "Tab Label",
+        "purpose": "Tab-rail labels in Narrow caps."
+      },
+      "label-sm": {
+        "displayName": "Small Label",
+        "purpose": "Chips, tags, weekday heads, Today row labels."
+      },
+      "mono": {
+        "displayName": "Clock Mono",
+        "purpose": "Times only."
+      }
+    },
+    "board": {
+      "texture": "assets/cloth.png",
+      "size": "128px",
+      "blend": "soft-light",
+      "selector": "html[data-sect]",
+      "subjects": [
+        "latin",
+        "eng",
+        "msi",
+        "fr",
+        "fgc",
+        "arts",
+        "glee",
+        "health",
+        "other",
+        "off"
+      ],
+      "note": "other and off both map to slate."
+    },
+    "shadows": [
+      {
+        "name": "leaf",
+        "value": "3px 3px 0 rgb(0 0 0 / .2),0 10px 24px -14px rgb(0 0 0 / .45)",
+        "purpose": "Every leaf and the game-night strip: paper thickness on the cut side plus ambient fall-off."
+      },
+      {
+        "name": "leaf-dark",
+        "value": "3px 3px 0 rgb(0 0 0 / .35),0 12px 26px -14px rgb(0 0 0 / .7)",
+        "purpose": "Leaf in dark mode."
+      },
+      {
+        "name": "tab-fore-edge",
+        "value": "inset 3px 0 0 rgb(0 0 0 / .15),2px 2px 0 rgb(0 0 0 / .18)",
+        "purpose": "Resting tabs on the >=1180px rail."
+      },
+      {
+        "name": "tab-fore-edge-live",
+        "value": "3px 3px 0 rgb(0 0 0 / .22)",
+        "purpose": "The extended live tab."
+      },
+      {
+        "name": "tab-strip",
+        "value": "inset 0 -3px 0 rgb(0 0 0 / .18)",
+        "purpose": "Resting tabs in the top strip."
+      },
+      {
+        "name": "tab-strip-live",
+        "value": "0 -3px 0 #f6f2e7 inset,0 4px 10px -4px rgb(0 0 0 / .5)",
+        "purpose": "Live tab in the top strip."
+      },
+      {
+        "name": "on-board-lift",
+        "value": "0 1px 2px rgb(0 0 0 / .18),0 6px 14px -8px rgb(0 0 0 / .45)",
+        "purpose": "Link tabs, day letter and the bar's primary button; soft, never hard."
+      },
+      {
+        "name": "hole",
+        "value": "inset 2px 2px 3px rgb(0 0 0 / .5)",
+        "purpose": "Punch holes and the punched check box."
+      }
+    ],
+    "motion": [
+      {
+        "name": "step",
+        "value": "90ms steps(2)",
+        "purpose": "Default for the world's own motion: button press, link-tab lift, top-strip tab movement."
+      },
+      {
+        "name": "board-fade",
+        "value": "background-color 600ms ease-out",
+        "purpose": "Board changes cloth at a bell; the only eased transition; active only once html[data-sect-ready] is set (two frames after first paint)."
+      },
+      {
+        "name": "punch",
+        "value": "420ms linear(0, .32 12%, .78 26%, 1.08 40%, 1.12 48%, 1.04 62%, .99 78%, 1)",
+        "purpose": "Check-off spring scale from .55; the one sanctioned bounce."
+      },
+      {
+        "name": "strike",
+        "value": "background-size 180ms steps(3)",
+        "purpose": "Checked title strikes in place."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "prefers-reduced-motion removes all transitions and animations."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone-narrow",
+        "value": "559px"
+      },
+      {
+        "name": "phone",
+        "value": "759px"
+      },
+      {
+        "name": "two-column",
+        "value": "900px"
+      },
+      {
+        "name": "fore-edge-rail",
+        "value": "1180px"
+      },
+      {
+        "name": "wide",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Leaf",
+      "kind": "card",
+      "refersTo": "leaf",
+      "description": "Milk-white punched leaf on the cloth board; every work area is one.",
+      "html": "<div class=\"ds-board\"><section class=\"ds-leaf\"><h2 class=\"ds-h\">Homework</h2><p>Latin: translate lines 40 to 60.</p><p>English: read chapter 4.</p></section></div>",
+      "css": ".ds-board{background:#2b6650;padding:22px;font:14.5px/1.5 Archivo,system-ui,sans-serif}.ds-leaf{position:relative;background:#fbf8ef;color:#1b1a17;border-radius:3px;padding:16px 18px 16px 34px;box-shadow:3px 3px 0 rgb(0 0 0 / .2),0 10px 24px -14px rgb(0 0 0 / .45)}.ds-leaf::before,.ds-leaf::after{content:'';position:absolute;left:10px;top:54px;width:14px;height:14px;border-radius:50%;background:#2b6650;box-shadow:inset 2px 2px 3px rgb(0 0 0 / .5),0 0 0 2px #f2eee2,0 0 0 3px #ddd6c4}.ds-leaf::after{top:122px}.ds-h{margin:0 0 8px;font:700 16px/1.2 'Archivo Narrow',Archivo,sans-serif;letter-spacing:.06em;text-transform:uppercase}"
+    },
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Leaf-white with a 1.5px ink rule; steps on press.",
+      "html": "<button class=\"ds-btn\">Study</button>",
+      "css": ".ds-btn{border-radius:4px;background:#fbf8ef;border:1.5px solid #1b1a17;color:#1b1a17;font:700 14px Archivo,system-ui,sans-serif;padding:7px 14px;cursor:pointer;transition:transform .09s steps(2)}.ds-btn:hover{background:#f2eee2}.ds-btn:active{transform:translate(1px,1px)}.ds-btn:focus-visible{outline:2px solid #1b1a17;outline-offset:2px}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid ink; the main action on a leaf.",
+      "html": "<button class=\"ds-btn-primary\">Add</button>",
+      "css": ".ds-btn-primary{border-radius:4px;background:#1b1a17;border:1.5px solid #1b1a17;color:#fbf8ef;font:700 14px Archivo,system-ui,sans-serif;padding:7px 14px;cursor:pointer;transition:transform .09s steps(2)}.ds-btn-primary:active{transform:translate(1px,1px)}.ds-btn-primary:focus-visible{outline:2px solid #1b1a17;outline-offset:2px}"
+    },
+    {
+      "name": "Subject Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Solid tab hue, white narrow caps, like a coloured tab edge.",
+      "html": "<span class=\"ds-chip\" style=\"background:#1f5fa8\">English</span> <span class=\"ds-chip\" style=\"background:#8a5a00\">Latin</span>",
+      "css": ".ds-chip{display:inline-block;font:700 11px/1.5 'Archivo Narrow',Archivo,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#fff;padding:0 6px;border-radius:2px}"
+    },
+    {
+      "name": "Now-Plate",
+      "kind": "custom",
+      "refersTo": "now-plate",
+      "description": "Solid black plate with class, big countdown and a progress bar in the class hue.",
+      "html": "<div class=\"ds-plate\"><div class=\"ds-plate-row\"><span class=\"ds-lbl\">English · Rm 204</span><span class=\"ds-num\">23:41</span></div><div class=\"ds-sub\">ends 10:45 · then <b>MSI</b></div><div class=\"ds-prog\"><i style=\"width:48%\"></i></div></div>",
+      "css": ".ds-plate{background:#1b1a17;color:#f6f2e7;border-radius:2px;padding:14px 16px;display:grid;gap:6px;font-family:Archivo,system-ui,sans-serif}.ds-plate-row{display:flex;justify-content:space-between;align-items:baseline}.ds-lbl{font:700 15px/1.25 Archivo,sans-serif}.ds-num{font:800 46px/.95 Archivo,sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.ds-sub{font-size:13px;color:#c9c3b3}.ds-sub b{color:#f6f2e7}.ds-prog{height:6px;background:rgb(255 255 255 / .14)}.ds-prog i{display:block;height:100%;background:#1f5fa8}"
+    },
+    {
+      "name": "Tab Rail",
+      "kind": "nav",
+      "refersTo": "tab",
+      "description": "Today's classes as fore-edge divider tabs, height by length; the live one is pulled out.",
+      "html": "<div class=\"ds-rail\"><button class=\"ds-tab ds-past\" style=\"background:#8a5a00;flex:45\">Latin<small>8:00</small></button><button class=\"ds-tab ds-now\" style=\"background:#1f5fa8;flex:45\">English<small>9:00 now</small></button><button class=\"ds-tab\" style=\"background:#2c7a4b;flex:45\">MSI<small>10:50</small></button><button class=\"ds-tab\" disabled style=\"flex:30\">Lunch<small>12:00</small></button></div>",
+      "css": ".ds-rail{display:flex;flex-direction:column;gap:4px;width:96px;height:300px;padding:16px 0;background:#2b4f7c;margin-left:auto}.ds-tab{flex-basis:0;min-height:44px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;margin-right:12px;padding:6px 10px 6px 12px;border:0;border-radius:0 6px 6px 0;color:#fff;text-align:left;cursor:pointer;font:700 13px/1.15 'Archivo Narrow',Archivo,sans-serif;letter-spacing:.06em;text-transform:uppercase;box-shadow:inset 3px 0 0 rgb(0 0 0 / .15),2px 2px 0 rgb(0 0 0 / .18)}.ds-tab small{font:500 11px/1.2 'IBM Plex Mono',monospace;letter-spacing:0;text-transform:none;opacity:.85}.ds-tab:not(:disabled):hover{margin-right:6px}.ds-tab:focus-visible{outline:2px solid #f6f2e7;outline-offset:-4px}.ds-now{margin-right:0;box-shadow:3px 3px 0 rgb(0 0 0 / .22)}.ds-now:hover{margin-right:0}.ds-past{filter:saturate(.35) brightness(.85)}.ds-tab:disabled{background:rgb(0 0 0 / .24);cursor:default}"
+    },
+    {
+      "name": "Check-off Punch",
+      "kind": "input",
+      "refersTo": "check",
+      "description": "Checking punches the box into a hole showing the board; the row strikes in place.",
+      "html": "<label class=\"ds-row\"><input type=\"checkbox\" class=\"ds-check\"><span class=\"ds-title\">French: vocab quiz</span></label><label class=\"ds-row\"><input type=\"checkbox\" class=\"ds-check\" checked><span class=\"ds-title\">MSI: lab write-up</span></label>",
+      "css": ".ds-row{display:flex;gap:14px;align-items:center;padding:11px 2px;border-bottom:1px solid #ddd6c4;background:#fbf8ef;font:600 15.5px/1.3 Archivo,sans-serif;color:#1b1a17}.ds-check{appearance:none;margin:0;width:20px;height:20px;border:2px solid #1b1a17;border-radius:2px;background:#fbf8ef;cursor:pointer;transition:border-radius .12s steps(2)}.ds-check:hover{border-color:#5b3fa6}.ds-check:focus-visible{outline:2px solid #1b1a17;outline-offset:2px}.ds-check:checked{border-radius:50%;border-color:transparent;background:#2b6650;box-shadow:inset 2px 2px 3px rgb(0 0 0 / .5);animation:ds-punch .42s linear(0,.32 12%,.78 26%,1.08 40%,1.12 48%,1.04 62%,.99 78%,1)}.ds-title{background:linear-gradient(#1b1a17,#1b1a17) 0 58%/0% 1.5px no-repeat;transition:background-size .18s steps(3)}.ds-check:checked+.ds-title{background-size:100% 1.5px;color:#8f897b}@keyframes ds-punch{0%{transform:scale(.55)}100%{transform:scale(1)}}@media (prefers-reduced-motion:reduce){.ds-check,.ds-title{transition:none;animation:none}}"
+    },
+    {
+      "name": "Errata Slip",
+      "kind": "custom",
+      "refersTo": "errata-slip",
+      "description": "Overdue as a vermilion slip tucked onto the Homework leaf.",
+      "html": "<button class=\"ds-slip\">2 overdue · tap to see</button>",
+      "css": ".ds-slip{background:#c8321f;color:#fff;border:0;border-radius:1px;padding:5px 14px 5px 12px;font:700 13px Archivo,sans-serif;cursor:pointer;transform:rotate(-1.2deg);filter:drop-shadow(0 2px 2px rgb(0 0 0 / .2));clip-path:polygon(0 0,100% 0,calc(100% - 6px) 50%,100% 100%,0 100%)}.ds-slip:hover{transform:rotate(0)}.ds-slip:focus-visible{outline:2px solid #1b1a17;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Open Binder",
+    "overview": "The planner is a ring binder lying open at today's section. Every work area is a milk-white leaf with two punch holes down its bound edge, lying on one coloured section board. The board is bookcloth: a procedural cloth tile (`assets/cloth.png`, 128px, made by `tools/make-cloth.py`) soft-light blended over a deep, low-chroma hue that belongs to the class Brian is in, or heading to. Before and after school, on free periods and evenings the board is slate. At each bell the board changes cloth, and the schedule itself is the binder's tab rail: today's periods as divider tabs, sized by length, coloured by subject, the live one pulled out.\n\nDensity is operational: ruled rows, no floating cards, no tinted wells. Leaves carry content; the board carries only the bar, the tab rail and the link row. Motion is mechanical, like a tab hinge or a hole punch: stepped, short, never smooth, with one eased exception (the board fade at a bell).\n\nThe whole world lives in `tabboard.css`, scoped to `:root:not([data-skin])`; the optional skins in `themes/` are separate alternates and are not part of this system. `app.js` `renderTabs()` sets `data-sect` (board colour), builds `#tabrail`, and sets `data-only` when a tab is picked.",
+    "keyCharacteristics": [
+      "One cloth board per class hue, slate when no class is on; white leaves sit calmly on it all day.",
+      "Punched leaves: two holes on the bound edge show the board's own cloth through the paper.",
+      "The schedule is a physical tab rail on the fore edge; the live class is the extended tab.",
+      "Narrow caps for section heads and tab labels; mono only for times.",
+      "Stepped motion (two frames, 90ms); the board's 600ms fade at a bell is the only eased transition.",
+      "Vermilion means overdue. Nothing is bright yellow."
+    ],
+    "rules": [
+      {
+        "name": "The No Bright Yellow Rule",
+        "body": "Brian rejected bright yellow: it hurts. Every board is deep and low-chroma, and Latin, the warmest subject, sits at ochre-olive on the board and dark ochre on its tab. No new surface, highlight or state may introduce a saturated yellow.",
+        "section": "colors"
+      },
+      {
+        "name": "The Board Is the Class Rule",
+        "body": "The board colour is information, not decoration: it always equals the current or next class's hue (or slate). Never set it for style.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Red Rule",
+        "body": "Vermilion is reserved for overdue and errata. Other warnings use ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tab Caps Rule",
+        "body": "Uppercase spaced Narrow is for things that would be printed on a tab or a section divider: leaf heads, tab labels, chips, row labels. Never for sentences.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono Is a Clock Rule",
+        "body": "Plex Mono sets times. Countdowns and counts use tabular Archivo heavy, not mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hard Edge Is Paper Rule",
+        "body": "A hard offset shadow appears only on leaves and tabs, where it is the thickness of paper or card. Nothing else gets one: not buttons, not chips, not the now-plate.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do set the board only through `data-sect`, from the current or next class, and slate otherwise.",
+      "Do render the board as the cloth tile soft-light blended over the board hue, everywhere the board shows (page, bar, holes, today's cell, punched checks).",
+      "Do put work on leaves: milk paper, 3px corners, two punch holes in a 34px bound gutter, the Leaf shadow.",
+      "Do set section heads and tab labels in Archivo Narrow 700 uppercase with 0.04 to 0.08em tracking, and times in IBM Plex Mono.",
+      "Do move in two steps at 90ms; the 600ms board fade at a bell is the only eased exception, and only after `data-sect-ready`.",
+      "Do keep the live class's tab extended and the board equal to its hue.",
+      "Do draw icons as inline SVG strokes."
+    ],
+    "donts": [
+      "Don't use bright yellow anywhere: no yellow board, highlight, badge or state.",
+      "Don't put a hard offset shadow on anything but leaves and tabs.",
+      "Don't use vermilion for anything but overdue and errata.",
+      "Don't float tinted cards on the board or nest boxed wells inside leaves; rule rows instead.",
+      "Don't ease the world's own motion, and don't let the board fade on page load.",
+      "Don't move a checked item away; it strikes in place.",
+      "Don't apply these rules to the skins in `themes/`; they are separate alternates."
+    ]
+  }
+}

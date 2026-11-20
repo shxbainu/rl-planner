@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#7a1a22">
+<meta name="theme-color" content="#3b4250">
 <title>RL Planner</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a1a22'/%3E%3Ctext x='32' y='43' font-family='Helvetica,Arial,sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3ERL%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..600&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Atkinson+Hyperlegible+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="paper.css">
+<link rel="stylesheet" href="tabboard.css">
 <script>
   // apply the saved skin and light/dark before first paint (?theme=name previews one without saving)
   (function () {
@@ -55,6 +55,8 @@
 
 <div class="gn" id="gn" hidden></div>
 
+<nav class="tabrail" id="tabrail" aria-label="Today's classes: pick one to filter homework" hidden></nav>
+
 <main class="dash">
   <div class="col col-a">
     <section class="panel p-sched" aria-labelledby="sched-h">
@@ -74,13 +76,13 @@
     <section class="panel p-lunch" aria-labelledby="lunch-h">
       <div class="panel-h"><h2 id="lunch-h">Lunch</h2>
         <div class="lunch-nav">
-          <button class="icon-btn sm" type="button" data-lunch="-1" aria-label="Earlier day">‹</button>
+          <button class="icon-btn sm" type="button" data-lunch="-1" aria-label="Earlier day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
           <span id="lunch-day"></span>
-          <button class="icon-btn sm" type="button" data-lunch="1" aria-label="Later day">›</button>
+          <button class="icon-btn sm" type="button" data-lunch="1" aria-label="Later day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
         </div>
       </div>
       <div class="lunch" id="lunch"></div>
-      <a class="lunch-src" href="https://www.sagedining.com/sites/roxburylatin/menu" target="_blank" rel="noopener">Full menu on SAGE ↗</a>
+      <a class="lunch-src" href="https://www.sagedining.com/sites/roxburylatin/menu" target="_blank" rel="noopener">Full menu on SAGE <svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
     </section>
     <section class="panel p-chess" id="chess-box" aria-labelledby="chess-h" hidden>
       <div class="panel-h"><h2 id="chess-h">Daily puzzle</h2><span class="panel-meta" id="chess-meta"></span></div>
@@ -109,9 +111,9 @@
     <div class="panel-h">
       <h2 id="hw-h">Homework</h2>
       <div class="cal-nav">
-        <button class="icon-btn sm" type="button" data-cal="-1" aria-label="Earlier weeks">‹</button>
+        <button class="icon-btn sm" type="button" data-cal="-1" aria-label="Earlier weeks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
         <button class="link" type="button" data-cal="0" id="cal-range"></button>
-        <button class="icon-btn sm" type="button" data-cal="1" aria-label="Later weeks">›</button>
+        <button class="icon-btn sm" type="button" data-cal="1" aria-label="Later weeks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
       </div>
     </div>
     <div class="season" id="season"></div>
@@ -302,7 +304,7 @@
   <div class="g-head">
     <h2 id="g-title" class="sr-only">Game details</h2>
     <div id="g-score"></div>
-    <button class="icon-btn" type="button" id="g-close" aria-label="Close">✕</button>
+    <button class="icon-btn" type="button" id="g-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <div class="seg g-tabs" role="tablist" id="g-tabs">
     <button type="button" data-tab="box" aria-pressed="true">Box score</button>
@@ -315,7 +317,7 @@
 <dialog id="xdlg" class="x-dlg" aria-labelledby="x-dlg-h">
   <div class="x-dlg-head">
     <h2 id="x-dlg-h"></h2>
-    <button class="icon-btn" type="button" id="x-close" aria-label="Close">✕</button>
+    <button class="icon-btn" type="button" id="x-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <div class="x-dlg-body" id="x-dlg-body"></div>
 </dialog>
@@ -328,7 +330,7 @@
     <span class="st-why" id="st-why"></span>
     <span class="st-stats" id="st-stats"></span>
     <button class="st-mo" id="st-motion" type="button" aria-pressed="true" title="Background motion on or off">Motion</button>
-    <button class="st-x" id="st-close" type="button" aria-label="Close study mode (Esc)">✕</button>
+    <button class="st-x" id="st-close" type="button" aria-label="Close study mode (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </header>
   <div class="st-left">
     <section class="st-card st-clock now-card" id="st-clock" aria-live="off"></section>
@@ -358,7 +360,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="app.js"></script>
-<!-- spring physics for the Ink & Paper look (motion.dev); the planner works the same without it -->
+<!-- spring physics for the Tab Board look (motion.dev); the planner works the same without it -->
 <script type="module">
   import { animate, stagger } from "https://cdn.jsdelivr.net/npm/motion@14.9.1/+esm";
   window.Motion = { animate, stagger };

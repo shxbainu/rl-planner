@@ -3,3 +3,9 @@ font-samples/
 news.json
 news_summary.json
 menu.json
+# design tool scratch (mockups, screenshots, pick history); keep surfaces/, design.json, config.json
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/questions/
+.impeccable/reference/
+.impeccable/hook.cache.json

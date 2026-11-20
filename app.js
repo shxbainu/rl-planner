@@ -16,8 +16,8 @@
   let quoteDeck = [], qFilter = "all"; // the quote deck (quotes.json) and the Quotes tab filter
 
   // ---------- storage ----------
-  // localStorage is the store; the sync further down mirrors it to one shared copy online. So two devices can merge, every change
-  // carries a time: done[k] is when it was checked, undone[k] when unchecked, removed[id] when an item or countdown was
+  // localStorage is the store (no sync between devices yet; git history has the old jsonblob sync). Every change
+  // carries a time, so a future sync can merge: done[k] is when it was checked, undone[k] when unchecked, removed[id] when an item or countdown was
   // deleted, lettersAt[date] when a day letter was set or cleared, prefs[name] = { v, t }. Quotes: quotes[id] is that quote's
   // practice progress { lv, step, due, seen, last, t }, myQuotes the ones Brian added, qlog[date] how many he practiced that day.
   function load() {
@@ -27,51 +27,11 @@
       return s ? { ...empty, ...s } : empty;
     } catch { return empty; }
   }
-  let onSave = null; // set by the sync further down, on the live site
   function save() {
     try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
-    onSave?.();
   }
   const stamp = () => new Date().toISOString();
   function setPref(name, v) { state.prefs = { ...state.prefs, [name]: { v, t: stamp() } }; save(); }
-
-  // what syncs (the rest, like the open tab, stays per device), and how two copies merge: for each check-off, item,
-  // countdown, day letter and pref, the newer change wins; a delete or uncheck newer than the item undoes it
-  const SYNCED = ["done", "undone", "manual", "letters", "lettersAt", "countdowns", "removed", "prefs", "notes", "quotes", "myQuotes", "qlog", "focusLog"];
-  const syncedPart = (s) => Object.fromEntries(SYNCED.map((k) => [k, s?.[k] ?? (Array.isArray(state[k]) ? [] : {})]));
-  function mergeState(a, b) {
-    const tm = (v) => (typeof v === "string" ? v : ""), max = (...xs) => xs.map(tm).sort().at(-1) || "";
-    const out = { done: {}, undone: {}, manual: [], letters: {}, lettersAt: {}, countdowns: [], removed: {}, prefs: {}, notes: {}, quotes: {}, myQuotes: [], qlog: {}, focusLog: {} };
-    for (const k of new Set([a.done, b.done, a.undone, b.undone].flatMap((m) => Object.keys(m || {})))) {
-      const on = a.done?.[k] ?? b.done?.[k], onT = max(a.done?.[k], b.done?.[k]), offT = max(a.undone?.[k], b.undone?.[k]);
-      if (on != null && onT >= offT) out.done[k] = onT || on; // a check-off from before times were kept counts as oldest
-      else if (offT) out.undone[k] = offT;
-    }
-    for (const k of new Set([a.removed, b.removed].flatMap((m) => Object.keys(m || {})))) out.removed[k] = max(a.removed?.[k], b.removed?.[k]);
-    const list = (xa = [], xb = [], id) => {
-      const m = new Map(), t = (x) => tm(x.t) || tm(x.added);
-      for (const x of [...xa, ...xb]) { const cur = m.get(x[id]); if (!cur || t(x) > t(cur)) m.set(x[id], x); }
-      return [...m.values()].filter((x) => !(out.removed[x[id]] > t(x)));
-    };
-    out.manual = list(a.manual, b.manual, "uid");
-    out.countdowns = list(a.countdowns, b.countdowns, "id");
-    out.myQuotes = list(a.myQuotes, b.myQuotes, "id");
-    for (const d of new Set([a.qlog, b.qlog].flatMap((m) => Object.keys(m || {})))) out.qlog[d] = Math.max(a.qlog?.[d] || 0, b.qlog?.[d] || 0);
-    for (const d of new Set([a.focusLog, b.focusLog].flatMap((m) => Object.keys(m || {})))) out.focusLog[d] = Math.max(a.focusLog?.[d] || 0, b.focusLog?.[d] || 0);
-    for (const d of new Set([a.letters, b.letters, a.lettersAt, b.lettersAt].flatMap((m) => Object.keys(m || {})))) {
-      const ta = tm(a.lettersAt?.[d]), tb = tm(b.lettersAt?.[d]), from = tb > ta ? b : ta > tb ? a : a.letters?.[d] ? a : b;
-      if (from.letters?.[d]) out.letters[d] = from.letters[d];
-      if (ta || tb) out.lettersAt[d] = max(ta, tb);
-    }
-    // settings, each item's notes / steps / links, and each quote's progress go by the newer edit
-    for (const f of ["prefs", "notes", "quotes"]) {
-      for (const k of new Set([a[f], b[f]].flatMap((m) => Object.keys(m || {})))) {
-        const pa = a[f]?.[k], pb = b[f]?.[k];
-        out[f][k] = !pa ? pb : !pb ? pa : tm(pb.t) > tm(pa.t) ? pb : pa;
-      }
-    }
-    return out;
-  }
 
   // ---------- dates (all local, as YYYY-MM-DD) ----------
   const pad = (n) => String(n).padStart(2, "0");
@@ -201,7 +161,7 @@
     ].filter(Boolean).join("");
     const nm = !done && nextMeeting(it.class);
     const next = nm ? `<span class="next" title="${nm.unsure ? "Based on a guessed day letter" : ""}">next class ${esc(/^(Today|Tomorrow)$/.test(relDay(nm.date)) ? relDay(nm.date).toLowerCase() : relDay(nm.date))} ${esc(nm.time)}${nm.unsure ? "?" : ""}</span>` : "";
-    return `<li class="item${done ? " done" : ""}${major && !done ? " major" : ""}${overdue ? " overdue" : ""}" style="${cc(it.class)}" data-id="${esc(it.id)}">
+    return `<li class="item${done ? " done" : ""}${major && !done ? " major" : ""}${overdue ? " overdue" : ""}" style="${cc(it.class)}" data-c="${cls(it.class).color}" data-id="${esc(it.id)}">
       <input type="checkbox" class="check" ${done ? "checked" : ""} aria-label="Done: ${esc(it.title)}">
       <div class="body" role="button" tabindex="0" aria-label="Open ${esc(it.title)}">
         <span class="title">${esc(it.title)}</span>
@@ -388,6 +348,40 @@
     skinSchedule();
   }
 
+  // Tab Board: the board takes the hue of the class you're in (or heading to), and today's classes are the binder's tabs.
+  function renderTabs(rows, isToday) {
+    const p = periodNow(), seg = p.mode === "class" ? p.seg : p.mode === "passing" || p.mode === "before" ? p.next : null;
+    document.documentElement.dataset.sect = seg?.name ? cls(seg.name).color : "off";
+    if (!document.documentElement.dataset.sectReady) requestAnimationFrame(() => requestAnimationFrame(() => { document.documentElement.dataset.sectReady = "1"; }));
+    const rail = $("#tabrail");
+    if (!rail) return;
+    const tabs = (rows || []).filter((r) => r.kind === "class" || r.kind === "lunch");
+    rail.hidden = !tabs.length;
+    document.documentElement.toggleAttribute("data-rail", !!tabs.length); // a flag, not body:has(), so styles don't recheck the whole page
+    if (!tabs.length) { rail.innerHTML = ""; return; }
+    const m = now().getHours() * 60 + now().getMinutes(), pick = document.documentElement.dataset.only || "";
+    const sig = tabs.map((r) => `${r.name}${isToday && m >= minutes(r.bell.start) && m < minutes(r.bell.end)}`).join() + pick;
+    if (rail.dataset.sig === sig) return;
+    rail.dataset.sig = sig;
+    rail.innerHTML = tabs.map((r) => {
+      const c = r.name && cls(r.name), len = minutes(r.bell.end) - minutes(r.bell.start);
+      const live = isToday && m >= minutes(r.bell.start) && m < minutes(r.bell.end);
+      const past = isToday && m >= minutes(r.bell.end);
+      const label = c ? c.name : "Lunch";
+      return `<button type="button" class="tab${live ? " now" : ""}${past ? " past" : ""}${c && pick === c.color ? " on" : ""}" style="flex:${len};${c ? cc(r.name) : ""}"
+        ${c ? `data-sub="${c.color}" aria-pressed="${pick === c.color}"` : "disabled"} title="${esc(label)} ${r.bell.start}–${r.bell.end}${c ? " · show only this class's homework" : ""}">
+        <b>${esc(c ? c.short || label : label)}</b><small>${r.bell.start}</small></button>`;
+    }).join("");
+  }
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("#tabrail .tab[data-sub]");
+    if (!t) return;
+    const r = document.documentElement, on = r.dataset.only === t.dataset.sub;
+    if (on) delete r.dataset.only; else r.dataset.only = t.dataset.sub;
+    $("#tabrail").dataset.sig = "";
+    renderSchedule();
+  });
+
   function renderSchedule() {
     const t = today(), day = schoolDay(), isToday = day === t;
     const { letter } = letterFor(day);
@@ -396,6 +390,7 @@
     $("#sched-h").textContent = isToday ? "Today" : relDay(day);
     $("#sched-meta").textContent = letter ? (special(day) ? "Special schedule" : `${classes} classes`) : "";
     $("#now-card").innerHTML = nowCard(rows, isToday, day, letter);
+    renderTabs(special(day) ? [] : rows, isToday);
     if (special(day)) {
       $("#timeline").innerHTML = `<li class="empty">Times for this special schedule aren't posted yet.</li>`;
       skinSchedule();
@@ -481,7 +476,7 @@
 
   // Two school weeks (Mon–Fri) of chips by due date; the picked day's full checklist sits underneath.
   let calWeek = 0, selDay = null, showOverdue = false;
-  let notesOpen = false;
+  let notesOpen = false, hwOrder = { key: "", ids: [] };
   $("#hw-notes").addEventListener("toggle", (e) => { notesOpen = e.target.open; }, true);
   function renderHomework() {
     const t = today();
@@ -519,7 +514,10 @@
     let list, head;
     if (showOverdue && overdue.length) { list = overdue; head = "Overdue"; }
     else { showOverdue = false; list = (byDay.get(selDay) || []); head = `${relDay(selDay)}${daysBetween(t, selDay) >= 2 && daysBetween(t, selDay) < 7 ? `, ${fmt(selDay, { month: "short", day: "numeric" })}` : ""}`; }
-    list = [...list].sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type));
+    // the order holds while you work through a day: a checked row is struck where it is, it never jumps away
+    const okey = showOverdue ? "overdue" : selDay;
+    if (hwOrder.key === okey) list = [...list].sort((a, b) => (hwOrder.ids.indexOf(a.id) + 1 || 1e4) - (hwOrder.ids.indexOf(b.id) + 1 || 1e4));
+    else { list = [...list].sort((a, b) => isDone(a) - isDone(b) || MAJOR.has(b.type) - MAJOR.has(a.type)); hwOrder = { key: okey, ids: list.map((i) => i.id) }; }
     const openN = list.filter((i) => !isDone(i)).length;
     $("#ag-h").textContent = head;
     $("#hw-meta").textContent = list.length ? `${openN} of ${list.length} left` : "";
@@ -855,7 +853,7 @@
   function spRenderBar(lofi, live, embed) {
     const el = $("#sp-bar"), dis = spConnected() ? `<button type="button" data-sp="disconnect">Disconnect</button>` : "";
     el.classList.toggle("pasting", embed && spPasting);
-    if (embed && spPasting) { el.innerHTML = `${spForm()}<button class="sp-x" type="button" data-sp="cancel" aria-label="Cancel">✕</button>`; return; }
+    if (embed && spPasting) { el.innerHTML = `${spForm()}<button class="sp-x" type="button" data-sp="cancel" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`; return; }
     if (lofi) {
       const radio = lofiRadio(), why = radio && lofiMode === "auto" ? "YouTube's blocked here · " : "";
       el.innerHTML = `<span class="sp-k own">${radio ? `${why}radio` : LOFI.sub}</span><span class="sp-bar-acts"><button type="button" data-lofi="${radio ? "video" : "radio"}">${radio ? "Try video" : "Radio"}</button></span>`;
@@ -1509,12 +1507,15 @@
   }
 
   // ---------- Daily chess puzzle: Lichess's puzzle of the day, solved right on the board ----------
-  const PZ = { d: null, b: null, step: 0, sel: null, last: null, msg: "", hint: false, busy: false };
-  const GLYPH = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
+  const PZ = { d: null, b: null, step: 0, sel: null, last: null, msg: "", hint: false, busy: false, built: "" };
+  const PZ_NAME = { k: "king", q: "queen", r: "rook", b: "bishop", n: "knight", p: "pawn" };
   const pzSolved = () => { try { return JSON.parse(localStorage.getItem("rlp-pz-solved") || "{}"); } catch { return {}; } };
   const sqRC = (sq) => [8 - +sq[1], "abcdefgh".indexOf(sq[0])];
   const rcSq = (r, c) => "abcdefgh"[c] + (8 - r);
+  const pzWhite = () => PZ.d.puzzle.fen.split(" ")[1] === "w";
   function pzParse(fen) { return fen.split(" ")[0].split("/").map((row) => [...row].flatMap((ch) => (/\d/.test(ch) ? Array(+ch).fill("") : [ch]))); }
+  // pieces: the Cburnett set (CC BY-SA 3.0, via cm-chessboard), one sprite, drawn with <use>
+  const pzPiece = (pc) => pc ? `<svg class="pc" viewBox="0 0 40 40" aria-hidden="true"><use href="assets/chess-pieces.svg#${pc === pc.toUpperCase() ? "w" : "b"}${pc.toLowerCase()}"/></svg>` : "";
   function pzMove(b, uci) {
     const [fr, fc] = sqRC(uci.slice(0, 2)), [tr, tc] = sqRC(uci.slice(2, 4));
     let pc = b[fr][fc];
@@ -1524,58 +1525,161 @@
     b[tr][tc] = pc; b[fr][fc] = "";
     PZ.last = [uci.slice(0, 2), uci.slice(2, 4)];
   }
+  // a played move: the piece glides from its square to the new one (transform only), then the board settles
+  function pzPlay(uci) {
+    const from = $(`#chess [data-sq="${uci.slice(0, 2)}"] .pc`), to = $(`#chess [data-sq="${uci.slice(2, 4)}"]`);
+    pzMove(PZ.b, uci);
+    if (!from || !to || reduced()) return renderChess();
+    const a = from.getBoundingClientRect(), z = to.getBoundingClientRect();
+    from.style.transition = "transform .18s cubic-bezier(.2,.7,.2,1)";
+    from.style.transform = `translate(${z.left - a.left}px,${z.top - a.top}px)`;
+    from.style.zIndex = 2;
+    setTimeout(renderChess, 185);
+  }
   function pzReset() {
     Object.assign(PZ, { b: pzParse(PZ.d.puzzle.fen), step: 0, sel: null, msg: "", hint: false, busy: false });
     PZ.last = PZ.d.puzzle.lastMove ? [PZ.d.puzzle.lastMove.slice(0, 2), PZ.d.puzzle.lastMove.slice(2, 4)] : null;
     renderChess();
   }
+  // the board is built once per puzzle; each update only touches the squares that changed
   function renderChess() {
     const box = $("#chess-box"), el = $("#chess");
     if (!PZ.d) { box.hidden = true; return; }
     box.hidden = false;
-    const pz = PZ.d.puzzle, white = pz.fen.split(" ")[1] === "w", sol = pz.solution, done = PZ.step >= sol.length;
-    const theme = pz.themes.find((x) => /^mateIn\d$/.test(x))?.replace("mateIn", "Mate in ") || ({ crushing: "Win material", advantage: "Get the advantage", equality: "Hold the draw" })[pz.themes.find((x) => ["crushing", "advantage", "equality"].includes(x))] || "Find the best move";
-    $("#chess-meta").textContent = `Rated ${pz.rating}`;
+    const pz = PZ.d.puzzle, white = pzWhite(), sol = pz.solution, done = PZ.step >= sol.length;
+    if (PZ.built !== pz.id) {
+      PZ.built = pz.id;
+      const theme = pz.themes.find((x) => /^mateIn\d$/.test(x))?.replace("mateIn", "Mate in ") || ({ crushing: "Win material", advantage: "Get the advantage", equality: "Hold the draw" })[pz.themes.find((x) => ["crushing", "advantage", "equality"].includes(x))] || "Find the best move";
+      $("#chess-meta").textContent = `Rated ${pz.rating}`;
+      let cells = "";
+      for (let i = 0; i < 64; i++) {
+        const r = white ? Math.floor(i / 8) : 7 - Math.floor(i / 8), c = white ? i % 8 : 7 - (i % 8);
+        cells += `<button type="button" class="${(r + c) % 2 ? "dk" : "lt"}" data-sq="${rcSq(r, c)}">${c === (white ? 0 : 7) ? `<em class="rk">${8 - r}</em>` : ""}${r === (white ? 7 : 0) ? `<em class="fl">${"abcdefgh"[c]}</em>` : ""}<span class="pcs"></span></button>`;
+      }
+      el.innerHTML = `<p class="pz-task"><b>${white ? "White" : "Black"} to move</b> · ${esc(theme)}</p>
+        <div class="pz-board" role="grid" aria-label="Chess board">${cells}</div>
+        <p class="pz-msg" role="status"></p><div class="pz-acts"></div>`;
+    }
     const mine = (pc) => pc && (pc === pc.toUpperCase()) === white;
     const hintSq = PZ.hint && !done ? sol[PZ.step].slice(0, 2) : "";
-    let cells = "";
-    for (let i = 0; i < 64; i++) {
-      const r = white ? Math.floor(i / 8) : 7 - Math.floor(i / 8), c = white ? i % 8 : 7 - (i % 8), sq = rcSq(r, c), pc = PZ.b[r][c];
-      const cls = [(r + c) % 2 ? "dk" : "lt", PZ.sel === sq && "sel", PZ.last?.includes(sq) && "last", hintSq === sq && "hint", mine(pc) && !done && "mine"].filter(Boolean).join(" ");
-      const name = pc ? `${pc === pc.toUpperCase() ? "white" : "black"} ${({ k: "king", q: "queen", r: "rook", b: "bishop", n: "knight", p: "pawn" })[pc.toLowerCase()]}` : "";
-      cells += `<button type="button" class="${cls}" data-sq="${sq}" aria-label="${sq}${name ? `, ${name}` : ""}">${pc ? `<span class="pc ${pc === pc.toUpperCase() ? "w" : "b"}">${GLYPH[pc.toLowerCase()]}\uFE0E</span>` : ""}${c === (white ? 0 : 7) ? `<em class="rk">${8 - r}</em>` : ""}${r === (white ? 7 : 0) ? `<em class="fl">${"abcdefgh"[c]}</em>` : ""}</button>`;
-    }
-    el.innerHTML = `<p class="pz-task"><b>${white ? "White" : "Black"} to move</b> · ${esc(theme)}</p>
-      <div class="pz-board${PZ.msg === "wrong" ? " nope" : ""}" role="grid" aria-label="Chess board">${cells}</div>
-      <p class="pz-msg" role="status">${done ? `Solved${pzSolved()[pz.id] === "shown" ? " (with the answer shown)" : ""}. Nice.` : PZ.msg === "wrong" ? "Not that one. Try another move." : PZ.msg === "good" ? "Yes! Keep going." : "Click a piece, then where it goes."}</p>
-      <div class="pz-acts">${done ? `<button class="btn" type="button" data-pz="reset">Play it again</button>` : `<button class="btn" type="button" data-pz="hint">Hint</button><button class="btn" type="button" data-pz="show">Show answer</button>`}<a class="link" href="https://lichess.org/training/${encodeURIComponent(pz.id)}" target="_blank" rel="noopener">On Lichess ↗</a></div>`;
+    el.querySelectorAll(".pz-board button").forEach((btn) => {
+      const sq = btn.dataset.sq, [r, c] = sqRC(sq), pc = PZ.b[r][c];
+      btn.classList.toggle("sel", PZ.sel === sq);
+      btn.classList.toggle("last", !!PZ.last?.includes(sq));
+      btn.classList.toggle("hint", hintSq === sq);
+      btn.classList.toggle("mine", mine(pc) && !done);
+      if (btn.dataset.pc !== pc) {
+        btn.dataset.pc = pc;
+        btn.querySelector(".pcs").innerHTML = pzPiece(pc);
+        btn.setAttribute("aria-label", `${sq}${pc ? `, ${pc === pc.toUpperCase() ? "white" : "black"} ${PZ_NAME[pc.toLowerCase()]}` : ""}`);
+      }
+    });
+    const board = el.querySelector(".pz-board");
+    board.classList.remove("nope");
+    if (PZ.msg === "wrong") { void board.offsetWidth; board.classList.add("nope"); }
+    el.querySelector(".pz-msg").textContent = done ? `Solved${pzSolved()[pz.id] === "shown" ? " with the answer shown" : ""}.` : PZ.msg === "wrong" ? "Not that one. Try another move." : PZ.msg === "good" ? "Yes. Keep going." : "Click a piece, then the square it moves to.";
+    const acts = done ? `<button class="btn" type="button" data-pz="reset">Play it again</button>` : `<button class="btn" type="button" data-pz="hint">Hint</button><button class="btn" type="button" data-pz="show">Show answer</button>`;
+    const box2 = el.querySelector(".pz-acts");
+    if (box2.dataset.k !== String(done)) { box2.dataset.k = String(done); box2.innerHTML = `${acts}<a class="link" href="https://lichess.org/training/${encodeURIComponent(pz.id)}" target="_blank" rel="noopener">Open on Lichess</a>`; }
   }
   function pzMark(how) { const m = pzSolved(); if (!m[PZ.d.puzzle.id]) { m[PZ.d.puzzle.id] = how; try { localStorage.setItem("rlp-pz-solved", JSON.stringify(m)); } catch {} } }
   function pzReply() { // the other side answers from the solution
     const sol = PZ.d.puzzle.solution;
-    if (PZ.step < sol.length) { PZ.busy = true; setTimeout(() => { pzMove(PZ.b, sol[PZ.step]); PZ.step++; PZ.busy = false; renderChess(); }, 450); }
-    else pzMark("solved");
+    if (PZ.step < sol.length) { PZ.busy = true; setTimeout(() => { pzPlay(sol[PZ.step]); PZ.step++; PZ.busy = false; }, 380); }
+    else { pzMark("solved"); renderChess(); }
   }
   $("#chess").addEventListener("click", (e) => {
     const act = e.target.closest("[data-pz]")?.dataset.pz;
     if (act === "reset") return pzReset();
     if (act === "hint") { PZ.hint = true; return renderChess(); }
     if (act === "show") {
-      pzMark("shown");
-      const run = () => { if (PZ.step < PZ.d.puzzle.solution.length) { pzMove(PZ.b, PZ.d.puzzle.solution[PZ.step]); PZ.step++; renderChess(); setTimeout(run, 650); } };
-      PZ.sel = null; return run();
+      pzMark("shown"); PZ.sel = null;
+      const run = () => { if (PZ.step < PZ.d.puzzle.solution.length) { pzPlay(PZ.d.puzzle.solution[PZ.step]); PZ.step++; setTimeout(run, 520); } else renderChess(); };
+      return run();
     }
+    if (pzDrag.ate) { pzDrag.ate = false; return; } // a drag already handled this press
     const sq = e.target.closest("[data-sq]")?.dataset.sq;
-    const sol = PZ.d?.puzzle.solution;
-    if (!sq || PZ.busy || !sol || PZ.step >= sol.length) return;
-    const white = PZ.d.puzzle.fen.split(" ")[1] === "w", [r, c] = sqRC(sq), pc = PZ.b[r][c];
-    const mine = pc && (pc === pc.toUpperCase()) === white;
-    if (!PZ.sel || (mine && PZ.sel !== sq)) { PZ.sel = mine ? sq : null; PZ.msg = ""; return renderChess(); }
+    if (!sq || !pzLive()) return;
+    if (!PZ.sel || (pzMine(sq) && PZ.sel !== sq)) { PZ.sel = pzMine(sq) ? sq : null; PZ.msg = ""; return renderChess(); }
     if (PZ.sel === sq) { PZ.sel = null; return renderChess(); }
-    const want = sol[PZ.step];
-    if (PZ.sel + sq === want.slice(0, 4)) { pzMove(PZ.b, want); PZ.step++; PZ.sel = null; PZ.hint = false; PZ.msg = "good"; renderChess(); pzReply(); }
-    else { PZ.sel = null; PZ.msg = "wrong"; renderChess(); }
+    pzTry(PZ.sel, sq, false);
   });
+  const pzLive = () => { const sol = PZ.d?.puzzle.solution; return !PZ.busy && sol && PZ.step < sol.length; };
+  const pzMine = (sq) => { const [r, c] = sqRC(sq), pc = PZ.b[r][c]; return !!pc && (pc === pc.toUpperCase()) === pzWhite(); };
+  // one move attempt, from a click pair or a drop; a dropped piece is already on its square, so it doesn't glide again
+  function pzTry(from, to, dropped) {
+    const want = PZ.d.puzzle.solution[PZ.step];
+    PZ.sel = null;
+    if (from + to === want.slice(0, 4)) {
+      PZ.hint = false; PZ.msg = "good";
+      if (dropped) { pzMove(PZ.b, want); renderChess(); } else pzPlay(want);
+      PZ.step++; pzReply();
+    } else { PZ.msg = "wrong"; renderChess(); }
+  }
+  // drag and drop like any chess site: the piece follows the pointer (mouse, pen or finger), lands where it's dropped,
+  // and slides back home if the drop isn't the move. A press without movement stays a click.
+  const pzDrag = { on: false, ate: false };
+  $("#chess").addEventListener("pointerdown", (e) => {
+    const btn = e.target.closest(".pz-board [data-sq]");
+    if (!btn || e.button > 0 || !pzLive() || !pzMine(btn.dataset.sq)) return;
+    const pc = btn.querySelector(".pc");
+    if (!pc) return;
+    Object.assign(pzDrag, { from: btn.dataset.sq, btn, pc, x: e.clientX, y: e.clientY, id: e.pointerId, on: false, over: null });
+    try { btn.setPointerCapture(e.pointerId); } catch {} // a stale pointer id; the drag still works without capture
+  });
+  $("#chess").addEventListener("pointermove", (e) => {
+    const d = pzDrag;
+    if (!d.btn || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.on) {
+      if (Math.hypot(dx, dy) < 4) return;
+      d.on = true;
+      d.pc.classList.add("drag");
+      d.btn.closest(".pz-board").classList.add("dragging");
+      if (PZ.sel !== d.from) { PZ.sel = d.from; PZ.msg = ""; renderChess(); }
+    }
+    // pointermove can fire far faster than the screen; move the piece once per frame
+    d.px = e.clientX; d.py = e.clientY;
+    if (d.raf) return;
+    d.raf = requestAnimationFrame(() => {
+      d.raf = 0;
+      if (!d.on || !d.pc) return;
+      d.pc.style.transform = `translate3d(${d.px - d.x}px,${d.py - d.y}px,0) scale(1.12)`;
+      const over = document.elementFromPoint(d.px, d.py)?.closest(".pz-board [data-sq]") || null;
+      if (over !== d.over) { d.over?.classList.remove("drop"); over?.classList.add("drop"); d.over = over; }
+    });
+  });
+  function pzDrop(e, cancel) {
+    const d = pzDrag;
+    if (!d.btn || e.pointerId !== d.id) return;
+    const board = d.btn.closest(".pz-board");
+    d.btn = null;
+    if (d.raf) { cancelAnimationFrame(d.raf); d.raf = 0; }
+    board?.classList.remove("dragging");
+    // the drop square is wherever the pointer is now, even if the last frame hadn't run yet
+    const at = document.elementFromPoint(e.clientX, e.clientY)?.closest(".pz-board [data-sq]");
+    if (at) d.over = at;
+    d.over?.classList.remove("drop");
+    if (!d.on) return; // a plain press: the click handler takes it
+    d.ate = true;
+    setTimeout(() => { d.ate = false; }, 0);
+    d.pc.classList.remove("drag");
+    const to = !cancel && d.over?.dataset.sq;
+    if (to && to !== d.from) {
+      const want = PZ.d.puzzle.solution[PZ.step];
+      if (d.from + to === want.slice(0, 4)) {
+        const a = d.over.getBoundingClientRect(), z = d.pc.closest("[data-sq]").getBoundingClientRect();
+        d.pc.style.transform = `translate(${a.left - z.left}px,${a.top - z.top}px)`; // settle onto the square
+        return pzTry(d.from, to, true);
+      }
+    }
+    // wrong square or off the board: slide home, then report it
+    d.pc.style.transition = reduced() ? "" : "transform .16s cubic-bezier(.2,.7,.2,1)";
+    d.pc.style.transform = "";
+    setTimeout(() => { d.pc.style.transition = ""; if (to && to !== d.from) pzTry(d.from, to, true); }, reduced() ? 0 : 160);
+  }
+  $("#chess").addEventListener("pointerup", (e) => pzDrop(e, false));
+  $("#chess").addEventListener("pointercancel", (e) => pzDrop(e, true));
   async function loadChess() {
     const t = today();
     let cached = null;
@@ -1617,21 +1721,18 @@
     save();
   }
 
+  let hwSoon = 0;
   document.addEventListener("change", (e) => {
     if (e.target.matches(".check")) {
+      // instant: the tick draws (CSS) and the row is struck in place; counts and the calendar catch up a beat later
       const li = e.target.closest(".item");
       const id = li.dataset.id, on = e.target.checked;
       li.classList.toggle("done", on);
       setDone(id, on);
-      if (mo()) checkOff(li, e.target);
-      else {
-        li.style.setProperty("--rnd", (Math.random() * 2 - 1).toFixed(2));
-        li.classList.add("leaving");
-        setTimeout(renderHomework, leaveMs());
-      }
+      clearTimeout(hwSoon);
+      hwSoon = setTimeout(renderHomework, 220);
       if (on) {
-        toast("Moved to Done", () => { setDone(id, false); renderHomework(); });
-        // finished everything due that day? celebrate a little
+        toast("Checked off", () => { setDone(id, false); renderHomework(); });
         const day = allItems().find((i) => i.id === id)?.due;
         const left = allItems().filter((i) => i.due === day && !isDone(i)).length;
         if (day && !left) toast(`Everything due ${relDay(day).toLowerCase()} is done`);
@@ -1658,7 +1759,7 @@
 
   // ---------- one assignment, opened: notes, steps, links and photos ----------
   // Tap a row (not its checkbox), a Tests row or a Next up chip: a drawer on laptops, a sheet from the bottom on phones.
-  // Notes, steps and links live in state.notes[item id], so they sync and outlast Muse's refreshes; photos are big, so
+  // Notes, steps and links live in state.notes[item id], so they outlast Muse's refreshes; photos are big, so
   // they're shrunk and kept in this browser's IndexedDB only.
   const noteOf = (id) => ({ text: "", steps: [], links: [], ...(state.notes?.[id] || {}) });
   function setNote(id, patch) {
@@ -1773,7 +1874,7 @@
         ${it.details ? `<p class="ad-det">${esc(it.details)}</p>` : ""}
         <div class="ad-acts">
           <label class="ad-done"><input type="checkbox" class="check" data-ad="done"${done ? " checked" : ""}><span>${done ? "Done" : "Mark done"}</span></label>
-          ${link ? `<a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">${link.topics ? "Topics" : "Bulletin board"} ↗</a>` : ""}
+          ${link ? `<a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">${link.topics ? "Topics" : "Bulletin board"} <svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>` : ""}
           ${it.manual ? `<button type="button" class="btn" data-edit="${esc(it.id)}">Edit</button>` : ""}
         </div>
       </header>
@@ -1801,7 +1902,7 @@
   }
   function renderFound(text) {
     const urls = linkify(text);
-    $("#ad-found").innerHTML = urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))} ↗</a>`).join("");
+    $("#ad-found").innerHTML = urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))} <svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>`).join("");
   }
   function renderSteps() {
     const steps = noteOf(adId).steps;
@@ -2266,7 +2367,7 @@
 
   // ---------- skins: optional looks from themes/, picked in the top bar (index.html applies the saved one before paint) ----------
   const SKIN = "rlp-skin";
-  const SKINS = { original: "Ink & Paper", herbarium: "Herbarium", moss: "Moss", departure: "Departure board", blueprint: "Blueprint", catalog: "Card catalog", nautical: "Nautical chart", almanac: "Seed almanac", arcade: "Arcade", chess: "Chess club", hardwood: "Hardwood" };
+  const SKINS = { original: "Tab Board", herbarium: "Herbarium", moss: "Moss", departure: "Departure board", blueprint: "Blueprint", catalog: "Card catalog", nautical: "Nautical chart", almanac: "Seed almanac", arcade: "Arcade", chess: "Chess club", hardwood: "Hardwood" };
   const V = new URL(document.currentScript.src).searchParams.get("v") || "";
   const skinNow = () => root.dataset.skin || "original";
   function setSkin(name, remember = true) {
@@ -2295,19 +2396,18 @@
     sel.value = skinNow();
     sel.onchange = () => { setSkin(sel.value); skinSels.forEach((o) => { o.value = sel.value; }); };
   });
-  // the Nov 2026 redesign lives in Ink & Paper, so every device lands there once (any skin can be picked again after);
-  // run after start-up so everything setSkin redraws exists. The pref it saves is newer, so sync carries it to other devices.
+  // the Nov 18 2026 redesign lives in Tab Board, so every device lands there once (any skin can be picked again after);
+  // run after start-up so everything setSkin redraws exists.
   setTimeout(() => {
     try {
-      if (localStorage.getItem("rlp-ink-paper-1")) return;
-      localStorage.setItem("rlp-ink-paper-1", "1");
+      if (localStorage.getItem("rlp-tab-board-1")) return;
+      localStorage.setItem("rlp-tab-board-1", "1");
       if (skinNow() !== "original") { setSkin("original"); skinSels.forEach((o) => { o.value = "original"; }); }
     } catch {}
   }, 0);
 
   const reduced = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
   // a skin can hold a checked row on screen a moment for its stamp (--leave-ms in its CSS)
-  const leaveMs = () => reduced() ? 220 : parseInt(getComputedStyle(root).getPropertyValue("--leave-ms")) || 220;
 
   // split text into one tile per character; tiles whose character changed since `prev` get .flip
   function flaps(el, text, prev) {
@@ -3128,73 +3228,7 @@
     openCmd();
   });
 
-  // ---------- sync: one shared copy for every device that opens the site (the planner is Brian's alone) ----------
-  // A JSON blob on jsonblob.com holds the synced part of the state, no sign-in. Each visit merges it in; each change
-  // merges and writes it back a moment later; while the page is open it picks up the other device's changes every
-  // 20 seconds. localStorage stays the real store, so offline (or if the blob were ever gone) nothing is lost.
-  // Only the live site syncs, so a local preview's test check-offs never reach it.
-  const SYNC_URL = ""; // https://jsonblob.com/api/jsonBlob/<id>
-  const syncURL = (() => {
-    const q = new URLSearchParams(location.search).get("syncurl"); // a local stand-in, for testing the preview
-    if (q && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)) return q;
-    return location.hostname === "shxbainu.github.io" ? SYNC_URL : "";
-  })();
-  // a stable string for comparing two copies (key order doesn't matter)
-  const canon = (v) => JSON.stringify(v, (k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort()) : x));
-  // take a merged copy: save it here, redraw, and apply settings picked on the other device
-  function syncApply(next) {
-    const before = state.prefs || {};
-    state = { ...state, ...next };
-    try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
-    const changed = (k) => state.prefs?.[k] && state.prefs[k].t !== before[k]?.t;
-    if (changed("skin") && SKINS[state.prefs.skin.v]) {
-      setSkin(state.prefs.skin.v, false);
-      try { localStorage.setItem(SKIN, state.prefs.skin.v); } catch {}
-      document.querySelectorAll(".skin-select").forEach((o) => { o.value = state.prefs.skin.v; });
-    }
-    if (changed("theme")) { root.dataset.theme = state.prefs.theme.v; try { localStorage.setItem(THEME, state.prefs.theme.v); } catch {} paintThemeBtn(); spRender(); }
-    if (changed("focus") && ST_PRESETS[state.prefs.focus.v]) {
-      try { localStorage.setItem("rlp-focus", state.prefs.focus.v); } catch {}
-      if (!st.focus.endsAt) Object.assign(st.focus, { preset: state.prefs.focus.v, phase: "focus", left: ST_PRESETS[state.prefs.focus.v][0] * 60e3, round: 1 });
-    }
-    if (changed("spClient") && !spConnected()) { spA = { ...spA, client: state.prefs.spClient.v }; spSaveAuth(); }
-    if (schedule) render();
-  }
-  let syncTimer, syncBusy = false, syncAgain = false, lastCloud = null;
-  async function syncNow() {
-    clearTimeout(syncTimer);
-    if (!syncURL) return;
-    if (syncBusy) { syncAgain = true; return; }
-    syncBusy = true;
-    try {
-      const r = await fetch(syncURL, { cache: "no-store", headers: { Accept: "application/json" } });
-      if (!r.ok) throw new Error(`sync read ${r.status}`);
-      const got = await r.json(), remote = got && typeof got.done === "object" && Array.isArray(got.manual) ? got : null;
-      const local = syncedPart(state), merged = remote ? mergeState(local, remote) : local;
-      if (canon(merged) !== canon(local)) syncApply(merged);
-      if (!remote || canon(merged) !== canon(remote)) {
-        const w = await fetch(syncURL, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(merged) });
-        if (!w.ok) throw new Error(`sync write ${w.status}`);
-      }
-      lastCloud = merged;
-    } catch (e) { console.warn("sync: will try again", e.message); } // offline or the service is down
-    syncBusy = false;
-    if (syncAgain) { syncAgain = false; syncNow(); }
-  }
-  if (syncURL) {
-    onSave = () => { clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, 1200); };
-    syncNow();
-    setInterval(() => { if (!document.hidden) syncNow(); }, 20_000);
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) syncNow(); });
-    addEventListener("online", syncNow);
-    // closing the tab right after a change: send it on the way out (merged with the last copy seen)
-    addEventListener("pagehide", () => {
-      if (!syncTimer || !lastCloud) return;
-      try { fetch(syncURL, { method: "PUT", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(mergeState(syncedPart(state), lastCloud)) }); } catch {}
-    });
-  }
-
-  // Laptops (Ink & Paper): Homework on the left, the day on the right (schedule, weather, next up, quote, links, music),
+  // Laptops (Tab Board): Homework on the left, the day on the right (schedule, weather, next up, quote, links, music),
   // and everything else as open cards packed in columns underneath: lunch, the Week/Tests/Quotes box, sports,
   // fantasy, news and countdowns. Nothing hides behind a tab nobody opens, and the two columns end near each other.
   // Phones and skins keep the original arrangement; each moved element goes back to the exact spot it came from.
@@ -3229,7 +3263,7 @@
   matchMedia("(min-width:900px)").addEventListener("change", placeFeed);
 
   // ---------- motion: spring physics from Motion (motion.dev), loaded as a module in index.html ----------
-  // Only on the Ink & Paper look (skins have their own effects), never with reduced motion, and not in a hidden tab
+  // Only on the Tab Board look (skins have their own effects), never with reduced motion, and not in a hidden tab
   // (it pauses animations, which would leave things mid-fade). Without Motion
   // (offline, blocked CDN) every change below still happens, just instantly.
   const mo = () => (window.Motion && !root.dataset.skin && !document.hidden && !matchMedia("(prefers-reduced-motion:reduce)").matches ? window.Motion : null);
@@ -3311,24 +3345,6 @@
     settle(m.animate(els, { opacity: 0, x: -dist * dir }, { duration: 0.12, ease: "easeIn" }), () => {
       update();
       m.animate(els, { opacity: [0, 1], x: [dist * 1.3 * dir, 0] }, spring(0.38, 0.12));
-    });
-  }
-
-  // checking off: the box squishes, the tick draws (CSS), the title is struck, the row slides away, the rest close up
-  function checkOff(li, box) {
-    const m = mo();
-    m.animate(box, { scale: [0.8, 1] }, spring(0.25, 0.5));
-    setTimeout(() => settle(m.animate(li, { x: 26, opacity: 0 }, spring(0.3, 0)), () => flip(renderHomework)), 300);
-  }
-  function flip(update) {
-    const m = mo(), key = (el) => `${el.closest("ul")?.id}:${el.dataset.id}`, before = new Map();
-    document.querySelectorAll(".p-hw .item[data-id]").forEach((el) => before.set(key(el), el.getBoundingClientRect().top));
-    update();
-    if (!m) return;
-    document.querySelectorAll(".p-hw .item[data-id]").forEach((el) => {
-      const top = before.get(key(el));
-      if (top == null) m.animate(el, { opacity: [0, 1], y: [-6, 0] }, spring(0.35, 0.1));
-      else if (Math.abs(top - el.getBoundingClientRect().top) > 1) m.animate(el, { y: [top - el.getBoundingClientRect().top, 0] }, spring(0.35, 0.1));
     });
   }
 

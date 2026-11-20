@@ -1107,9 +1107,14 @@ dialog.qp{width:min(680px,calc(100vw - 24px));max-width:none;max-height:calc(100
 .pz-board .sel{box-shadow:inset 0 0 0 3px #7a1a22,inset 0 0 0 100px rgb(122 26 34 / .14)}
 .pz-board .hint{box-shadow:inset 0 0 0 3px #2c7a4b}
 .pz-board .mine:hover{filter:brightness(1.06)}
-.pz-board .pc{font-size:clamp(22px,7.5vw,34px);line-height:1;pointer-events:none;font-family:"Segoe UI Symbol","Apple Symbols","DejaVu Sans",serif}
-.pz-board .pc.w{color:#fbf6ec;-webkit-text-stroke:1.1px #2a211c;text-shadow:0 1px 1px rgb(0 0 0 / .25)}
-.pz-board .pc.b{color:#231b17;text-shadow:0 1px 0 rgb(255 255 255 / .18)}
+/* pieces are SVG (assets/chess-pieces.svg); a played move translates the svg, so it sits above the squares */
+.pz-board .pcs{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.pz-board .pc{position:relative;width:88%;height:88%;pointer-events:none;filter:drop-shadow(0 1px 1px rgb(0 0 0 / .28))}
+.pz-board{touch-action:none;user-select:none;-webkit-user-select:none}
+.pz-board .mine{cursor:grab}
+.pz-board .pc.drag{z-index:5;filter:none;will-change:transform}
+.pz-board.dragging,.pz-board.dragging button{cursor:grabbing}
+.pz-board .drop{box-shadow:inset 0 0 0 3px rgb(0 0 0 / .45)}
 .pz-board em{position:absolute;font:700 8.5px/1 var(--ui,system-ui);font-style:normal;opacity:.6;pointer-events:none}
 .pz-board .lt em{color:#8b6a4c}.pz-board .dk em{color:#f3e9d6}
 .pz-board .rk{left:2px;top:2px}.pz-board .fl{right:2px;bottom:2px}

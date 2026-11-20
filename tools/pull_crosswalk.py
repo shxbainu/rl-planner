@@ -229,7 +229,7 @@ def pair_up(new, old):
 
 def keep_titles(data):
     """Check-offs are keyed by class + title + due, so a reworded title would drop Brian's tick.
-    When Muse's file rewords an assignment the repo already has, keep the repo's title and due date, and never
+    When Muse's file rewords an assignment the repo already has, keep the repo's title (but Muse's due date), and never
     let a quiz or test slip to plain homework. Also keep special days Muse left out, and anything due after
     the last date Muse's file covers (exams past the marking period)."""
     try:
@@ -239,9 +239,10 @@ def keep_titles(data):
         return data
     old = repo.get("assignments", [])
     for a, b in pair_up(data["assignments"], old):
-        if a["title"] != b["title"] or a["due"] != b["due"]:
-            print(f"  kept title: {a['class']} {a['title']!r} {a['due']} -> {b['title']!r} {b['due']}")
-        a["title"], a["due"] = b["title"], b["due"]
+        if a["title"] != b["title"]:
+            print(f"  kept title: {a['class']} {a['title']!r} -> {b['title']!r}")
+        # the title is kept so a reworded item keeps its tick; the due date is Muse's, since a postponed quiz must move
+        a["title"] = b["title"]
         if b.get("type") in MAJOR:
             a["type"] = b["type"]
     data["special"] = {**repo.get("special", {}), **data.get("special", {})}
