@@ -5,7 +5,7 @@
    "opp": "vs MIN",
    "player": "Mike Evans",
    "points": null,
-   "proj": 12.05,
+   "proj": 11.5,
    "slot": "BE",
    "status": "Q",
    "team": "SF"
@@ -15,63 +15,63 @@
    "opp": "vs BAL",
    "player": "Bryce Young",
    "points": null,
-   "proj": 17.36,
+   "proj": 17.4,
    "slot": "BE",
    "status": "",
    "team": "CAR"
   },
   {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "@ PHI",
-   "player": "Jaylen Warren",
+   "kickoff": "2026-11-22T20:20:00-05:00",
+   "opp": "@ SF",
+   "player": "Vikings",
    "points": null,
-   "proj": 15.68,
+   "proj": 4.5,
    "slot": "BE",
    "status": "",
-   "team": "PIT"
+   "team": "MIN"
   },
   {
    "kickoff": "2026-11-23T20:15:00-05:00",
    "opp": "vs CIN",
    "player": "Rachaad White",
    "points": null,
-   "proj": 7.71,
+   "proj": 7.7,
    "slot": "BE",
-   "status": "",
+   "status": "Q",
    "team": "WSH"
-  },
-  {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "@ CHI",
-   "player": "Jordyn Tyson",
-   "points": null,
-   "proj": 11.74,
-   "slot": "BE",
-   "status": "",
-   "team": "NO"
-  },
-  {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "vs NO",
-   "player": "Bears",
-   "points": null,
-   "proj": 6.01,
-   "slot": "BE",
-   "status": "",
-   "team": "CHI"
   },
   {
    "kickoff": "2026-11-22T16:25:00-05:00",
    "opp": "@ DEN",
    "player": "Fernando Mendoza",
    "points": null,
-   "proj": 14.41,
+   "proj": 14.4,
    "slot": "BE",
    "status": "",
    "team": "LV"
+  },
+  {
+   "kickoff": null,
+   "opp": "BYE",
+   "player": "Bijan Robinson",
+   "points": null,
+   "proj": null,
+   "slot": "BE",
+   "status": "BYE",
+   "team": "ATL"
+  },
+  {
+   "kickoff": "2026-11-22T16:05:00-05:00",
+   "opp": "vs NYJ",
+   "player": "Cameron Dicker",
+   "points": null,
+   "proj": 10.2,
+   "slot": "BE",
+   "status": "",
+   "team": "LAC"
   }
  ],
- "inactives": "Week 11 has not started; no inactives yet. Thu night game: Spencer Shrader (IND K) at HOU Thu Nov 19, 8:15 PM. Garrett Wilson's Q tag is gone after his Week 10 return (7 catches, 106 yards vs BUF). Mike Evans is Q (Achilles) and may practice this week per Shanahan; if cleared he is a bench/flex option. Note: What's Fay's 67.6 projection is low because several of their starters show '--' for Week 11 (Deshaun Watson, Harold Fannin Jr., Matthew Golden, Packers D/ST, Trey Smack).",
+ "inactives": "Final inactive check 11:37-11:38 AM ET (also checked 10:58 and 11:26 AM): ESPN's fantasy box score still posts no active or inactive designation for any 1 PM starter, so no 1 PM starter can be formally confirmed active; none is listed inactive either. 1 PM starters Gibbs (vs TB), Moore (vs MIA), Tyson (@ CHI), Gordon (@ BUF) all show only 'Sun 1:00 PM' with no tag. Jordyn Tyson (chest) has no designation for Sun @ CHI. Mike Evans (Q, Achilles, bench) is reportedly ready to return Sun night vs MIN (8:20 PM). Rachaad White (Q, heel, bench) is questionable for Mon vs CIN. Bijan Robinson is on bye in Week 11. Thu night: IND lost 3-26 at HOU; Spencer Shrader finished with 1.0 (1-for-3 FG, proj 9.4). Opponent's Tank Dell has 5.7 from Thu. Note: ESPN's box-score Proj Total is 117.6-116.2 (accounts for Thu actuals); the starter projection rows sum to 126.0-120.9.",
  "league": "FFantasy Football",
  "lineup": [
   {
@@ -79,7 +79,7 @@
    "opp": "vs MIN",
    "player": "Brock Purdy",
    "points": null,
-   "proj": 17.58,
+   "proj": 17.6,
    "slot": "QB",
    "status": "",
    "team": "SF"
@@ -89,7 +89,7 @@
    "opp": "vs TB",
    "player": "Jahmyr Gibbs",
    "points": null,
-   "proj": 21.94,
+   "proj": 21.9,
    "slot": "RB",
    "status": "",
    "team": "DET"
@@ -99,7 +99,7 @@
    "opp": "vs LV",
    "player": "Jonah Coleman",
    "points": null,
-   "proj": 19.39,
+   "proj": 19.4,
    "slot": "RB",
    "status": "",
    "team": "DEN"
@@ -109,30 +109,30 @@
    "opp": "vs MIA",
    "player": "DJ Moore",
    "points": null,
-   "proj": 13.62,
+   "proj": 13.7,
    "slot": "WR",
    "status": "",
    "team": "BUF"
-  },
-  {
-   "kickoff": "2026-11-22T16:05:00-05:00",
-   "opp": "@ LAC",
-   "player": "Garrett Wilson",
-   "points": null,
-   "proj": 13.93,
-   "slot": "WR",
-   "status": "",
-   "team": "NYJ"
   },
   {
    "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "vs MIA",
-   "player": "Dalton Kincaid",
+   "opp": "@ CHI",
+   "player": "Jordyn Tyson",
    "points": null,
-   "proj": 8.59,
+   "proj": 11.8,
+   "slot": "WR",
+   "status": "",
+   "team": "NO"
+  },
+  {
+   "kickoff": "2026-11-22T20:20:00-05:00",
+   "opp": "vs MIN",
+   "player": "George Kittle",
+   "points": null,
+   "proj": 13.1,
    "slot": "TE",
    "status": "",
-   "team": "BUF"
+   "team": "SF"
   },
   {
    "kickoff": "2026-11-22T13:00:00-05:00",
@@ -146,74 +146,74 @@
   },
   {
    "kickoff": "2026-11-22T20:20:00-05:00",
-   "opp": "@ SF",
-   "player": "Vikings",
+   "opp": "vs MIN",
+   "player": "49ers",
    "points": null,
-   "proj": 4.47,
+   "proj": 5.4,
    "slot": "D/ST",
    "status": "",
-   "team": "MIN"
+   "team": "SF"
   },
   {
    "kickoff": "2026-11-19T20:15:00-05:00",
    "opp": "@ HOU",
    "player": "Spencer Shrader",
-   "points": null,
-   "proj": 9.38,
+   "points": 1.0,
+   "proj": 9.4,
    "slot": "K",
    "status": "",
    "team": "IND"
   }
  ],
  "matchup": {
-  "my_proj": 122.69,
-  "my_score": 0.0,
-  "opp_proj": 67.6,
-  "opp_score": 0.0,
+  "my_proj": 117.6,
+  "my_score": 1.0,
+  "opp_proj": 116.2,
+  "opp_score": 5.7,
   "opponent": "What's Fay (Dominic Bober)"
  },
  "moves": [
   {
    "by": "Claude",
    "kind": "start/sit",
-   "text": "Start the Bears D/ST (vs NO, 1:00 PM) over the Vikings D/ST (vs SF in Mexico City, Sun 8:20 PM)",
-   "why": "The Bears project 6.01 at home against a Saints offense that scored 17 against Carolina last week. The Vikings project 4.47, the lowest in the lineup, against Purdy, who just threw for 389 yards and 3 TDs at Dallas (ESPN). Starting the Vikings also bets against your own QB in the same game. Both D/STs are healthy. Make the swap before the Bears lock at 1 PM Sunday."
+   "text": "Keep Ollie Gordon II at FLEX over Mike Evans; Evans has no late-swap path this week",
+   "why": "Gordon (13.8 @ BUF) and every other WR/FLEX starter lock at 1 PM, while SF's inactives come out about 6:50 PM, well after that. To use Evans (11.5 vs MIN, 8:20 PM) you'd have to start him before 1 PM, on a Q tag (Achilles) after one limited practice Thu, his first since Week 6. ESPN's only update says he's 'reportedly ready to return' (Rapoport). He projects 2.3 below Gordon, so leave him benched."
   },
   {
    "by": "Claude",
-   "kind": "trade",
-   "text": "The Bijan + Kittle offer is still worth it, even though Bijan is on bye this week",
-   "why": "ESPN lists ATL on bye in Week 11, so Bijan scores 0 this week if the offer is accepted before it expires (~Wed Nov 19, 4:55 PM). That costs little this week: Gibbs, Coleman and Gordon fill RB/FLEX, Kittle (healthy, 6-74 Sun) replaces Kincaid at TE, and Tyson (11.74, NO @ CHI 1:00 PM) replaces Wilson (13.93), a drop of about 2 points against an opponent projected at 67.6. From Week 12 on you get an RB1 and a TE1. Note that Purdy, Kittle and Evans would all play SF's Sunday night game."
+   "kind": "start/sit",
+   "text": "Keep Brock Purdy at QB over Bryce Young (17.6 vs 17.4); decide before 1 PM if you want Young",
+   "why": "ESPN lists both as healthy. Young had a sore foot Wed but practiced fully. Young (vs BAL) locks at 1 PM, and once it passes Purdy (vs MIN in Mexico City, 8:20 PM) is the only option. The 0.2-point gap is noise. Purdy also stacks with Kittle and the 49ers D/ST in the same game, which helps you most in a matchup projected 117.6-116.2."
   },
   {
    "by": "Claude",
    "kind": "waiver",
-   "text": "If the trade goes through, use the open roster spot on a WR: check waivers for one playing Sunday",
-   "why": "The deal sends three players and brings back two, which frees one roster spot. After Wilson leaves, the WRs are Moore, Tyson and Evans (Q, Achilles; ESPN return date Nov 22; Shanahan 'hoping to' have him practice this week). Even if Evans plays, his Sunday 8:20 PM kickoff means you'd want a healthy fallback. That kickoff also leaves time to swap him in or out after SF's inactives."
+   "text": "For Week 12, check waivers for a WR and cut Mendoza or the Vikings D/ST after tonight",
+   "why": "Your only WRs are Moore, Tyson and Evans (Q). Meanwhile the bench carries 3 QBs (Purdy, Young, Mendoza), 2 D/STs and 2 Ks (Shrader 1-for-3 Thu, Dicker). ESPN shows no byes in Week 12, so the spot is worth more as WR depth. Drop only after Mendoza (4:25 PM) and the Vikings (8:20 PM) have played. Shrader vs Dicker can wait until Muse posts Week 12 projections."
   },
   {
    "by": "Muse",
    "kind": "start/sit",
-   "text": "Keep Jonah Coleman starting at RB2",
-   "why": "19.39 vs LV at home, well above Jaylen Warren's 15.68 at PHI; Coleman is in the lineup after his Week 10 bye."
-  },
-  {
-   "by": "Muse",
-   "kind": "trade",
-   "text": "Pending offer: Bijan Robinson + George Kittle for Warren + Wilson + Kincaid",
-   "why": "Proposed by Brian Nov 17, 4:55 PM, expires ~Nov 19. Upgrades RB2 and TE, but leaves only Tyson (11.74) behind Moore at WR if Wilson goes."
+   "text": "Keep Jordyn Tyson at WR2; he has no injury designation for Sun @ CHI",
+   "why": "Tyson (11.8 @ CHI) was limited earlier in the week with a chest injury but ESPN shows no Q tag and reports no designation for Sunday. If a 1 PM scratch somehow hits, Evans (Q, 11.5 vs MIN, 8:20 PM) is the only WR fallback."
   },
   {
    "by": "Muse",
    "kind": "start/sit",
-   "text": "Watch Mike Evans (Q) practice reports Wed-Fri",
-   "why": "Shanahan hopes Evans practices this week after missing three games with Achilles tendinitis; if cleared (12.05 vs MIN) he is a bench/flex option, but both starting WRs project higher."
+   "text": "No K swap possible: Shrader is locked at 1.0 after Thu; Dicker (10.2 vs NYJ) stays benched",
+   "why": "Shrader went 1-for-3 Thu (IND lost 3-26) and his slot locked when that game started, so the Sun 8:09 AM Dicker add cannot replace him this week. Dicker is a K option for next week if Shrader keeps struggling."
+  },
+  {
+   "by": "Muse",
+   "kind": "waiver",
+   "text": "No waiver move needed; Bijan Robinson returns from bye next week and takes RB2 back",
+   "why": "Coleman (19.4 vs LV) holds RB2 this week while Bijan is on bye. Waiver order was 7 of 12 as of Thu. No trades since Thu."
   }
  ],
  "record": "6-4-0",
  "team": "The Gibbs That Keep On Giving",
- "trades": "PENDING trade proposed by Brian Nov 17, 4:55 PM, expires ~Nov 19, 4:55 PM, with Goon city mets (Kristen Ranere): receive Bijan Robinson (ATL RB) + George Kittle (SF TE), send Jaylen Warren + Garrett Wilson + Dalton Kincaid. Justin Jefferson offers both closed (declined Nov 10) - do not re-offer the Young+Warren core. Transactions: added Fernando Mendoza (LV QB) Wed Nov 11, 3:35 AM (waivers); dropped Malik Washington Tue Nov 10, 6:10 PM; dropped Antonio Williams Tue Nov 10, 3:05 PM. No Brian adds/drops Nov 12-17. Waiver order 9 of 12. Week 10 result: beat I like pizza (Declan) 172.26-147.28, now 6-4-0, 4th of 12.",
- "updated_at": "2026-11-17T18:52:00-05:00",
+ "trades": "Fri Nov 20, 9:30 AM Brian added Jonathon Brooks (CAR RB) from free agency; Sun Nov 22, 8:09 AM he added Cameron Dicker (LAC K, 10.2 vs NYJ) and dropped Brooks to waivers. No trades since Thu Nov 19. Earlier: Bijan/Kittle trade processed Wed Nov 18, 9:10 PM (receive Bijan Robinson + George Kittle, send Jaylen Warren + Garrett Wilson + Dalton Kincaid); Brian added 49ers D/ST Wed Nov 18 and dropped Bears D/ST Thu Nov 19, 7:58 PM. Week 10 result: beat I like pizza (Declan) 172.26-147.28, now 6-4-0, 4th of 12. Thu night: Shrader 1.0 final (IND lost 3-26 at HOU); opponent's Tank Dell 5.7.",
+ "updated_at": "2026-11-22T11:40:00-05:00",
  "week": 11,
- "source": "Muse, Crosswalk post n8g5a7 (Tue Nov 17)"
+ "source": "Muse, Crosswalk post b2v1ke (Sun Nov 22)"
 }
