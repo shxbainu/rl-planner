@@ -1,219 +1,203 @@
 {
  "bench": [
   {
-   "kickoff": "2026-11-22T20:20:00-05:00",
-   "opp": "vs MIN",
-   "player": "Mike Evans",
-   "points": null,
-   "proj": 11.5,
-   "slot": "BE",
-   "status": "Q",
-   "team": "SF"
-  },
-  {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "vs BAL",
+   "kickoff": "2026-11-30T20:15:00-05:00",
+   "opp": "@ TB",
    "player": "Bryce Young",
    "points": null,
-   "proj": 17.4,
+   "proj": 14.2,
    "slot": "BE",
    "status": "",
    "team": "CAR"
   },
   {
-   "kickoff": "2026-11-22T20:20:00-05:00",
-   "opp": "@ SF",
+   "kickoff": "2026-11-29T13:00:00-05:00",
+   "opp": "vs ATL",
    "player": "Vikings",
    "points": null,
-   "proj": 4.5,
+   "proj": 6.4,
    "slot": "BE",
    "status": "",
    "team": "MIN"
   },
   {
-   "kickoff": "2026-11-23T20:15:00-05:00",
-   "opp": "vs CIN",
+   "kickoff": "2026-11-29T13:00:00-05:00",
+   "opp": "vs NYJ",
+   "player": "Ollie Gordon II",
+   "points": null,
+   "proj": 14.0,
+   "slot": "BE",
+   "status": "",
+   "team": "MIA"
+  },
+  {
+   "kickoff": "2026-11-29T16:25:00-05:00",
+   "opp": "@ ARI",
    "player": "Rachaad White",
    "points": null,
-   "proj": 7.7,
+   "proj": 1.7,
    "slot": "BE",
-   "status": "Q",
+   "status": "",
    "team": "WSH"
   },
   {
-   "kickoff": "2026-11-22T16:25:00-05:00",
-   "opp": "@ DEN",
+   "kickoff": "2026-11-29T13:00:00-05:00",
+   "opp": "@ CIN",
+   "player": "Jordyn Tyson",
+   "points": null,
+   "proj": 10.4,
+   "slot": "BE",
+   "status": "",
+   "team": "NO"
+  },
+  {
+   "kickoff": "2026-11-29T20:20:00-05:00",
+   "opp": "@ CLE",
    "player": "Fernando Mendoza",
    "points": null,
-   "proj": 14.4,
+   "proj": 16.1,
    "slot": "BE",
    "status": "",
    "team": "LV"
-  },
-  {
-   "kickoff": null,
-   "opp": "BYE",
-   "player": "Bijan Robinson",
-   "points": null,
-   "proj": null,
-   "slot": "BE",
-   "status": "BYE",
-   "team": "ATL"
-  },
-  {
-   "kickoff": "2026-11-22T16:05:00-05:00",
-   "opp": "vs NYJ",
-   "player": "Cameron Dicker",
-   "points": null,
-   "proj": 10.2,
-   "slot": "BE",
-   "status": "",
-   "team": "LAC"
   }
  ],
- "inactives": "Final inactive check 11:37-11:38 AM ET (also checked 10:58 and 11:26 AM): ESPN's fantasy box score still posts no active or inactive designation for any 1 PM starter, so no 1 PM starter can be formally confirmed active; none is listed inactive either. 1 PM starters Gibbs (vs TB), Moore (vs MIA), Tyson (@ CHI), Gordon (@ BUF) all show only 'Sun 1:00 PM' with no tag. Jordyn Tyson (chest) has no designation for Sun @ CHI. Mike Evans (Q, Achilles, bench) is reportedly ready to return Sun night vs MIN (8:20 PM). Rachaad White (Q, heel, bench) is questionable for Mon vs CIN. Bijan Robinson is on bye in Week 11. Thu night: IND lost 3-26 at HOU; Spencer Shrader finished with 1.0 (1-for-3 FG, proj 9.4). Opponent's Tank Dell has 5.7 from Thu. Note: ESPN's box-score Proj Total is 117.6-116.2 (accounts for Thu actuals); the starter projection rows sum to 126.0-120.9.",
+ "inactives": "ESPN Week 12 box-score Injuries section: no Brian players injured this week, no players on bye. No Q/D/O/BYE/IR tag on any starter or bench player (checked Evans, Coleman, White, Tyson). Caveat: the team header shows 'Pending Moves 1' (red badge), but ESPN's Transactions page rendered only its heading and footer on three separate loads, so the pending move's player, action and effective date could NOT be verified; check it in the ESPN app before Thursday.",
  "league": "FFantasy Football",
  "lineup": [
   {
-   "kickoff": "2026-11-22T20:20:00-05:00",
-   "opp": "vs MIN",
+   "kickoff": "2026-11-29T16:25:00-05:00",
+   "opp": "vs SEA",
    "player": "Brock Purdy",
    "points": null,
-   "proj": 17.6,
+   "proj": 18.8,
    "slot": "QB",
    "status": "",
    "team": "SF"
   },
   {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "vs TB",
+   "kickoff": "2026-11-26T13:00:00-05:00",
+   "opp": "vs CHI",
    "player": "Jahmyr Gibbs",
    "points": null,
-   "proj": 21.9,
+   "proj": 25.6,
    "slot": "RB",
    "status": "",
    "team": "DET"
   },
   {
-   "kickoff": "2026-11-22T16:25:00-05:00",
-   "opp": "vs LV",
-   "player": "Jonah Coleman",
+   "kickoff": "2026-11-29T13:00:00-05:00",
+   "opp": "@ MIN",
+   "player": "Bijan Robinson",
    "points": null,
-   "proj": 19.4,
+   "proj": 17.7,
    "slot": "RB",
    "status": "",
-   "team": "DEN"
+   "team": "ATL"
   },
   {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "vs MIA",
+   "kickoff": "2026-11-29T16:25:00-05:00",
+   "opp": "vs SEA",
+   "player": "Mike Evans",
+   "points": null,
+   "proj": 14.9,
+   "slot": "WR",
+   "status": "",
+   "team": "SF"
+  },
+  {
+   "kickoff": "2026-11-26T20:20:00-05:00",
+   "opp": "vs KC",
    "player": "DJ Moore",
    "points": null,
-   "proj": 13.7,
+   "proj": 12.4,
    "slot": "WR",
    "status": "",
    "team": "BUF"
   },
   {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "@ CHI",
-   "player": "Jordyn Tyson",
-   "points": null,
-   "proj": 11.8,
-   "slot": "WR",
-   "status": "",
-   "team": "NO"
-  },
-  {
-   "kickoff": "2026-11-22T20:20:00-05:00",
-   "opp": "vs MIN",
+   "kickoff": "2026-11-29T16:25:00-05:00",
+   "opp": "vs SEA",
    "player": "George Kittle",
    "points": null,
-   "proj": 13.1,
+   "proj": 13.0,
    "slot": "TE",
    "status": "",
    "team": "SF"
   },
   {
-   "kickoff": "2026-11-22T13:00:00-05:00",
-   "opp": "@ BUF",
-   "player": "Ollie Gordon II",
+   "kickoff": "2026-11-27T15:00:00-05:00",
+   "opp": "@ PIT",
+   "player": "Jonah Coleman",
    "points": null,
-   "proj": 13.8,
+   "proj": 16.0,
    "slot": "FLEX",
    "status": "",
-   "team": "MIA"
+   "team": "DEN"
   },
   {
-   "kickoff": "2026-11-22T20:20:00-05:00",
-   "opp": "vs MIN",
+   "kickoff": "2026-11-29T16:25:00-05:00",
+   "opp": "vs SEA",
    "player": "49ers",
    "points": null,
-   "proj": 5.4,
+   "proj": 7.5,
    "slot": "D/ST",
    "status": "",
    "team": "SF"
   },
   {
-   "kickoff": "2026-11-19T20:15:00-05:00",
-   "opp": "@ HOU",
-   "player": "Spencer Shrader",
-   "points": 1.0,
-   "proj": 9.4,
+   "kickoff": "2026-11-29T16:05:00-05:00",
+   "opp": "vs NE",
+   "player": "Cameron Dicker",
+   "points": null,
+   "proj": 9.5,
    "slot": "K",
    "status": "",
-   "team": "IND"
+   "team": "LAC"
   }
  ],
  "matchup": {
-  "my_proj": 117.6,
-  "my_score": 1.0,
-  "opp_proj": 116.2,
-  "opp_score": 5.7,
-  "opponent": "What's Fay (Dominic Bober)"
+  "my_proj": 135.4,
+  "my_score": 0.0,
+  "opp_proj": 132.0,
+  "opp_score": 0.0,
+  "opponent": "Commissssshhhhhhh (Logan Slitt)"
  },
  "moves": [
   {
    "by": "Claude",
    "kind": "start/sit",
-   "text": "Keep Ollie Gordon II at FLEX over Mike Evans; Evans has no late-swap path this week",
-   "why": "Gordon (13.8 @ BUF) and every other WR/FLEX starter lock at 1 PM, while SF's inactives come out about 6:50 PM, well after that. To use Evans (11.5 vs MIN, 8:20 PM) you'd have to start him before 1 PM, on a Q tag (Achilles) after one limited practice Thu, his first since Week 6. ESPN's only update says he's 'reportedly ready to return' (Rapoport). He projects 2.3 below Gordon, so leave him benched."
-  },
-  {
-   "by": "Claude",
-   "kind": "start/sit",
-   "text": "Keep Brock Purdy at QB over Bryce Young (17.6 vs 17.4); decide before 1 PM if you want Young",
-   "why": "ESPN lists both as healthy. Young had a sore foot Wed but practiced fully. Young (vs BAL) locks at 1 PM, and once it passes Purdy (vs MIN in Mexico City, 8:20 PM) is the only option. The 0.2-point gap is noise. Purdy also stacks with Kittle and the 49ers D/ST in the same game, which helps you most in a matchup projected 117.6-116.2."
+   "text": "Keep Jonah Coleman at FLEX over Ollie Gordon II, and set the holiday slots before Thu 1 PM",
+   "why": "Coleman (16.0 @ PIT) had 24 carries for 111 yards and 3 TDs in Week 11; Gordon (14.0 vs NYJ) had 11 carries. ESPN lists both healthy and there are no Week 12 byes. Three starters lock early: Gibbs Thu 1 PM vs CHI, Moore Thu 8:20 PM vs KC, Coleman Fri 3 PM @ PIT. Gordon and Tyson play Sun 1 PM, so if Coleman pops up on DEN's injury report you can still swap him out before Fri 3 PM."
   },
   {
    "by": "Claude",
    "kind": "waiver",
-   "text": "For Week 12, check waivers for a WR and cut Mendoza or the Vikings D/ST after tonight",
-   "why": "Your only WRs are Moore, Tyson and Evans (Q). Meanwhile the bench carries 3 QBs (Purdy, Young, Mendoza), 2 D/STs and 2 Ks (Shrader 1-for-3 Thu, Dicker). ESPN shows no byes in Week 12, so the spot is worth more as WR depth. Drop only after Mendoza (4:25 PM) and the Vikings (8:20 PM) have played. Shrader vs Dicker can wait until Muse posts Week 12 projections."
+   "text": "I disagree with 'no waiver move': drop Rachaad White and check waivers for a WR",
+   "why": "White projects 1.7 at ARI and only returned two kickoffs Monday (48 yards). Your only WRs are Evans, Moore and Tyson, while the bench holds 3 QBs (Purdy, Mendoza, Young) and 2 D/STs. The roster also shows 15 players after Shrader was dropped, so check ESPN's 'Pending Moves 1' first: if it's a claim it may already fill the open spot. Waiver order is 10 of 12."
   },
   {
    "by": "Muse",
    "kind": "start/sit",
-   "text": "Keep Jordyn Tyson at WR2; he has no injury designation for Sun @ CHI",
-   "why": "Tyson (11.8 @ CHI) was limited earlier in the week with a chest injury but ESPN shows no Q tag and reports no designation for Sunday. If a 1 PM scratch somehow hits, Evans (Q, 11.5 vs MIN, 8:20 PM) is the only WR fallback."
+   "text": "Start Cameron Dicker at K (9.5 vs NE); Spencer Shrader was dropped Tue morning",
+   "why": "Shrader was dropped Tue Nov 24, 7:21 AM after scoring 1.0 in Week 11, so Dicker is now the only K on the roster; Dicker scored 8.0 on the bench in Week 11."
   },
   {
    "by": "Muse",
    "kind": "start/sit",
-   "text": "No K swap possible: Shrader is locked at 1.0 after Thu; Dicker (10.2 vs NYJ) stays benched",
-   "why": "Shrader went 1-for-3 Thu (IND lost 3-26) and his slot locked when that game started, so the Sun 8:09 AM Dicker add cannot replace him this week. Dicker is a K option for next week if Shrader keeps struggling."
+   "text": "Keep Mike Evans at WR1 (14.9 vs SEA); no injury tag on anyone this week",
+   "why": "Evans has no Q tag and ESPN lists no Brian player injured or on bye; Tyson (10.4 @ CIN) stays benched."
   },
   {
    "by": "Muse",
    "kind": "waiver",
-   "text": "No waiver move needed; Bijan Robinson returns from bye next week and takes RB2 back",
-   "why": "Coleman (19.4 vs LV) holds RB2 this week while Bijan is on bye. Waiver order was 7 of 12 as of Thu. No trades since Thu."
+   "text": "No waiver move needed; waiver order is 10 of 12 and no claims processed Nov 22-24",
+   "why": "Full healthy roster, no bye this week, Bijan back from bye at RB2 (17.7 @ MIN). Note: ESPN shows 'Pending Moves 1' but the transactions page would not load, so verify that pending move in the app before Thursday."
   }
  ],
- "record": "6-4-0",
- "team": "The Gibbs That Keep On Giving",
- "trades": "Fri Nov 20, 9:30 AM Brian added Jonathon Brooks (CAR RB) from free agency; Sun Nov 22, 8:09 AM he added Cameron Dicker (LAC K, 10.2 vs NYJ) and dropped Brooks to waivers. No trades since Thu Nov 19. Earlier: Bijan/Kittle trade processed Wed Nov 18, 9:10 PM (receive Bijan Robinson + George Kittle, send Jaylen Warren + Garrett Wilson + Dalton Kincaid); Brian added 49ers D/ST Wed Nov 18 and dropped Bears D/ST Thu Nov 19, 7:58 PM. Week 10 result: beat I like pizza (Declan) 172.26-147.28, now 6-4-0, 4th of 12. Thu night: Shrader 1.0 final (IND lost 3-26 at HOU); opponent's Tank Dell 5.7.",
- "updated_at": "2026-11-22T11:40:00-05:00",
- "week": 11,
- "source": "Muse, Crosswalk post b2v1ke (Sun Nov 22)"
+ "record": "7-4-0",
+ "team": "2016 Golden State Warriors",
+ "trades": "Tue Nov 24, 7:21 AM Brian dropped Spencer Shrader (IND K) from the roster. Sun Nov 22, 8:09 AM he added Cameron Dicker (LAC K) from free agency and dropped Jonathon Brooks (CAR RB) to waivers. Tue Nov 24, 3:03 PM league manager note: team renamed from The Gibbs That Keep On Giving to 2016 Golden State Warriors. No trades since Wed Nov 18 (Bijan/Kittle trade). Week 11 result: beat What's Fay (Dominic Bober) 152.1-142.22, now 7-4-0, 3rd of 12. Week 12 is a rematch vs Commissssshhhhhhh (Logan Slitt, 7-4-0, 4th); Week 1 Brian lost to them 137.0-143.66.",
+ "updated_at": "2026-11-24T18:56:00-05:00",
+ "week": 12,
+ "source": "Muse, Crosswalk post nmcg3c (Tue Nov 24)"
 }
